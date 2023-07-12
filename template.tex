@@ -1,0 +1,200 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Master Thesis Template by Fabian Schär %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Packages and Document Settings %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt,a4paper,titlepage,oneside,english]{article}
+
+%%% Main Packages %%%
+\usepackage[english]{babel}
+%\usepackage[ngerman]{babel} % Use this option for German settings.
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%%% Additional Packages %%%
+\usepackage{cite}
+\usepackage{framed}
+\usepackage{graphicx}
+%\usepackage[german]{fancyref}
+\usepackage[german,hidelinks]{hyperref} %hidelinks
+\usepackage{multirow}
+\usepackage[round]{natbib}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{pst-all} % Not working with Sweave!!!
+
+%%% Math Packages %%%
+\usepackage{amsmath}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{theorem}
+\usepackage{epsfig}
+\usepackage{longtable}
+
+%%% Layout Specifications %%%
+\geometry{a4paper, top=35mm, left=40mm, right=40mm, bottom=45mm,
+headsep=10mm, footskip=12mm}
+
+%%% Parskip Settings %%%
+\setlength{\parskip}{3mm}
+\setlength{\parindent}{0mm}
+
+%%% Document Specifications %%%
+\title{Template Master's Thesis}
+\author{John Doe}
+
+
+%%%%%%%%%%%%%%%%%%
+%%% Title Page %%%
+%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+%\begin{titlepage}
+\begin{center}
+\vspace{1em}
+\large{Master Thesis}\\
+\huge Developing Address Clustering Heuristics for Account-Based Blockchain Networks:\\ An Analysis based on a Specific Address Set \\
+\Large \vspace{1em}
+Dario Thürkauf
+\end{center}
+
+\vspace{1em}
+\normalsize
+\begin{flushleft}
+Supervised by:\\ 
+Prof. Dr. Fabian Schär \\
+Credit Suisse Asset Management (Schweiz) Professor for \\ 
+Distributed Ledger Technologies and Fintech \\
+Center for Innovative Finance, University of Basel
+\end{flushleft}
+
+\vspace{1em}
+\onehalfspacing
+\begin{center}
+\section*{Abstract}
+\end{center}
+Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his.  \\
+\vfill
+\textbf{Keywords:} Keyword 1, Keyword 2, Keyword 3, Keyword 4.\\
+\noindent\textbf{JEL:} X00, X00, X00
+%\end{titlepage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Contents & Declaration%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{gobble}
+
+\newpage
+\pagenumbering{Roman}
+\tableofcontents
+
+\vfill
+\begin{center}
+\includegraphics[width=4cm]{../figures/logo_cif.png}
+\end{center}
+\newpage
+\singlespacing
+%\vspace{-1.5cm}
+\section*{Declaration of Independent Authorship}
+I attest with my signature that I have written this work independently and without outside help. I also attest that the information concerning the sources used in this work is true and complete in every respect. All sources that have been quoted or paraphrased have been marked accordingly. 
+Additionally, I affirm that any text passages written with the help of AI-supported technology are marked as such, including a reference to the AI-supported program used. This paper may be checked for plagiarism and use of AI-supported technology using the appropriate software. I understand that unethical conduct may lead to a grade of 1 or ``fail`` or expulsion from the study program.\\
+
+Dario Thürkauf
+
+\begin{figure}[h!]
+	\centering
+	\hspace{-10cm}
+	\includegraphics[width=3cm]{../figures/signature.jpeg}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\onehalfspacing
+\pagenumbering{arabic}
+
+
+%%%%%%%%%%%%%%%%%%%
+%%% Introduction%%%
+%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+Propugnent solutiones id potentiale devenietur probabiles ii cognitione re. Si majestatis an sequuturum intelligat at im. Ulla ac de ausi vera vita meum tale. Tamen ullas ferre reddi aucta age vel aptum.\footnote{This is a footnote.} Communibus dulcedinem expectabam ima qui sequeretur objectivum. Age pla fal juncta somnis figura. Du caelum si natura quibus. Id omnis nulla fieri et video at falsa. Locusque et sentiens ei ac siquidem to. Istiusmodi ea ut voluntates formaliter. Admittere tantumdem at videlicet si. Ens aperte reddat imo altera quibus nemine. Priorem sternat dormire tes produci quosdam lapidem vel jam per. Mentemque abstinere aggredior percipior hic ita. Non aucupantur per ponderibus dulcedinem non.  \\
+
+%%% Table
+\begin{table}[h!]
+  \center
+  \begin{tabular}{lcc}
+    \hline\hline
+    Header & Header & Header \\ \hline
+    Entry 1 & $0 \leq x<1$ & $\alpha$\\
+    Entry 2 & $x=1$ & $\beta$\\
+    Entry 3 & $x>1$ & $\gamma$\\
+    \hline\hline
+  \end{tabular}
+  \caption{This is a table}
+  \label{tbl:test}
+\end{table}
+%%%
+
+As shown in table \ref{tbl:test}, deum sint fert suum cui voce tam jure. Cui mellis iisdem scient hic cumque vacabo necdum. Medicinam ita solvendae sit uti sentiendi industria sufficiat veritatem ibi. Si cera ea gi ausi vero data ii. Remotam futurus vix sentire cap est una. Certa reges ac dubie ii ab an talem cerae. Flexibile probandum geometras sic est non potestate admonitus vox. Ideoque una revolvo pla virorum mem lapidis nec. Simplex saeculi quidnam is ad. In somni ullam ideas solis ex sanae lapis ad.
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%%% Preliminaries %%%
+%%%%%%%%%%%%%%%%%%%%%
+
+\section{Preliminaries}
+
+
+
+%%%%%%%%%%%%
+%%% Data %%%
+%%%%%%%%%%%%
+
+\section{Data Preparation}
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%%% Data Analysis %%%
+%%%%%%%%%%%%%%%%%%%%%
+
+\section{Data Analysis}
+
+
+%%%%%%%%%%%%%%%%%%
+%%% Discussion %%%
+%%%%%%%%%%%%%%%%%%
+
+\section{Discussion}
+
+
+
+%%%%%%%%%%%%%%%%%%
+%%% Conclusion %%%
+%%%%%%%%%%%%%%%%%%
+
+\section{Conclusion}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Literaturverzeichnis %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\setcounter{page}{1}
+\pagenumbering{roman}
+\onehalfspacing
+\addcontentsline{toc}{section}{References}
+\bibliography{mybib}
+\bibliographystyle{agsm}
+
+%\section{Appendix}
+\end{document}
