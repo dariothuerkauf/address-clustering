@@ -1,13 +1,14 @@
 import pandas as pd
 from pymongo import MongoClient
+import numpy as np
 
 # Connect to db collections
 client = MongoClient('mongodb://localhost:27017/')
 db = client['address-clustering']
 transfers = db['transfers']
 transactions = db['transactions']
-#tornado_pools = pd.read_csv('../data/tornado-pools.csv')['contract_address'].tolist()
 
+# Tornado Pools dictionary
 tornado = [
     ('0xA160cdAB225685dA1d56aa342Ad8841c3b53f291', '100 Eth'),
     ('0x910Cbd523D972eb0a6f4cAe4618aD62622b39DbF', '10 Eth'),
@@ -41,8 +42,7 @@ tornado_pools.set_index('contract_address', inplace=True)
 tornado_pool_addresses = tornado_pools.index.tolist()
 #tornado_pools.to_csv('../data/tornado-pools.csv')
 
-
-# transactions
+# Transactions
 tornado_transactions = pd.DataFrame(list(transactions.find({"$or": [{"from": {"$in": tornado_pool_addresses}}, {"to": {"$in": tornado_pool_addresses}}]})))
 tornado_transactions['tokenName'] = 'Ether'
 tornado_transactions['tokenType'] = 'native'
@@ -50,10 +50,19 @@ tornado_transactions['isSet'] = 'from'
 tornado_transactions['userAddress'] = tornado_transactions['from']
 tornado_transactions['contractAddress'] = tornado_transactions['to']
 
-# transfers
+# Token Transfers
 tornado_transfers = pd.DataFrame(list(transfers.find({"$or": [{"from": {"$in": tornado_pool_addresses}}, {"to": {"$in": tornado_pool_addresses}}]})))
+tornado_transfers['contractAddress'] = np.where(tornado_transfers['isSet'] == 'to', tornado_transfers['from'], tornado_transfers['to'])
 
+# Concatenate
 df = pd.concat([tornado_transactions,tornado_transfers])
 df.drop(labels=['_id','tokenID'], axis=1, inplace=True)
+
+# Create a dictionary from the DataFrame
+tornado_dict = tornado_pools['pool'].to_dict()
+df['pool'] = df['contractAddress'].map(tornado_dict)
+
+# Save the DataFrame to a CSV file
 df.reset_index(drop=True, inplace=True)
 df.to_csv('../data/tornado.csv')
+print(df)
