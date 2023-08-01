@@ -1,6 +1,6 @@
 # Import packages
 import pandas as pd
-from karateclub import Diff2Vec, Role2Vec
+from karateclub import Diff2Vec, Role2Vec, DeepWalk
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
