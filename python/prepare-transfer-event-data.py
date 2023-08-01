@@ -103,4 +103,4 @@ events_inSet['userAddress'] = events_inSet.apply(lambda row: row['from'] if row[
                                                  axis=1)
 
 # Save as csv
-events_inSet.to_csv('../data/transfer_events.csv')
+events_inSet.to_csv('../data/raw_transfer_events.csv')
