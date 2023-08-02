@@ -8,13 +8,14 @@ import seaborn as sns
 
 
 # Functions
-def compute_weights(df): ### evtl direkt mit undirected graph arbeiten
+def compute_weights(df):  ### evtl direkt mit undirected graph arbeiten
     # Sort from and to addresses lexicographically
     df['from'], df['to'] = np.where(df['from'] > df['to'], [df['to'], df['from']], [df['from'], df['to']])
     # Group by 'from' and 'to', and count the number of interactions
     grouped_df = df.groupby(['from', 'to']).size().reset_index(name='weight')
-    #grouped_df = grouped_df.rename(columns={"from": "address1", "to": "address2"})
+    # grouped_df = grouped_df.rename(columns={"from": "address1", "to": "address2"})
     return grouped_df
+
 
 def clean_graph(G, k=None):
     """Convert to undirected graph and remove self loops"""
@@ -26,6 +27,7 @@ def clean_graph(G, k=None):
     if k is not None:
         G_tmp = nx.k_core(G_tmp, k=2)
     return G_tmp
+
 
 def recode_graph(G):
     """Rename nodes to work with Diff2Vec"""
@@ -57,33 +59,34 @@ def address_txs(address_str):
     transaction_df = pd.read_csv('../data/native_transfers.csv', index_col=[0])
     all_df = pd.concat([transaction_df, transfer_df], ignore_index=True)
     address = str(address_str).lower()
-    txs = all_df[(all_df["from"]==address) | (all_df["to"]==address)]
+    txs = all_df[(all_df["from"] == address) | (all_df["to"] == address)]
     return txs.sort_values("timeStamp")
 
 
-def show_patterns(events_df, addresses, hour_bins=24, figsize=(15,3), show_kde=False):
+def show_patterns(events_df, addresses, hour_bins=24, figsize=(15, 3), show_kde=False):
     """Show side channels distribution of the given addresses"""
     addresses = [addr.lower() for addr in addresses]
     events_df['timeStamp'] = pd.to_datetime(events_df['timeStamp'], unit='s')
-    events_df['hour'] = events_df['timeStamp'].dt.hour * 3600 + events_df['timeStamp'].dt.minute * 60 + events_df['timeStamp'].dt.second
+    events_df['hour'] = events_df['timeStamp'].dt.hour * 3600 + events_df['timeStamp'].dt.minute * 60 + events_df[
+        'timeStamp'].dt.second
     sns.set_theme(context='paper')
     if show_kde:
-        fig, ax = plt.subplots(1, figsize=(7.5,3))
+        fig, ax = plt.subplots(1, figsize=(7.5, 3))
         for address in addresses:
-            user_txs = events_df[events_df["from"]==address]
+            user_txs = events_df[events_df["from"] == address]
             print(address, len(user_txs))
         try:
             for address in addresses:
-                user_txs = events_df[events_df["from"]==address]
+                user_txs = events_df[events_df["from"] == address]
                 sns.kdeplot(user_txs['hour'], ax=ax)
             format_x_axis(ax, hour_bins)
         except Exception as e:
             print(e)
 
-    fig, ax = plt.subplots(1, figsize=(7.5,3))
-    bin_edges = np.linspace(events_df['hour'].min(), events_df['hour'].max(), hour_bins+1)  # set common bin edges
+    fig, ax = plt.subplots(1, figsize=(7.5, 3))
+    bin_edges = np.linspace(events_df['hour'].min(), events_df['hour'].max(), hour_bins + 1)  # set common bin edges
     for address in addresses:
-        user_txs = events_df[events_df["from"]==address]
+        user_txs = events_df[events_df["from"] == address]
         sns.histplot(user_txs["hour"], bins=bin_edges, kde=False, ax=ax, alpha=0.5)  # use common bin edges
         format_x_axis(ax, hour_bins)
 
@@ -91,10 +94,10 @@ def show_patterns(events_df, addresses, hour_bins=24, figsize=(15,3), show_kde=F
 ### Helper function
 def format_x_axis(ax, hour_bins):
     """Formats the x-axis of the time histogram."""
-    ax.set_xlim([0,86400])
-    x_ticks = np.linspace(0, 86400, hour_bins+1)
+    ax.set_xlim([0, 86400])
+    x_ticks = np.linspace(0, 86400, hour_bins + 1)
     ax.set_xticks(x_ticks)
-    x_labels = [f'{int(tick/3600)}' for tick in x_ticks]
+    x_labels = [f'{int(tick / 3600)}' for tick in x_ticks]
     ax.set_xticklabels(x_labels)
 
 
@@ -123,10 +126,41 @@ class DistCalculation:
         Returns:
             tuple: Two numpy arrays. The first one contains the distances to the nearest neighbors and the second one contains the indices of these neighbors.
         """
-        D, I = self.index.search(self.X[idx:idx+1], self.X.shape[0])
+        D, I = self.index.search(self.X[idx:idx + 1], self.X.shape[0])
         return D[0, 1:], I[0, 1:]
 
+
     def get_rank(self, address1, address2):
+        """
+        returns the average rank of two target vectors with respect to each other in a nearest neighbor search.
+        Args:
+            address1 (str): Address corresponding to the first vector
+            address2 (str): Address corresponding to the second vector
+        Returns:
+            tuple: The average rank of the two vectors and the corresponding distances. If either address is not found in the node_map, it returns (None, None).
+        """
+        address1, address2 = address1.lower(), address2.lower()
+        if address1 in self.node_map and address2 in self.node_map:
+            query_idx1 = self.node_map[address1]
+            query_idx2 = self.node_map[address2]
+
+            distances1, indices1 = self.get_dist_idx(query_idx1)
+            distances2, indices2 = self.get_dist_idx(query_idx2)
+
+            if len(indices1) > 0 and query_idx2 in indices1 and len(indices2) > 0 and query_idx1 in indices2:
+                trg_idx1 = np.where(indices1 == query_idx2)[0]
+                print(trg_idx1)
+                trg_idx2 = np.where(indices2 == query_idx1)[0]
+                print(trg_idx2)
+                average_rank = (trg_idx1.item() + 1 + trg_idx2.item() + 1) / 2
+                average_distance = (distances1[trg_idx1].item() + distances2[trg_idx2].item()) / 2
+                return average_rank, average_distance
+            else:
+                return None, None
+        else:
+            return None, None
+
+    def foo(self, address1, address2):
         """
         returns the rank of a target vector with respect to a query vector in a nearest neighbor search.
         Args:
@@ -144,8 +178,10 @@ class DistCalculation:
 
             if len(indices) > 0 and target_idx in indices:
                 trg_idx = np.where(indices == target_idx)[0]
-                return trg_idx.item()+1, distances[trg_idx].item()
+                return trg_idx.item() + 1, distances[trg_idx].item()
             else:
                 return None, None
         else:
             return None, None
+
+
