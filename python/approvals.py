@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import pandas as pd
 
-# Connect to db collections
+# Connect to db collection
 client = MongoClient('mongodb://localhost:27017/')
 db = client['address-clustering']
 transactions = db['transactions']
@@ -17,9 +17,11 @@ approvals['spender'] = approvals['spender'].apply(lambda x: '0x' + x)
 
 # Only keep spenders from set
 self_approvals = approvals[approvals['spender'].isin(users)]
+print(f'Approvals of set address: {len(self_approvals)}')
 
 # Only keep senders from set that approved another address
 filtered_self_approvals = self_approvals[self_approvals['from'] != self_approvals['spender']]
+print(f'Approvals of set address (other address): {len(filtered_self_approvals)}')
 
 # Remove unnecessary rows
 filtered_self_approvals = filtered_self_approvals[['hash','from', 'to', 'spender']].reset_index(drop=True)
@@ -27,3 +29,5 @@ filtered_self_approvals = filtered_self_approvals[['hash','from', 'to', 'spender
 # Group approvals by 'from' address
 grouped_df = filtered_self_approvals.groupby(['from']).size().reset_index(name='Number of Approvals given')
 print(grouped_df)
+print(filtered_self_approvals)
+

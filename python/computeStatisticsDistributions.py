@@ -8,16 +8,16 @@ def add_ToD(df):
     df['ToD'] = df['timeStamp'].dt.hour * 3600 + df['timeStamp'].dt.minute * 60 + df['timeStamp'].dt.second
     return df
 
-def compute_statistics(data):
+def compute_statistics(data, col_name='ToD'):
     """ Compute mean, median, standard deviation for each 'from' address """
-    stats = data.groupby('from').agg({'ToD': ['mean', 'median', np.std]})
+    stats = data.groupby('from').agg({col_name: ['mean', 'median', np.std]})
     stats.columns = ['_'.join(col).strip() for col in stats.columns.values]
     return stats
 
-def compute_histogram(data, bins):
-    """ Compute histogram for ToD column with specified number of bins """
-    labels = [f"hist_bin_{i}" for i in range(1, bins+1)]
-    data['bin'] = pd.cut(data['ToD'], bins=bins, labels=labels)
+def compute_histogram(data, bins, col_name='ToD'):
+    """ Compute histogram for specified column with number of bins """
+    labels = [f"{col_name}_hist_bin_{i}" for i in range(1, bins+1)]
+    data['bin'] = pd.cut(data[col_name], bins=bins, labels=labels)
     hist_data = data.groupby(['from', 'bin']).size().unstack(fill_value=0)
     return hist_data
 
@@ -28,7 +28,6 @@ polygon_trx = pd.read_csv('../data/raw_polygon_transactions.csv', index_col=[0])
 transaction_df = pd.concat([ethereum_trx, polygon_trx])
 
 
-
 #################
 ### TimeOfDay ###
 #################
@@ -37,19 +36,15 @@ transaction_df = pd.concat([ethereum_trx, polygon_trx])
 transaction_df = add_ToD(transaction_df)
 
 # Filter out addresses with less then 5 trx sent
-#counts = transaction_df.groupby('from').size()
-#addresses_to_keep = counts[counts >= 5].index
-#transaction_df_filtered = transaction_df[transaction_df['from'].isin(addresses_to_keep)]
 transaction_df_filtered = transaction_df[transaction_df.groupby('from')['from'].transform('size') >= 5]
 
-
 # Compute statistics and histogram
-hist_df = compute_histogram(transaction_df_filtered, bins=6)
-stats_df = compute_statistics(transaction_df_filtered)
-result_df = pd.merge(stats_df, hist_df, left_index=True, right_index=True)
+stats_df = compute_statistics(transaction_df_filtered, 'ToD')
+hist_df = compute_histogram(transaction_df_filtered, 6, 'ToD')
 
 # Save to csv
-result_df.to_csv('../data/timeOfDay.csv')
+combined_stats_hist_ToD = pd.concat([stats_df, hist_df], axis=1)
+combined_stats_hist_ToD.to_csv('../data/timeOfDay.csv')
 
 
 ################
@@ -71,16 +66,15 @@ ethereum_trx['normalized_gasPrice'] = ethereum_trx['gasPrice'] / ethereum_trx['d
 polygon_trx['normalized_gasPrice'] = polygon_trx['gasPrice'] / polygon_trx['daily_avg_gasPrice']
 
 # Concatenate dataframes
-transaction_df = pd.concat([ethereum_trx, polygon_trx])
+transaction_df_normalizedGas = pd.concat([ethereum_trx, polygon_trx])
 
-# # Filter out addresses with less then 5 trx sent
-# counts = transaction_df.groupby('from').size()
-# addresses_to_keep = counts[counts >= 5].index
-# transaction_df_clean = transaction_df[transaction_df['from'].isin(addresses_to_keep)]
+# Filter out addresses with less then 5 trx sent
+transaction_df_normalizedGas = transaction_df_normalizedGas[transaction_df_normalizedGas.groupby('from')['from'].transform('size') >= 5]
 
 # Compute statistics and histogram
-hist_df = compute_histogram(transaction_df_filtered, bins=50)
-stats_df = compute_statistics(transaction_df_filtered)
-result_df = pd.merge(stats_df, hist_df, left_index=True, right_index=True)
+stats_df = compute_statistics(transaction_df_normalizedGas, 'normalized_gasPrice')
+hist_df = compute_histogram(transaction_df_normalizedGas, 50, 'normalized_gasPrice')
 
-result_df.to_csv('../data/normalizedGas.csv')
+# Save to csv
+combined_stats_hist_nG = pd.concat([stats_df, hist_df], axis=1)
+combined_stats_hist_nG.to_csv('../data/normalizedGas.csv')

@@ -149,9 +149,9 @@ class DistCalculation:
 
             if len(indices1) > 0 and query_idx2 in indices1 and len(indices2) > 0 and query_idx1 in indices2:
                 trg_idx1 = np.where(indices1 == query_idx2)[0]
-                print(trg_idx1)
+                #print(trg_idx1)
                 trg_idx2 = np.where(indices2 == query_idx1)[0]
-                print(trg_idx2)
+                #print(trg_idx2)
                 average_rank = (trg_idx1.item() + 1 + trg_idx2.item() + 1) / 2
                 average_distance = (distances1[trg_idx1].item() + distances2[trg_idx2].item()) / 2
                 return average_rank, average_distance
