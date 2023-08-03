@@ -111,7 +111,7 @@ Dario Thürkauf
 \begin{figure}[h!]
 	\centering
 	\hspace{-10cm}
-	\includegraphics[width=3cm]{../figures/signature.jpeg}
+	%\includegraphics[width=3cm]{../figures/signature.jpeg}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%
 
@@ -126,7 +126,13 @@ Dario Thürkauf
 
 \section{Introduction}
 Motivation \& Relevance of the topic \\
-Literarure Review: Still nascent field, First start with bitcoin/UTXO based, go over to account-based: Victor, Beres et al. \\
+
+% Transaction data publicly available
+% Not really good to hide illicit business acitivities.
+% First, this was exploited in Bitcoin and Bitcoins UTXO model
+% Recently also account-based
+
+Literarure Review: Still nascent field, First start with bitcoin/UTXO based, go over to account-based: Victor, Beres et al., Tutela \\
 Structure of the paper  \\
 
 
@@ -136,7 +142,6 @@ Structure of the paper  \\
 
 \section{Preliminaries}
 
-Similar to seminar thesis\\
 Account-based blockchains\\
 Ethereum, Polygon\\
 Smart Contracts, EOAs\\
@@ -146,17 +151,20 @@ Metaverse, Decentraland \\
 Token Standards, shorter than in Seminar Thesis, comparable to Metaverse Retailing Paper \\
 
 
+
 %%%%%%%%%%%%
 %%% Data %%%
 %%%%%%%%%%%%
 
 \section{Data Preparation and Retrieval}
+From our address set containing X addresses, we selected addresses that were active on either Ethereum or Polygon using blockscan. Using this list, we were able to significantly reduce the amount of API calls.
+We collected these addresses transactions and token transfer data. 
 
 Transfer Events, adding Information (isInSet) \\
 Transactions \\
 Filtering, Intra-set transfers\\
 Data Structure, Fields \\
-Additional data \\
+Additional data, ENS \\
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -166,6 +174,17 @@ Additional data \\
 \section{Data Analysis}
 Existing clustering heuristics \\
 Graph-based network analysis\\
+
+Self-authorization \\
+Transaction Graph Analysis \\
+The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
+
+Diff2Vec, Role2Vec, DeepWalk \\
+Time-of-day transaction activity \\
+Transaction timestamps reveal the daily activity patterns of the account owner -> example
+Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram dividid into $b_{hour}$ bins. We chose 50 bins (from beres)
+Gas price distribution \\
+Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
 
 
 %%%%%%%%%%%%%%%%%%
