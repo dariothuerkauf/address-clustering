@@ -130,42 +130,47 @@ Dario Thürkauf
 In public permissionless blockchains such as Bitcoin \citep{nakamotoBitcoin2008} and Ethereum \citep{buterin2014ethereum}, individuals can participate with multiple pseudonymous addresses. Any user can create a large number of these addresses at virtually no cost. Also, contrary to popular belief, permissionless blockchains are completely transparent. All confirmed transactions are publicly observable and stored as part of the blockchain’s history. 
 This has opened up a nascent scientific field dealing with entity identification within blockchain networks. By analyzing on-chain data and detecting usage patterns, researchers try to cluster addresses that are controlled by the same user. Most of these methods are heuristics, as the lack of a ground truth makes evaluation hard \newline
 On the one hand, knowing which addresses belong to the same real-world entity is advantageous, as it allows for a better assessment of network properties in terms of usage, wealth distribution, and fraudulent activity \citep{FV:17}. For example, a user could manipulate a seemingly fair on-chain voting process by splitting his voting power among multiple addresses. \newline
-On the other hand, the lack of privacy is also detrimental to most use cases, especially financial applications. In response to this/ as a countermeasure, several privacy-enhancing protocols and tools have been proposed to obfuscate transaction tracing. This reaction has, in turn, sparked the development of other clustering heuristics exploiting user behavior interacting with privacy-enhancing protocols. \newline
+On the other hand, the lack of privacy is also detrimental to most financial use cases(financial applications). In response to this, several privacy-enhancing protocols and tools have been proposed to obfuscate transaction tracing. The most prominent/widely used of which is Tornado cash. This reaction has, in turn, sparked the development of other clustering heuristics exploiting user behavior interacting with privacy-enhancing protocols. \newline
 
-%Identifying addresses that belong to the same entity is predominantly done through heuristics. These heuristics try to make sense
+%Privacy will be an important topic in the future.
 
+%Identifying addresses that belong to the same entity is predominantly done through heuristics.
 
-\textbf{Related work}
+\textbf{Related work}\\
+Previous work in this field can be broadly distinguished between heuristics developed for the unspent transaction output (UTXO) model (e.g Bitcoin, ZCash) and the account-based model (e.g. Ethereum, Polygon). While both share the concept of addresses, the concept of accounts is not present in UTXO-based blockchains and the way in which transactions are processed is fundamentally different. Therefore, clustering heuristics are not applicable to account-model blockchains. Meiklejohn et al. proposes 
 
-Previous work in this field can be broadly distinguished between heuristics developed for the unspent transaction output (UTXO) model (e.g Bitcoin, ZCash) and the account-based model (e.g. Ethereum, Polygon). While these models share the concept of addresses, the concept of accounts is not present in UTXO-based blockchains and the way in which transactions are processed is fundamentally different.
-In the UTXO model, each transaction has to reference an . When spending a Bitcoin, a user creates a UTXO. Each UTXO incorporates a spending condition, which can only be fulfilled by the . Transactions can thought of as large graphs of inputs and outputs and most wallet implementation use a new Bitcoin address/public key for each transaction.
-
-%Two architectures/models. Describe and compare.
-
-\textbf{UTXO-model clustering heuristics} %not the focus of this work and therefore not explained
-
-Meiklejohn
+\textbf{UTXO-model clustering heuristics} \\%not the focus of this work and therefore not explained
+A number of address clustering heuristics in the UTXO setup have been proposed Bitcoin (Meiklejohn), Litecoin, and ZCash. Satoshi proposed using a new address for each transaction and most wallets work this way.
 
 In contrast to the UTXO-model, in account-based blockchains, native transactions can only move funds between a single sender and receiver (payment transaction), and the “change” remains in the sender account. Subsequent transactions necessarily use the same address again. The account-based model essentially relies on address reuse on the protocol level. (Citation)
 
-\textbf{Account-model clustering heuristics}
-
+\textbf{Account-model clustering heuristics}\\
 \cite{FV:17} was the first to introduce clustering heuristics for account-based blockchains. He proposed and applied heuristics that exploit patterns related to deposit addresses, multiple participation in airdrops, and token authorization mechanisms. \newline
 \cite{Beres2020} argue that Victor’s heuristics, while powerful, assume participation in certain on-chain events and therefore propose more universally applicable methods. Their technique utilizes graph representation learning, a subset of machine learning interpreting transactions or token transfers as network graphs, with addresses as nodes and transactions or token transfers as edges. They further contribute to the field by proposing time-of-day activity and transaction fee-based user profiling techniques. Using ENS address pairs as ground truth, they test the methods rigorously and apply their findings to significantly reduce the privacy guarantees of Tornado Cash. They also provide a comprehensive overview and comparison of different node embedding algorithms. \newline
-\cite{wu2022tutela} adapt one of Beres et al. node embedding algorithms and apply it at scale. Further, they propose five clustering heuristics in the context of Tornado Cash. They build an application built on those heuristics to report the true anonymity of an Ethereum address. All methods will be discussed in greater detail in Section 3.
-Broadening the scope to entity identification, Friedhelm and Lüders (2020) undertook an analysis of the top 1000 Ethereum-ERC20 token networks from a graph perspective. Similarly, Casale-Brunet et al. extended the analysis to various NFT (ERC721) ecosystems. (Payette Schwager)
+\cite{wu2022tutela} extend on one of \cite{Beres2020} node embedding algorithms and apply it at scale. Further, they propose five clustering heuristics in the context of Tornado Cash. They build an application built on those heuristics to report the true anonymity of an Ethereum address. All methods will be discussed in greater detail in Section 3.
+Broadening the scope to entity identification, \cite{victorlüders2019} undertook an analysis of the top Ethereum-ERC20 token networks from a graph perspective. Similarly, \cite{casalebrunet2021} extend the analysis to various NFT (ERC721) ecosystems. Both find ... Payette schwager propose a segmentation of Ethereum address space into four distinct behaviour groups based on a broad range of address features (k-means). 
 
 Instead of on-chain data, \cite{yu2023} propose a new correlation method by utilizing nodes as entities, exploiting network information. This approach comes with a whole new set of limitations and problems, but one can possibly avoid the impact of privacy-enhancing technologies. This approach may be interesting once privacy-enhancing techniques are more widely used.
 
 %network level/off-chain data ->
 %transaction level/ on-chain data ->
+%In the UTXO model, each transaction has to reference an output from a previous transaction. When spending a Bitcoin, a user creates a UTXO. Each UTXO incorporates a spending condition, which can only be fulfilled by the . Transactions can thought of as large graphs of inputs and outputs and most wallet implementation use a new Bitcoin address/public key for each transaction.
+
 
 \textbf{Our contribution}\\
-Anwenden/discuss and evaluate existing heuristics to my specific address set.
-Anpassen, erweitern
-Eigene, spezifische Heuristiken ausdenken
+In this work, we perform entity identification/address clustering on an address set containing 473,927 addresses. 
+These addresses were gathered in a separate project by collecting avatar activity snapshots over a 8 month time frame spanning from July, 2022 to April, 2023. Due to the blockchain-based architecture of Decentraland, each avatar contains information about a users' Web3 address. 
 
-\textbf{Structure of the paper}
+We test the applicability of existing heuristics for our case and evaluate their success in detecting (given there is a ground truth). We estimate how many real-world entities are represented by these addresses. To achieve this, we adapt and extend existing methods to our specific situation/setting.
+
+Propose own heuristics approaches for detecting address clusters.
+
+%We apply several existing clustering heuristics in order to cluster a specific set containing 400k addresses.
+%Anwenden/discuss and evaluate existing heuristics to my specific address set.
+%Anpassen, erweitern
+%Eigene, spezifische Heuristiken ausdenken
+
+\textbf{Structure of the paper}\\
 The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the key concepts (basics, necessary for understanding the setup), including Ethereum accounts and the EVM, tokens, Decentraland and privacy-enhancing protocols. In Section 3, we describe our data collection methodology and the data preparation. Section 4  describes and different clustering heuristics in detail. Section 5 applies the clustering heuristics from 4. Finally we discuss the results of our analysis and summarize our findings in Sections 5 and 6.
 
 % Motivation \& Relevance of the topic \\
@@ -183,7 +188,7 @@ The remainder of this paper is structured as follows: In Section 2, we provide a
 
 \section{Preliminaries}
 
-\textbf{Account-based blockchains, Contract Accounts and EOAs}\\
+\textbf{Contract Accounts and EOAs}\\
 Account-based blockchains usually distinguish between \textit{externally owned accounts} (EOAs) and \textit{contract accounts} (smart contracts). EOAs are created and controlled by private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. Contract accounts are controlled by the contract's code, their state can be modified through transactions sent to the contract and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, it is defined as the last 20 bytes of the Keccak-256 hash of the RLP encoding of the sender address and account nonce. \citep{GW:14} \newline
 In addition, \cite{eip1014} introduces a new contract creation mechanism allowing for more predictable contract addresses.%EIP-1014
 
