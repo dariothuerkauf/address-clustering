@@ -649,3 +649,4 @@ cython_debug/
 .idea/
 .Rhistory
 data
+paper.ps
