@@ -97,7 +97,7 @@ Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et
 
 \vfill
 \begin{center}
-\includegraphics[width=4cm]{../figures/logo_cif.png}
+%\includegraphics[width=4cm]{../figures/logo_cif.png}
 \end{center}
 \newpage
 \singlespacing
@@ -125,15 +125,56 @@ Dario Thürkauf
 %%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
-Motivation \& Relevance of the topic \\
 
+
+In public permissionless blockchains such as Bitcoin \citep{nakamotoBitcoin2008} and Ethereum \citep{buterin2014ethereum}, individuals can participate with multiple pseudonymous addresses. Any user can create a large number of these addresses at virtually no cost. Also, contrary to popular belief, permissionless blockchains are completely transparent. All confirmed transactions are publicly observable and stored as part of the blockchain’s history. 
+This has opened up a nascent scientific field dealing with entity identification within blockchain networks. By analyzing on-chain data and detecting usage patterns, researchers try to cluster addresses that are controlled by the same user. Most of these methods are heuristics, as the lack of a ground truth makes evaluation hard \newline
+On the one hand, knowing which addresses belong to the same real-world entity is advantageous, as it allows for a better assessment of network properties in terms of usage, wealth distribution, and fraudulent activity \citep{FV:17}. For example, a user could manipulate a seemingly fair on-chain voting process by splitting his voting power among multiple addresses. \newline
+On the other hand, the lack of privacy is also detrimental to most use cases, especially financial applications. In response to this/ as a countermeasure, several privacy-enhancing protocols and tools have been proposed to obfuscate transaction tracing. This reaction has, in turn, sparked the development of other clustering heuristics exploiting user behavior interacting with privacy-enhancing protocols. \newline
+
+%Identifying addresses that belong to the same entity is predominantly done through heuristics. These heuristics try to make sense
+
+
+\textbf{Related work}
+
+Previous work in this field can be broadly distinguished between heuristics developed for the unspent transaction output (UTXO) model (e.g Bitcoin, ZCash) and the account-based model (e.g. Ethereum, Polygon). While these models share the concept of addresses, the concept of accounts is not present in UTXO-based blockchains and the way in which transactions are processed is fundamentally different.
+In the UTXO model, each transaction has to reference an . When spending a Bitcoin, a user creates a UTXO. Each UTXO incorporates a spending condition, which can only be fulfilled by the . Transactions can thought of as large graphs of inputs and outputs and most wallet implementation use a new Bitcoin address/public key for each transaction.
+
+%Two architectures/models. Describe and compare.
+
+\textbf{UTXO-model clustering heuristics} %not the focus of this work and therefore not explained
+
+Meiklejohn
+
+In contrast to the UTXO-model, in account-based blockchains, native transactions can only move funds between a single sender and receiver (payment transaction), and the “change” remains in the sender account. Subsequent transactions necessarily use the same address again. The account-based model essentially relies on address reuse on the protocol level. (Citation)
+
+\textbf{Account-model clustering heuristics}
+
+\cite{FV:17} was the first to introduce clustering heuristics for account-based blockchains. He proposed and applied heuristics that exploit patterns related to deposit addresses, multiple participation in airdrops, and token authorization mechanisms. \newline
+\cite{Beres2020} argue that Victor’s heuristics, while powerful, assume participation in certain on-chain events and therefore propose more universally applicable methods. Their technique utilizes graph representation learning, a subset of machine learning interpreting transactions or token transfers as network graphs, with addresses as nodes and transactions or token transfers as edges. They further contribute to the field by proposing time-of-day activity and transaction fee-based user profiling techniques. Using ENS address pairs as ground truth, they test the methods rigorously and apply their findings to significantly reduce the privacy guarantees of Tornado Cash. They also provide a comprehensive overview and comparison of different node embedding algorithms. \newline
+\cite{wu2022tutela} adapt one of Beres et al. node embedding algorithms and apply it at scale. Further, they propose five clustering heuristics in the context of Tornado Cash. They build an application built on those heuristics to report the true anonymity of an Ethereum address. All methods will be discussed in greater detail in Section 3.
+Broadening the scope to entity identification, Friedhelm and Lüders (2020) undertook an analysis of the top 1000 Ethereum-ERC20 token networks from a graph perspective. Similarly, Casale-Brunet et al. extended the analysis to various NFT (ERC721) ecosystems. (Payette Schwager)
+
+Instead of on-chain data, \cite{yu2023} propose a new correlation method by utilizing nodes as entities, exploiting network information. This approach comes with a whole new set of limitations and problems, but one can possibly avoid the impact of privacy-enhancing technologies. This approach may be interesting once privacy-enhancing techniques are more widely used.
+
+%network level/off-chain data ->
+%transaction level/ on-chain data ->
+
+\textbf{Our contribution}\\
+Anwenden/discuss and evaluate existing heuristics to my specific address set.
+Anpassen, erweitern
+Eigene, spezifische Heuristiken ausdenken
+
+\textbf{Structure of the paper}
+The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the key concepts (basics, necessary for understanding the setup), including Ethereum accounts and the EVM, tokens, Decentraland and privacy-enhancing protocols. In Section 3, we describe our data collection methodology and the data preparation. Section 4  describes and different clustering heuristics in detail. Section 5 applies the clustering heuristics from 4. Finally we discuss the results of our analysis and summarize our findings in Sections 5 and 6.
+
+% Motivation \& Relevance of the topic \\
 % Transaction data publicly available
 % Not really good to hide illicit business acitivities.
 % First, this was exploited in Bitcoin and Bitcoins UTXO model
 % Recently also account-based
+%Literarure Review: Still nascent field, First start with bitcoin/UTXO based, go over to account-based: Victor, Beres et al., Tutela \\
 
-Literarure Review: Still nascent field, First start with bitcoin/UTXO based, go over to account-based: Victor, Beres et al., Tutela \\
-Structure of the paper  \\
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -142,13 +183,20 @@ Structure of the paper  \\
 
 \section{Preliminaries}
 
-Account-based blockchains\\
-Ethereum, Polygon\\
-Smart Contracts, EOAs\\
-Transactions, Transfer Events \\
-Privacy-enhancing protocols, Tornado \\
-Metaverse, Decentraland \\
-Token Standards, shorter than in Seminar Thesis, comparable to Metaverse Retailing Paper \\
+\textbf{Account-based blockchains, Contract Accounts and EOAs}\\
+Account-based blockchains usually distinguish between \textit{externally owned accounts} (EOAs) and \textit{contract accounts} (smart contracts). EOAs are created and controlled by private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. Contract accounts are controlled by the contract's code, their state can be modified through transactions sent to the contract and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, it is defined as the last 20 bytes of the Keccak-256 hash of the RLP encoding of the sender address and account nonce. \citep{GW:14} \newline
+In addition, \cite{eip1014} introduces a new contract creation mechanism allowing for more predictable contract addresses.%EIP-1014
+
+\textbf{Ethereum, Polygon, EVM}\\
+
+\textbf{Transactions, Transfer Events}\\
+
+\textbf{Tokens and Token Standards}\\
+%shorter than in Seminar Thesis, comparable to Metaverse Retailing Paper
+
+\textbf{Metaverse, Decentraland} \\
+
+\textbf{Privacy-enhancing protocols, mixing, Tornado} \\
 
 
 
@@ -156,28 +204,64 @@ Token Standards, shorter than in Seminar Thesis, comparable to Metaverse Retaili
 %%% Data %%%
 %%%%%%%%%%%%
 
-\section{Data Preparation and Retrieval}
-From our address set containing X addresses, we selected addresses that were active on either Ethereum or Polygon using blockscan. Using this list, we were able to significantly reduce the amount of API calls.
-We collected these addresses transactions and token transfer data. 
+\section{Data Collection and Preparation}
 
-Transfer Events, adding Information (isInSet) \\
-Transactions \\
-Filtering, Intra-set transfers\\
-Data Structure, Fields \\
+The initial dataset contained 473,927 unique Web3 addresses. As we are only interested in clustering methods leveraging on-chain transaction or token transfer data, we omit addresses that were not recorded on either Ethereum or Polygon. This was achieved using data/information from Blockscan\footnote{\url{https://blockscan.com/}}. In total, 59,651 addresses were recorded on Ethereum, 129,988 addresses on Polygon and 52,095 on both networks simultanously. Therefore, the remaining address set comprises 137,544 addresses. Figure 1 visualizes the subsets in a VENN diagram. 
+We used these addresses to gather/collect transaction and token transfer receipts from Ethereum Mainnet and Polygon PoS. Ethereum or Polygon data can be accessed directly through a node or an application programming interface (API) provider such as Infura or Etherscan. The absence of account indexing in Ethereum or Polygon makes queries of the type "Retrieve all past transactions and token transfers of address \texttt{0xABC}" challenging, as one would have to scan through every block and every token transfer event emitted by a specified set of token contracts. Fortunately, Etherscan offers/provides an API Endpoint Module for ``Accounts`` that facilitates the retrieval of transactions and token transfer events for a given address. Using our network specific address subsets, we were able to significantly reduce the amount of API calls. 
+
+We gathered all transactions and token transfer data of the addresses until block 17,670,000 on Ethereum (July 11, 2023) and block 44,990,000 on Polygon (July 12, 2023). The results were stored in comma-separated value (CSV) files and loaded into a MongoDB database\footnote{\url{https://www.mongodb.com/}}.
+
+Statistics about data, how many transactions, how many transfers, size
+Transfer events = 30,689,978
+Transactions = 16,184,993, how many polygon/ethereum, table
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\hline \hline
+  & Transactions & Transfers \\
+ \hline
+ Polygon & Cell 2 & Cell 3 \\
+ Ethereum & Cell 5 & Cell 6 \\
+ \hline
+ Total & 16,184,993 & 30,689,978 \\
+ \hline \hline
+\end{tabular}
+\caption{Size of raw data}
+\label{tab:data_size}
+\end{table}
+
+
+The transaction data fields contain the transaction hash, from and to address, the timestamp in seconds from UNIX epoch, a nonce, value, input (calldata), gasused, gasprice, functionname (from Etherscan), chainname.
+Token transfer receipts include the transactions hash, timestamp, from and to address, nonce, gas price, the amount of gas used, chain information, the token contract address and name, tokenType, and token standard specific fields: value, tokenDecimal for ERC-20, tokenID for ERC-721, and value/tokenID for ERC-1155.
+
+
+%Transfer Events, adding Information (isInSet) \\
+%Transactions \\
+%Filtering, Intra-set transfers\\
+%Data Structure, Fields \\
+%We reduced this set to addresses that were active/recorded on either Ethereum or Polygon using Blockscan\footnote{\url{https://blockscan.com/}}. This reduced the address set from to X.
+%Using Blockscan\footnote{\url{https://blockscan.com/}}, we were able to reduce the address set to addresses that were recorded on either Ethereum or Polygon.
+
+For detecting ground truth pairs in order to evaluate our node embedding methods, we gathered data from ENS contract...
 Additional data, ENS \\
 
 
-%%%%%%%%%%%%%%%%%%%%%
-%%% Data Analysis %%%
-%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Clustering Heuristics %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Data Analysis}
-Existing clustering heuristics \\
-Graph-based network analysis\\
+\section{Clustering Heuristics}
+% Goal: explain each heuristic, categorize, and discuss applicability to our address set
 
 Self-authorization \\
-Transaction Graph Analysis \\
-The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
+Deposit address reuse \\
+Airdrop multi participation \\
+
+Graph-based network analysis / Transaction Graph Analysis
+Token networks -> Victor, Casale Brunet
+
+%The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
 
 Diff2Vec, Role2Vec, DeepWalk \\
 Time-of-day transaction activity \\
@@ -185,6 +269,16 @@ Transaction timestamps reveal the daily activity patterns of the account owner -
 Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram dividid into $b_{hour}$ bins. We chose 50 bins (from beres)
 Gas price distribution \\
 Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%%% Data Analysis %%%
+%%%%%%%%%%%%%%%%%%%%%
+
+\section{Data Analysis}
+
+
 
 
 %%%%%%%%%%%%%%%%%%
