@@ -5,6 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from tqdm import tqdm
 
 
 # Functions
@@ -99,6 +100,7 @@ def format_x_axis(ax, hour_bins):
     ax.set_xticks(x_ticks)
     x_labels = [f'{int(tick / 3600)}' for tick in x_ticks]
     ax.set_xticklabels(x_labels)
+
 
 
 ############################
