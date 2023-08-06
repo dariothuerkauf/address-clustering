@@ -126,11 +126,13 @@ Dario Thürkauf
 
 \section{Introduction}
 
-Public permissionless blockchains such as Bitcoin \citep{nakamotoBitcoin2008} and Ethereum \citep{buterin2014ethereum} allow users/individuals to participate with multiple pseudonymous addresses. The creation of these addresses is virtually cost free. Contrary to popular belief, these blockchains are entirely transparent. All transactions are stored as part of the blockchain's history and publicly observable.
+Public permissionless blockchains such as Bitcoin \citep{nakamotoBitcoin2008} and Ethereum \citep{buterin2014ethereum} allow users %individuals
+ to participate with multiple pseudonymous addresses. The creation of these addresses is virtually cost free. Contrary to popular belief, these blockchains are entirely transparent. All transactions are stored as part of the blockchain's history and publicly observable.
 This has opened up a nascent scientific field dealing with entity identification within blockchain networks. Researchers try to cluster addresses controlled by the same user by analyzing on-chain data and detecting usage patterns. The majority of these methods are heuristic which often makes them difficult to evaluate due to the absence of any ground truth. \newline
-On one hand, identifying the addresses that belong to the same real-world entity is beneficial as it allows better evaluation of network properties with respect to usage, distribution of wealth and detecting fraudulent activities \citep{FV:17}. For instance, if a user distributes their voting power across various addresses, they might manipulate an on-chain voting process that seems fair at the outset. \newline
+On one hand, identifying the addresses that belong to the same real-world entity is beneficial. According to \cite{FV:17} it allows better evaluation of network properties with respect to usage, distribution of wealth and detecting fraudulent activities. For instance, if a user distributes their voting power across various addresses, they might manipulate an on-chain voting process that seems fair at the outset. \newline
 Conversely, the lack of privacy is also detrimental to most financial use cases (DeFi). As a response, multiple privacy-enhancing tools and protocols have been proposed to obfuscate transaction tracing. 
 Nonetheless, these protocols are not yet widely adopted and careless user behaviour can undermine the privacy guarantees they offer. \newline
+%As such/In conclusion
 The topic of privacy, or lack thereof, will remain significant for future blockchain development and research.
 
 %However, they are not widely used even cannot guarantee perfect privacy (factors: size of anonymity set, usage /user behaviour of protocol, privacy guarantees depend on other users).
@@ -141,35 +143,30 @@ The topic of privacy, or lack thereof, will remain significant for future blockc
 Previous work in this field can be broadly distinguished between heuristics developed for the unspent transaction output (UTXO) model (e.g Bitcoin, ZCash) and the account-based model (e.g. Ethereum, Polygon). While both models share the concept of addresses, the notion of accounts is not present in UTXO-based blockchains. The way in which transactions are processed is fundamentally different, and therefore, clustering heuristics are not applicable to both paradigms.
 %\textbf{UTXO-model clustering heuristics} 
 A number of address clustering heuristics in the UTXO setup have been proposed for Bitcoin and derivatives \citep{Androulaki2013, Meiklejohn2013, Haslhofer2016, jourdan2018, kappos2022}. All these methods will not be the focus of this work and therefore not discussed. As suggested by Nakamoto in the Bitcoin whitepaper, most Bitcoin wallet implementations use a new key pair for each transaction to keep them from being linked to a common owner. \newline
-In contrast to the UTXO-model, native transactions in account-based blockchains can only move funds between a single sender and receiver, and the ``change``remains in the sender account. Subsequent transactions necessarily use the same address again. The account-based model essentially relies on address reuse on the protocol level. \citep{Beres2020} \newline
+In contrast to the UTXO-model, native transactions in account-based blockchains can only move funds between a single sender and receiver, and the ``change``remains in the sender account. Subsequent transactions necessarily use the same address again. The account-based model essentially relies on address reuse on the protocol level. Therefore, privacy guarantees should be lower and most users likely use only a small number of addresses. \citep{Beres2020} \newline
 % Make an assumption that people only use a small set of addressesyy
 %\textbf{Account-model clustering heuristics}
 Clustering heuristics for account-based blockchains were first introduced by \cite{FV:17}. He proposed and applied heuristics that exploit patterns related to deposit addresses, multiple participation in airdrops, and token authorization mechanisms. \newline
 \cite{Beres2020} propose more universally applicable methods, as they argue that Victor’s heuristics, while powerful, assume participation in certain on-chain events. Their technique interprets transactions or token transfers as network graphs, with addresses as nodes and asset transfers as edges. They quantitavely compare graph-representation learning algorithms (a subset of machine learning) and propose further user profiling techniques based on time-of-day activity and transaction fees. Using ENS address pairs as ground truth (quasi-identifiers), the authors rigorously test their methods and apply their findings to significantly reduce the privacy guarantees of Tornado Cash. \newline
 \cite{wu2022tutela} extend on one of \cite{Beres2020} graph representation learning (node-embedding) algorithms and apply it at scale. Further, they also propose a set of new clustering heuristics targeting Tornado Cash, showing that careless user behavior can still reveal identity. They build an application built on those heuristics to measure the anonymity of an Ethereum address. \newline
 All of the methods mentioned will be discussed in greater detail in Section 3. \newline
-Broadening the scope of entity identification, \cite{victorlüders2019} analyzed the top Ethereum ERC-20 token networks from a graph perspective. Similarly, \cite{casalebrunet2021} apply a similar analysis to various non-fungible token (NFT) ecosystems. Both find similarities to interaction graphs in social networks (hub-and-spoke). \cite{Payette2017} propose a segmentation of Ethereum address space into four distinct behaviour groups sharing similar attributes using k-means clustering. 
+Broadening the scope of entity identification, \cite{victorlüders2019} analyzed the largest Ethereum ERC-20 token networks from a graph perspective. Similarly, \cite{casalebrunet2021} apply a similar analysis to various non-fungible token (NFT) ecosystems. Both find similarities to interaction graphs in social networks (hub-and-spoke). Further, \cite{Payette2017} propose a segmentation of Ethereum address space into four distinct behaviour groups sharing similar attributes using k-means clustering. 
 
 \cite{yu2023} propose a novel approach for correlation analysis by exploiting network information, rather than treating users as entities and analyzing on-chain data. Although this approach has the potential to avoid the impact of privacy-enhancing technologies, it introduces a new set of limitations and problems. Thus, this approach may be of great interest for further research, particularly when privacy-enhancing techniques become more widely used.
 
-%network level/off-chain data ->
-%transaction level/ on-chain data ->
-%In the UTXO model, each transaction has to reference an output from a previous transaction. When spending a Bitcoin, a user creates a UTXO. Each UTXO incorporates a spending condition, which can only be fulfilled by the . Transactions can thought of as large graphs of inputs and outputs and most wallet implementation use a new Bitcoin address/public key for each transaction.
-%In addition, the authors provide a comprehensive overview and comparison of various node embedding algorithms.
-
 
 \textbf{Our contribution}\\
-In this work, we perform entity identification/address clustering on an address set containing 473,927 addresses. 
-These addresses were gathered in a separate project by collecting avatar activity snapshots over a 8 month time frame spanning from July, 2022 to April, 2023. Due to the blockchain-based architecture of Decentraland, each avatar contains information about a users' Web3 address. 
-
-We test the applicability of existing heuristics for our case and evaluate their success in detecting (given there is a ground truth). We estimate how many real-world entities are represented by these addresses. To achieve this, we adapt and extend existing methods to our specific situation/setting. Propose own heuristics approaches for detecting address clusters.
-
-%We apply several existing clustering heuristics in order to cluster a specific set containing 400k addresses.
+Due to Decentraland's blockchain-based architecture, each avatar contains information about a user's Web3 address. 
+To obtain these addresses, a separate project collected snapshots of avatar activity over an ten-month period from July 2022 to April 2023. 
+In this work, we perform entity identification on this address set containing 473,927 addresses. 
+The applicability of existing heuristics is tested, and if feasible, their efficacy in detecting entities using multiple addresses is evaluated. 
+The objective is to estimate the number of real-world entities that are represented by these addresses. Our focus is on clustering addresses within this set alone, while disregarding possible clusters outside of it that were not active in Decentraland during the given timeframe. 
+Furthermore, we introduce our own heuristics for identifying address clusters and evaluate their suitability for implementation in other contexts.
 %Anwenden/discuss and evaluate existing heuristics to my specific address set.
 %Anpassen, erweitern
 %Eigene, spezifische Heuristiken ausdenken
 
-The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the key concepts (basics, necessary for understanding the setup), including Ethereum accounts and the EVM, tokens, Decentraland and privacy-enhancing protocols. In Section 3, we describe our data collection methodology and the data preparation. Section 4  describes and different clustering heuristics in detail. Section 5 applies the clustering heuristics from 4. Finally we discuss the results of our analysis and summarize our findings in Sections 5 and 6.
+The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the key concepts (basics, necessary for understanding the setup), including Ethereum accounts and the EVM, tokens, Decentraland and privacy-enhancing protocols. In Section 3, we describe our data collection methodology and the data preparation. Section 4  describes different clustering heuristics in detail. Section 5 applies the clustering heuristics from 4. Finally we discuss the results of our analysis and summarize our findings in Sections 5 and 6.
 
 % Motivation \& Relevance of the topic \\
 % Transaction data publicly available
@@ -241,7 +238,7 @@ Transactions = 16,184,993, how many polygon/ethereum, table
 \end{table}
 
 
-The transaction data fields contain the transaction hash, from and to address, the timestamp in seconds from UNIX epoch, a nonce, value, input (calldata), gasused, gasprice, functionname (from Etherscan), chainname.
+The transaction data fields contain the transaction hash, from and to address, the timestamp in seconds from the UNIX epoch, a nonce, value, input (often reffered to as calldata), the amount of gas used in the transaction, the specified gas price, the name of the function called (added by Etherscan) and the name of the blockchain.
 Token transfer receipts include the transactions hash, timestamp, from and to address, nonce, gas price, the amount of gas used, chain information, the token contract address and name, tokenType, and token standard specific fields: value, tokenDecimal for ERC-20, tokenID for ERC-721, and value/tokenID for ERC-1155.
 
 
