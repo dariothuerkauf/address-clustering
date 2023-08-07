@@ -185,7 +185,7 @@ Polygon is a so-called sidechain and aims to address the scalability limitations
 According to \cite{roth2019tokenization}, \textit{tokens} as rivalrous, digital units of value that represent ownership of an asset or utility. Smart contracts are the primary method of creating tokens on EVM-based blockchains. In essence, a smart-contract-based token is a mapping of accounts with token balances and a set of functions defining how these balances can be changed. Any smart contract containing these elements can be interpreted as a token contract. \citep{roth2019tokenization} \newline
 Token standards specify basic interfaces that allow for interoperability between contracts. These standards do not prescribe an implementation but set minimum requirements without restricting the design beyond that. 
 The most common token standards are ERC-20\footnote{https://eips.ethereum.org/EIPS/eip-20} for fungible tokens (NFTs), ERC-721\footnote{https://eips.ethereum.org/EIPS/eip-721} for non-fungible tokens or ERC-1155\footnote{https://eips.ethereum.org/EIPS/eip-1155} for semi-fungible tokens.\newline
-When a (blockchain) transaction completes, it produces a transaction receipt that contains log entries providing information about the actions that occurred during its execution. The standarization of tokens allows us to listen for ``transfer events``, which are emitted whenever an asset/token changes ownership.\cite{mastering_ethereum}
+When a (blockchain) transaction completes, it produces a transaction receipt that contains log entries providing information about the actions that occurred during its execution \citep{mastering_ethereum}. The standarization of tokens allows us to listen for ``transfer events``, which are emitted whenever an asset/token changes ownership.
 These transfer events include the \textit{sender} and \textit{recipient} address, along with a \textit{token ID} and/or \textit{amount}. 
 
 %Token standards specify basic interfaces that allow for interoperability between contracts. These standards do not prescribe an implementation but set minimum requirements without restricting the design beyond that. ERC-20 (fungible), ERC-721 (non-fungible) or ERC-1155 (semi-fungible) are the most widely used token standards. \newline
@@ -209,26 +209,21 @@ LAND / MANA
  
 %If you choose to experience Decentraland Explorer without a wallet, the information will only be locally stored: you will be able to walk around, customize your Avatar and chat with others in-world, but you won’t have the chance to receive daily rewards, participate in events or log in with a different device using the same Guest ID and Avatar.
 
-\textbf{Non-custodial crypto asset mixers} \\
+\textbf{Non-custodial crypto asset mixers and Tornado Cash} \\
+%intuition of how it works,  distinction between custodial and non-custodial, Tornado cash = SC based
+According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. At a high level, we can distinguish between custodial and non-custodial crypto-asset mixers. \newline
+In the custodial setup, users send their assets to a centralized service provider's public deposit address. In return, the provider sends the assets back to a privately relayed recipient address. This approach is fully trust-based, as the service provider has complete control over the assets and access to the identifying data. \newline 
+In contrast, non-custodial crypto asset mixers (e.g., Tornado Cash) replace the trusted mixing party with a publicly verifiable smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This has the advantage that users do not have to share the identifying information with anyone and there is no liquidity risk as the funds are locked. \citep{nadler2023tornado} \newline
+In a nutshell, the mixer works in the following way: Various entities deposit the same amount of a specific crpyto asset to a mixer address acting as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the deposit and withdrawal addresses. This is achieved using zK-SNARKS. 
+Each depositor inserts a hash value in a Merkle-tree. At the time of withdrawal, each legitimate withdrawer can prove unlinkably with a zero-knowledge proof that they know the pre-image of a previously inserted hash leaf in the Merkle-tree. %Subsequently, users can withdraw their asset from the mixer whenever they consider that the size of the anonymity set is satisfactory.
+ For a more detailed description of how Tornado Cash works, see \cite{nadler2023tornado} or \cite{Beres2020}. For a mathematical discussion of ZKSNARK, please refer to Petkus (2019), Thaler (2022) or Berentsen et al. (2022). \newline
+In the context of this work, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The number of addresses that have deposited in a particular pool is defined as the \textit{anonymity set}. Typically, a larger anonymity set will provide a higher level of privacy, as a larger number of deposit addresses can be associated with a given withdrawal address. \newline
+In theory, if the anonymity set is large enough, third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
+Furthermore, \cite{Beres2020} and \cite{wu2022tutela} have proposed approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in the next section.
+% making use of address re-use, transaction activity, transaction cost choice, or more complex transaction graph and network analyses.
 
--> intuition of how it works,  distinction between custodial and non-custodial, Tornado cash = SC based
-
-According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. On a high level, we can distinguish between two types of implementation. The simplest version is a custodial model. In this setup, users send their assets to a centralized service provider operating the pool. In return, the provider sends back the assets to a privately relayed recipient address. This approach is fully trust-based because the service provider has complete control over the assets and access to the identifying data. 
-
-In contrast to that, non-custodial crypto asset mixers replace the trusted mixing party with a publicly verifiable (transparent) smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This has the advantage that users do not have to share the identifying information with anyone and there is no liquidity risk since the funds are locked.
-
-Brief explanation of how it works:
-
-Various entities deposit the same amount of a specific crypto asset to a mixer address. The mixer acts as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the depositor and withdrawal addresses. Third parties can still observe the addresses that have deposited to and withdrawn from the pool, but given a large enough anonymity set, those third parties cannot link a specific depositor address to a specific withdrawal address.
-
-
-
-Moreover, the user does not have to share the identifying information with anyone and there is no liquidity risk, since the funds are locked and cannot be used in any other way. As such, non-custodial mixers can be created as an immutable and independent infrastructure, where no centralized entity can unilaterally control, alter, or delete the information.
-
-
-The best known smart-contract based non-custodial mixer is Tornado Cash.
-
-%Crypto asset mixers can be implemented at various levels of technological sophistication. 
+%The best known smart-contract based non-custodial mixer is Tornado Cash.
+ 
 
 %%%%%%%%%%%%
 %%% Data %%%
@@ -283,20 +278,27 @@ Additional data, ENS \\
 \section{Clustering Heuristics}
 % Goal: explain each heuristic, categorize, and discuss applicability to our address set
 
-Self-authorization \\
-Deposit address reuse \\
-Airdrop multi participation \\
+\textbf{Self-authorization} \newline
+The \texttt{approve} function required in all three token standards allows another address to spend tokens on behalf of the actual owners. This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility. \citep{FV:17}
 
-Graph-based network analysis / Transaction Graph Analysis
+\textbf{Deposit address reuse} \newline
+This heuristic exploits the common practice of crypto exchanges creating so-called deposit addresses for each user, which forward funds to a main address. Multiple addresses that send funds to the same deposit address are highly likely controlled by the same entity. \citep{FV:17}
+
+\textbf{Airdrop multi participation} \newline
+Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. A famous example is Uniswap's UNI airdrop, where each address that interacted with the protocol received a fixed amount of UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. These distribution mechanisms are often not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
+
+\textbf{Graph-based network analysis/Transaction Graph Analysis}\newline
 Token networks -> Victor, Casale Brunet
 
 %The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
 
 Diff2Vec, Role2Vec, DeepWalk \\
-Time-of-day transaction activity \\
+
+\textbf{Time-of-day transaction activity} \\
 Transaction timestamps reveal the daily activity patterns of the account owner -> example
 Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram dividid into $b_{hour}$ bins. We chose 50 bins (from beres)
-Gas price distribution \\
+
+\textbf{Gas price distribution} \\
 Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
 
 
