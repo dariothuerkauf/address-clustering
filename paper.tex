@@ -213,19 +213,18 @@ LAND / MANA
 
 -> intuition of how it works,  distinction between custodial and non-custodial, Tornado cash = SC based
 
-According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. On a high level, we can distinguish between two types of implementation. 
+According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. On a high level, we can distinguish between two types of implementation. The simplest version is a custodial model. In this setup, users send their assets to a centralized service provider operating the pool. In return, the provider sends back the assets to a privately relayed recipient address. This approach is fully trust-based because the service provider has complete control over the assets and access to the identifying data. 
+
+In contrast to that, non-custodial crypto asset mixers replace the trusted mixing party with a publicly verifiable (transparent) smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This has the advantage that users do not have to share the identifying information with anyone and there is no liquidity risk since the funds are locked.
+
+Brief explanation of how it works:
+
+Various entities deposit the same amount of a specific crypto asset to a mixer address. The mixer acts as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the depositor and withdrawal addresses. Third parties can still observe the addresses that have deposited to and withdrawn from the pool, but given a large enough anonymity set, those third parties cannot link a specific depositor address to a specific withdrawal address.
 
 
-The simplest version is a custodial model. In this setup, users send their assets to a centralized service provider operating the pool. In return, the provider sends back the assets to a privately relayed recipient address. This approach is fully trust-based because the service provider has complete control over the assets and access to the identifying data. 
-
-
-, where a centralized service provider operates the mixing service. Users send their funds to the mixing service’s public deposit address and specify a recipient address over a private channel. 
-
-In contrast to that, non-custodial crypto asset mixers do not require trust. Instead, they rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit.
 
 Moreover, the user does not have to share the identifying information with anyone and there is no liquidity risk, since the funds are locked and cannot be used in any other way. As such, non-custodial mixers can be created as an immutable and independent infrastructure, where no centralized entity can unilaterally control, alter, or delete the information.
 
-Various entities deposit the same amount of a specific crypto asset to a mixer address. The mixer acts as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the depositor and withdrawal addresses. Third parties can still observe the addresses that have deposited to and withdrawn from the pool, but given a large enough anonymity set, those third parties cannot link a specific depositor address to a specific withdrawal address.
 
 The best known smart-contract based non-custodial mixer is Tornado Cash.
 
