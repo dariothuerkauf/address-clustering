@@ -246,56 +246,78 @@ The starting point for our work was a dataset comprising 473,927 distinct (Web3)
 
 \subsection{Transactions and Token Transfer Events}
 The address dataset was used to collect transaction and token transfer event data from Ethereum and Polygon. Ethereum or Polygon data can be accessed directly through a node or an application programming interface (API) provider like Infura or Etherscan. The absence of account indexing in Ethereum or Polygon poses a challenge for retrieving all past transactions and token transfers of a specific address, as it requires scanning through all blocks and token transfer events emitted by designated token contracts. Fortunately, Etherscan offers an API Endpoint Module for ``Accounts`` that facilitates the retrieval of transactions and token transfer events for a given address. By using our network-specific address subsets, we were able to significantly decrease the number of required API calls. 
-We gathered all transactions and token transfers up until block height \texttt{17,670,000} on Ethereum (July 11, 2023) and block \texttt{44,990,000} on Polygon (July 12, 2023). The output was saved in separate CSV files. We then imported this data into a MongoDB database\footnote{\url{https://www.mongodb.com/}}.
-In total, we collected 30,689,978 token transfers and 16,092,531 normal transactions. Figure X visualizes the number of daily transactions and token transfers for each chain. Can see activity.
+We gathered all transactions and token transfers up until block number \texttt{17,670,000} on Ethereum (July 11, 2023) and block number \texttt{44,990,000} on Polygon (July 12, 2023). In total, we collected more than 30 million %30,689,978
+token transfers and more than 16 million %16,092,531
+ normal transactions. The output was stored in CSV files and later imported  into a MongoDB\footnote{\url{https://www.mongodb.com/}} database. 
 
-Transfer Events: 30,689,978
-Transfer Events Ethereum: 7,832,778
-Transfer Events Polygon: 22,857,200
+The database contains separate collections for transactions and transfers. Both collections share fields including the transaction hash, timestamp in seconds from the UNIX epoch, the amount of gas used in the transaction, the gas price specified by the user and the nonce (for EOAs, the nonce corresponds to the number of transactions sent beginning from 0).
 
-Statistics about data, how many transactions on Polygon, how many on Ethereum, how many transfers on Polygon, how many on Ethereum -> Show in Figure
-
-Transactions = 16,092,531
-Transactions Ethereum = 8,448,584
-Transactions Polygon = 7,643,947
-
-%\begin{table}[h]
-%\centering
-%\begin{tabular}{lcc}
-%\hline \hline
-%  & Transactions & Transfers \\
-% \hline
-% Polygon & Cell 2 & Cell 3 \\
-% Ethereum & Cell 5 & Cell 6 \\
-% \hline
-% Total & 16,184,993 & 30,689,978 \\
-% \hline \hline
-%\end{tabular}
-%\caption{Size of raw data}
-%\label{tab:data_size}
-%\end{table}
-
-Transaction hash, timestamp in seconds from the UNIX epoch, gas used in the transaction, specified gas price, nonce
-
-
-
-
-The transaction data fields contain the transaction hash, from and to address, the timestamp in seconds from the UNIX epoch, a nonce, value, input (often referred to as calldata), the amount of gas used in the transaction, the specified gas price, the name of the function called (added by Etherscan) and the name of the blockchain.
+The transaction data field includes a from and to address ('to' address either smart contract or EOA for simple transfers), a value field (native asset), the transaction's input (mostly referred to as calldata), the name of the function called (added by Etherscan, none if simple transfer of Ether or Matic). We added the chain Name to combine the data from both chains.
 
 Token transfer receipts include the transaction hash, UNIX timestamp, sender and recipient address, nonce, gas price, the amount of gas, chain information, the token contract address and name, tokenType, and token standard specific fields: value, tokenDecimal for ERC-20, tokenID for ERC-721, and value/tokenID for ERC-1155.
 
 
-%Transfer Events, adding Information (isInSet) \\
-%Transactions \\
-%Filtering, Intra-set transfers\\
-%Data Structure, Fields \\
-%We reduced this set to addresses that were active/recorded on either Ethereum or Polygon using Blockscan\footnote{\url{https://blockscan.com/}}. This reduced the address set from to X.
-%Using Blockscan\footnote{\url{https://blockscan.com/}}, we were able to reduce the address set to addresses that were recorded on either Ethereum or Polygon.
+\iffalse
+Transactions: hash, from, to, timestamp, nonce, value, gasprice, gasUsed, input, functionName, chainName
+Transfers: hash, from (sender), to (recipient), contractAddress (tokenContract address), value (amount, only for ERC20, ERC1155), nonce, tokenName, gas price, gas used, chainName, tokenType (token standard), token ID (only for ERC721/ERC1155), ((isSet, userAddress))
+
+Transfer Events: 30,689,978
+Transfer Events Ethereum: 7,832,778
+Transfer Events Polygon: 22,857,200
+Transactions = 16,092,531
+Transactions Ethereum = 8,448,584
+Transactions Polygon = 7,643,947
+
+Most of the activity revolves around NFTs, especially on Polygon.
+Figure X visualizes the number of daily transactions and token transfers for each chain.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{../figures/transfers_tx_by_chain.png}
+	\caption{Monthly Transactions and Token Transfers by chain}
+	\label{fig:Data}
+\end{figure} 
+Transfer Events, adding Information (isInSet) \\
+Transactions \\
+Filtering, Intra-set transfers\\
+Data Structure, Fields \\
+We reduced this set to addresses that were active/recorded on either Ethereum or Polygon using Blockscan\footnote{\url{https://blockscan.com/}}. This reduced the address set from to X.
+Using Blockscan\footnote{\url{https://blockscan.com/}}, we were able to reduce the address set to addresses that were recorded on either Ethereum or Polygon.
+\fi
+
+
+\subsection{Intra-set asset transfers}
+Our goal is to cluster addresses belonging to the same real-world entity that were recorded in Decentraland during this 9-month period. Therefore, we disregard addresses outside of this set. 
+
+Since all of our addresses are EOAs (some multisig smart contract wallets). -> Check this?
+
+implications
+advantage that we do not need to check if a specific address is a contract.
+
+Filter transactions and transfers events where both the \texttt{from} (sender) and the \texttt{to} (recipient) address are in the address set
+
+call/define it intra-set transfers: includes all token transfers and standard native asset transfers. Use this to generate network graph. or for our other clustering heuristics.
 
 \subsection{ENS Names}
+In order to evaluate some of our clustering methods, we need a ground truth. Similarly to \cite{Beres2020}, we use Ethereum Name Service identifiers as ground truth information.
 
-For detecting ground truth pairs in order to evaluate our node embedding methods, we gathered data from ENS contract...
-Additional data, ENS \\
+ENS is a distributed, open, and extensible naming system based on the Ethereum blockchain. In spirit, it is similar to the well-known Domain Name Service (DNS). However, in ENS the registry is implemented in Ethereum smart contracts. ENS maps human-readable names like alice.eth to machine-readable identifiers such as Ethereum addresses. Therefore, ENS provides a more user-friendly way of transferring assets on Ethereum, where users can use ENS names as recipient addresses instead of the error-prone hexadecimal Ethereum addresses.
+
+Implemented as NFTs %Currently, all the subdomains or non .eth domains are not NFT, unless the domain registrar itself supports NFT such as (dcl.eth, and .kred).
+
+Find all addresses that transferred/minted etc. an ENS Name.
+Check for each address in the list if the address points to an human-readable name.
+If two addresses point to the same ENS name we consider them belonging to the same entity.
+
+We use ENS names with exactly two unique addresses to measure the performance of different profiling techniques.
+
+assume ENS names that point to multiple addresses, see 
+
+To get this information, we query .
+
+ 
+%For detecting ground truth pairs in order to evaluate our node embedding methods, we gathered data from ENS contract...
+% Check EDNS
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
