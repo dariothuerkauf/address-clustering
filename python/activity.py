@@ -17,6 +17,7 @@ df_transfer = df_transfer.drop_duplicates()
 print(f'Total number of transfer events: {df_transfer.shape[0]}')
 # Count number of transfers per chain
 print(df_transfer.groupby('chainName').size().reset_index(name='count'))
+print(df_transfer.groupby(['chainName','tokenType']).size().reset_index(name='count'))
 
 # Drop duplicates
 print(df_tx.shape[0])

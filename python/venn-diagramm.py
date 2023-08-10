@@ -1,12 +1,23 @@
+import pandas as pd
 from matplotlib_venn import venn2
 import matplotlib.pyplot as plt
 
-# Data
-polygon_only = 83774
-ethereum_only = 7867
-both = 49950
+df = pd.read_csv('../data/subsets.csv', index_col=[0])
 
-venn = venn2(subsets=(polygon_only, ethereum_only, both), set_labels=(None, None), set_colors=('#A5D7D2','#D20537'))
+# Addresses active only on Ethereum
+eth_only = df[(df['Ethereum'] == 1) & (df['Polygon'] == 0)]
+eth_only_count = len(eth_only)
+
+# Addresses active only on Polygon
+polygon_only = df[(df['Ethereum'] == 0) & (df['Polygon'] == 1)]
+polygon_only_count = len(polygon_only)
+
+# Addresses active on both Ethereum and Polygon
+both_active = df[(df['Ethereum'] == 1) & (df['Polygon'] == 1)]
+both_active_count = len(both_active)
+
+
+venn = venn2(subsets=(polygon_only_count, eth_only_count, both_active_count), set_labels=(None, None), set_colors=('#A5D7D2','#D20537'))
 
 
 ax = plt.gca()
