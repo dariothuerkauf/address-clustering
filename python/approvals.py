@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import pandas as pd
+import re
 
 # Connect to db collection
 client = MongoClient('mongodb://localhost:27017/')
@@ -8,7 +9,19 @@ transactions = db['transactions']
 users = pd.read_csv('../data/subsets.csv')['Address'].to_list()
 
 # Query all approval transactions
-approvals = pd.DataFrame(list(transactions.find({"functionName": "approve(address spender, uint256 rawAmount)"})))
+# approvals = pd.DataFrame(list(transactions.find({"functionName": "approve(address spender, uint256 rawAmount)"})))
+# print(f'Total approvals: {len(approvals)}')
+
+
+# List of function signatures you're interested in
+signatures = [
+    "0x095ea7b3",  # approve(address,uint256) for both ERC-20 and ERC-721
+    "0xa22cb465",  # setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
+    "0x2eb2c2d6"   # safeBatchTransferFrom(address,address,uint256[],uint256[],bytes) for ERC-1155
+]
+
+# MongoDB query to get transactions where the 'input' starts with any of the function signatures
+approvals = pd.DataFrame(list(transactions.find({"input": {"$in": [re.compile(f"^{sig}") for sig in signatures]}})))
 print(f'Total approvals: {len(approvals)}')
 
 # Extract spender address from calldata, Add '0x' to the start of each address
