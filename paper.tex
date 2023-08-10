@@ -142,17 +142,17 @@ The topic of privacy, or lack thereof, will remain significant for future blockc
 
 \textbf{Related work}\\
 Previous work in this field can be broadly distinguished between methods %heuristics
- developed for the unspent transaction output (UTXO) model (e.g, Bitcoin and ZCash) and the account-based model (e.g., Ethereum, Polygon). While both models share the concept of addresses, the notion of accounts is not present in UTXO-based blockchains. The way in which transactions are processed is fundamentally different, and therefore, clustering heuristics are not applicable to both paradigms.
+ developed for the unspent transaction output (UTXO) model (e.g, Bitcoin and ZCash) and the account-based model (e.g., Ethereum and Polygon). While both models share the concept of addresses, the notion of accounts is not present in UTXO-based blockchains. The way in which transactions are processed is fundamentally different, and therefore, clustering heuristics are not applicable to both paradigms.
 
 A number of address clustering heuristics in the UTXO setup have been proposed for Bitcoin and derivatives \citep{Androulaki2013, Meiklejohn2013, Haslhofer2016, jourdan2018, kappos2022}. All these methods will not be the focus of this work and therefore not discussed. As suggested by \cite{nakamotoBitcoin2008} in the Bitcoin whitepaper, most Bitcoin wallet implementations use a new key pair for each transaction to keep them from being linked to a common owner. \newline
 In contrast to the UTXO-model, native transactions in account-based blockchains can only move funds between a single sender and receiver, and the ``change`` remains in the sender account. Subsequent transactions necessarily use the same address again. The account-based model essentially relies on address reuse on the protocol level \citep{Beres2020}. Therefore, privacy guarantees should be lower and most users likely use only a small number of addresses. \newline
 % Make an assumption that people only use a small set of addresses
 Clustering heuristics for account-based blockchains were first introduced by \cite{FV:17}. He proposed and applied heuristics that exploit patterns related to deposit addresses, multiple participation in airdrops, and token authorization mechanisms. \newline
-\cite{Beres2020} propose more universally applicable methods, as they argue that Victor’s heuristics, while powerful, assume participation in certain on-chain events. Their technique interprets transactions or token transfers as network graphs, with addresses as nodes and asset transfers as edges. They quantitavely compare graph-representation learning algorithms (a subset of machine learning) and propose further user profiling techniques based on time-of-day activity and transaction fees. Using ENS address pairs as ground truth, the authors rigorously test their methods and apply their findings to significantly reduce the privacy guarantees of Tornado Cash, a non-custodial privacy-enhancing protocol on Ethereum. \newline
+\cite{Beres2020} propose more universally applicable methods, as they argue that Victor’s heuristics, while powerful, assume participation in certain on-chain events. Their technique interprets transactions or token transfers as network graphs, with addresses as nodes and asset transfers as edges. They quantitavely compare graph-representation learning algorithms (a subset of machine learning) and propose further user profiling techniques based on time-of-day activity and transaction fees. Using ENS address pairs as ground truth, the authors rigorously test their methods and apply their findings to significantly reduce the privacy guarantees of \textit{Tornado Cash}, a non-custodial privacy-enhancing protocol on Ethereum. \newline
 \cite{wu2022tutela} extend on one of \cite{Beres2020} graph representation learning %node-embedding
- algorithms and apply it at scale. Further, they also propose a set of new clustering heuristics targeting Tornado Cash,  showing that careless user behavior can still reveal identity. They build an application built on those heuristics to measure the anonymity of an Ethereum address. All of the methods mentioned will be discussed in greater detail in Section 3. \newline
-Broadening the scope of entity identification, \cite{victorlüders2019} study the largest Ethereum ERC-20 token networks from a graph perspective. Similarly, \cite{casalebrunet2021} apply network graph analysis to various non-fungible token (NFT) ecosystems. Both find that many of the networks follow either a star or a hub-and-spoke pattern. These patterns are common to interaction graphs in social networks. Further, \cite{Payette2017} propose a segmentation of the Ethereum address space into four distinct behaviour groups sharing similar attributes using k-means clustering. \newline
-Rather than treating users as entities and analyzing on-chain data, \cite{yu2023} propose a novel approach for correlation analysis by exploiting network information. Although this approach has the potential to avoid the impact of privacy-enhancing technologies, it introduces a new set of limitations and problems. Thus, this approach may be of great interest for further research, particularly when privacy-enhancing techniques become more widely used.
+ algorithms and apply it at scale. Further, they also propose a set of new clustering heuristics targeting Tornado Cash,  showing that careless user behavior can still reveal identity. Based on those heuristics, they build an application built to measure the anonymity of an Ethereum address. \newline All of the methods mentioned will be discussed in greater detail in Section 3. \newline
+Broadening the scope of entity identification, \cite{victorlüders2019} study the largest Ethereum ERC-20 token networks from a graph perspective. Similarly, \cite{casalebrunet2021} apply network graph analysis to various non-fungible token (NFT) ecosystems. Both find that many of the networks follow either a star or a hub-and-spoke pattern. These patterns are common to interaction graphs in social networks. Further, \cite{Payette2017} propose a segmentation of the Ethereum address space into four distinct behaviour groups sharing similar attributes while using k-means clustering. \newline
+Rather than treating users as entities and analyzing on-chain data, \cite{yu2023} propose (a novel) approach for correlation analysis by exploiting network information. Although this approach has the potential to avoid the impact of privacy-enhancing technologies, it introduces a new set of limitations and problems. Thus, this approach may be of great interest for further research, particularly when privacy-enhancing techniques become more widely used.
 
 
 \textbf{Our contribution}\\
@@ -164,7 +164,7 @@ Furthermore, we introduce our own heuristics for identifying address clusters an
 %Anwenden/discuss and evaluate existing heuristics to my specific address set.
 %Anpassen, erweitern
 
-The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the basic concepts necessary to understand the setup. The include Ethereum accounts and the EVM, tokens, Decentraland, and privacy-enhancing protocols. Section 3 describes our methodology for data collection and preparation. The fourth section provides a detailed explanation of various clustering heuristics.The fifth section applies the clustering heuristics described in section 4, after which we discuss the results of our analysis and summarize our findings in sections 6 and 7.
+The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the basic concepts necessary to understand the setup. This includes Ethereum accounts and the EVM, tokens, Decentraland, and privacy-enhancing protocols. Section 3 describes our methodology for data collection and preparation. The fourth section provides a detailed explanation of various clustering heuristics. The fifth section applies the clustering heuristics described in section 4, after which we discuss the results of our analysis and summarize our findings in sections 6 and 7.
 
 %%%%%%%%%%%%%%%%%%%%%
 %%% Preliminaries %%%
@@ -199,7 +199,7 @@ These transfer events include the \textit{sender} and \textit{recipient} address
 \subsection{Decentraland}
 \textit{Decentraland} is the first large-scale blockchain-based virtual world. It has attracted the attention of well-known companies like Tommy Hilfiger, Samsung, PepsiCo, Diesel, Adidas, and Netflix, who are actively engaged in it  \citep{metaverse-retailing2023}.\newline
 Decentraland is an ideal platform for empirical research for two main reasons.
-\textit{First}, its open architecture allows compiling snapshots of user activity, including the users' locations  within the metaverse. This was done by \cite{metaverse-retailing2023}, who captured snapshots of avatar locations over a period of 10 months. The addresses used in this thesis are provided form that work.
+\textit{First}, its open architecture allows compiling snapshots of user activity, including the users' locations  within the metaverse. This was done by \cite{metaverse-retailing2023}, who captured snapshots of avatar locations over a period of 10 months. The addresses they collected are used for this thesis.
 \textit{Second}, users who connect their Web3 account can own various digital assets, such as monetary units, land parcels, and avatar collectibles (e.g. wearables, emotes, and names). Smart contracts on Ethereum and Polygon track and manage the ownership of these assets \citep{goldbergschaer2023}. This allows us to analyze the entire transaction history and derive information about the users' economic activity. %avatars'
 \newline
 Initially, Decentraland launched with two native tokens. \textit{LAND}, an NFT compliant with ERC-721, manages the ownership of land parcels in Decentraland. \textit{MANA}, a fungible token compliant with ERC-20, is the in-world currency used to purchase digital goods and services. The majority of purchases and trades are settled in MANA. \newline 
@@ -218,9 +218,17 @@ In contrast, non-custodial crypto asset mixers (e.g., Tornado Cash) replace the 
 In a nutshell, the mixer works in the following way: Various entities deposit the same amount of a specific crpyto asset to a mixer address acting as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the deposit and withdrawal addresses. This is achieved using zkSNARKs (zero knowledge, succinct, non-interactive argument of knowledge). 
 Each depositor inserts a hash value in a Merkle-tree. At the time of withdrawal, each legitimate withdrawer can prove unlinkably with a zero-knowledge proof that they know the pre-image of a previously inserted hash leaf in the Merkle-tree. %Subsequently, users can withdraw their asset from the mixer whenever they consider that the size of the anonymity set is satisfactory.
  For a more detailed description of how Tornado Cash works, see \cite{nadler2023tornado} or \cite{Beres2020}. \newline %For a mathematical discussion around zkSNARKs, please refer to Petkus (2019), Thaler (2022) or Berentsen et al. (2022).
-In the context of this work, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The set of all deposits that a particular withdrawal could be originated from is defined as the \textit{anonymity set}. In theory, a larger anonymity set will provide a higher level of privacy and third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users (might) withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
+In the context of this work, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The set of all deposits that a particular withdrawal could be originated from is defined as the \textit{anonymity set}. 
+In theory, a larger anonymity set will provide a higher level of privacy, since  any withdrawal address could be linked to a larger set of deposit addresses. However, in practice this does not always hold true. %this is not always the case
+Some users reveal the link between their withdrawal and deposit addresses, which also affects the privacy of other depositors. For example, by withdrawing from the pool with the same address they deposited or directly send funds between the two addresses. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
 In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
-% making use of address re-use, transaction activity, transaction cost choice, or more complex transaction graph and network analyses.
+
+\iffalse
+In theory, a larger anonymity set will provide a higher level of privacy as third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users (might) withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
+In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
+%it is more difficult to link a withdrawal address to a specific depositor address)
+%making use of address re-use, transaction activity, transaction cost choice, or more complex transaction graph and network analyses.
+\fi
 
 %%%%%%%%%%%%
 %%% Data %%%
@@ -302,7 +310,7 @@ In addition to regular resolution from name to address, ENS also supports ``reve
  Reverse resolution %(without a library)
  follows the same pattern as forward resolution: Get the resolver for \texttt{`1234....addr.reverse'} (where \texttt{`1234...`} is the address you want to reverse-resolve), and call the \texttt{name()} function on that resolver. However, ENS does not enforce the accuracy of reverse records. This means \texttt{`1234....addr.reverse`} may claim that the name associated to their address is \texttt{`alice.eth`}. 
  
-Figure \ref{fig:ENS} illustrates how we used record changes and reverse resolutions to generate ground truth pairs: Initially, the domain name \texttt{`foo.eth`} resolves to address \texttt{`0xABC...`}. The owner also set a reverse resolution for this address, indicated by the the edge from the address to the domain name. Next, the owner of \texttt{`foo.eth`} decides to change the resolved address to \texttt{`0xDEF...`}, again setting a reverse record.  Nevertheless, \texttt{`ABC....addr.reverse`} still points to \texttt{`foo.eth`}. If we query the name corresponding to both \texttt{`0xABC...`} and \texttt{`0xDEF...`}, both will return the same name, even though a specific name can only resolve to one address at a time. 
+Figure \ref{fig:ENS} illustrates the mechanism that allowed us to generate ground truth pairs: Initially, the domain name \texttt{`foo.eth`} resolves to address \texttt{`0xABC...`}. The owner also set a reverse resolution for this address, indicated by the the edge from the address to the domain name. Next, the owner of \texttt{`foo.eth`} decides to change the resolved address to \texttt{`0xDEF...`}, again setting a reverse record.  Nevertheless, \texttt{`ABC....addr.reverse`} still points to \texttt{`foo.eth`}. If we query the name corresponding to both \texttt{`0xABC...`} and \texttt{`0xDEF...`}, both will return the same name, even though a specific name can only resolve to one address at a time. 
 We make the assumption that both addresses belong to the same entity if this specific case occurs.
 %We did not observe cases where someone set a reverse record to a completely unrelated address (e.g. alice.eth)
 
@@ -368,10 +376,23 @@ In this section, we provide a overview of clustering heuristics in the context o
 % Goal: explain each heuristic, categorize, and discuss applicability to our address set
 
 \subsection{Self-authorization}
-The \texttt{approve} function required in all three token standards allows another address to spend tokens on behalf of the actual owners. This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility. \citep{FV:17}
+\iffalse
+	This heuristic was formulated in \cite{FV:17}. 
+	All three token standards have/require functionality around approvals. These functions allow another address to spend tokens on behalf of the actual owners. This is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own. Reasons for this might be risk distribution over several addresses with partial accessibility ...
+		- approve(address,uint256)
+		- setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
+		- safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
+\fi
+
+The \texttt{`approve`} function required in all three token standards allows another address to spend tokens on behalf of the actual owners. This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility. \citep{FV:17} 
+
+Since we have all the addresses transactions, we can find transactions where someone approved another address from our set. 
+
+The first step is to get all approval transactions. We achieve this using the 'input'/calldata field. The first X bytes are always the function selector. We filter for the known function selectors for all standards. Next, we get the approved address/spender, also from the calldata, it is always at the same spot. We filter for spenders within the address set and for spenders who are different from the 'from' address. How many transactions are remaining? 
 
 \subsection{Deposit address reuse}
 This heuristic exploits the common practice of crypto exchanges creating so-called deposit addresses for each user, which forward funds to a main address. Multiple addresses that send funds to the same deposit address are highly likely controlled by the same entity. \citep{FV:17}
+We only have the addresses' transaction or token transfers, in order to get the exchange addresses, we would need to go one step further. -> We do not apply this with our dataset.
 
 \subsection{Airdrop multi participation}
 Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. A famous example is Uniswap's UNI airdrop, where each address that interacted with the protocol received a fixed amount of UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. These distribution mechanisms are often not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
@@ -382,7 +403,7 @@ Token networks -> Victor, Casale Brunet
 %The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
 \textbf{Node embeddings}
 
-Projects addresses to points in a low-dimensional vector space based on who it interacts with. In this vector space, adresses belonging to the same entity should be close together in Euclidian distance.
+Projects addresses to points in a low-dimensional vector space based on who it interacts with. In this vector space, adresses belonging to the same entity should be close together in Euclidean distance.
 
 Consider constructing an undirected graph from all Ethereum transactions where nodes are composed of distinct addresses, and an edge is placed between two nodes if there is a transaction between them.
 
@@ -404,6 +425,9 @@ Given the set of timestamps, an account is represented by the vector including t
 
 \subsection{Gas price distribution}
 Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
+
+
+\subsection{Own heuristics}
 
 
 
