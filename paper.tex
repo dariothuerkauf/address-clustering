@@ -341,7 +341,7 @@ If this special case occurs, we assume that both addresses belong to the same en
 We applied the following methodology to find ground truth pairs: First, we collected all addresses that interacted ENS (NFTs) to reduce the amount of name look-ups. For each of the remaining addresses, we checked if it points to an ENS domain name\footnote{This was done via the ENS module within web3.py \url{https://web3py.readthedocs.io/en/stable/ens_overview.html}}. If it did, we stored the associated ENS domain alongside the address in a CSV file. %(It provides an interface to look up domains and addresses). 
 Using the newly generated list, we checked if two addresses point to the same ENS domain. If this check was met, we stored both addresses alongside the ENS domain. \newline
 We found 11,440 reverse records and 40 address pairs. %(addresses pointing to the same .eth name)
-We use these pairs as our ground truth to measure the performance of different clustering heuristics. Even though this is a small sample compared to the total number of 'clusterable' addresses, we should still be able to evaluate (compare) the methods and infer their efficacy. %profiling techniques
+We use these pairs as our ground truth to measure the performance of different clustering heuristics. Even though this is a small sample compared to the total number of clusterable addresses, we should still be able to evaluate (compare) the methods and infer their efficacy. %profiling techniques
 
 
 \iffalse
@@ -368,11 +368,15 @@ We use these pairs as our ground truth to measure the performance of different c
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Clustering Heuristics}
-In this section, we provide a overview of clustering heuristics in the context of account-based blockchains and on-chain data. We will give a detailed explanation of the intuition/rationale behind the heuristic, the workings and discuss the applicability for our case. In Section 5 we will then apply  and, if possible, evaluate the heuristics deemed suited for us.
-%detailed explanation
+In this section, we present an overview of clustering heuristics in the context of account-based blockchains and on-chain data. We will give a detailed explanation of the mechanics and rationale behind the heuristic and assess its applicability to our case. 
+In Section 5, we will implement and evaluate the heuristics we determine to be suitable for our objectives.
+
 % Goal: explain each heuristic, categorize, and discuss applicability to our address set
+%In Section 5 we will then apply  and, if possible, evaluate the heuristics deemed suited for us.
+%intuition
 
 \subsection{Self-authorization}
+
 \iffalse
 	This heuristic was formulated in \cite{FV:17}. 
 	All three token standards have/require functionality around approvals. These functions allow another address to spend tokens on behalf of the actual owners. This is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own. Reasons for this might be risk distribution over several addresses with partial accessibility ...
@@ -388,8 +392,19 @@ Since we have all the addresses transactions, we can find transactions where som
 The first step is to get all approval transactions. We achieve this using the 'input'/calldata field. The first X bytes are always the function selector. We filter for the known function selectors for all standards. Next, we get the approved address/spender, also from the calldata, it is always at the same spot. We filter for spenders within the address set and for spenders who are different from the 'from' address. How many transactions are remaining? 
 
 \subsection{Deposit address reuse}
-This heuristic exploits the common practice of crypto exchanges creating so-called deposit addresses for each user, which forward funds to a main address. Multiple addresses that send funds to the same deposit address are highly likely controlled by the same entity. \citep{FV:17}
-We only have the addresses' transaction or token transfers, in order to get the exchange addresses, we would need to go one step further. -> We do not apply this with our dataset.
+The concept of deposit address reuse was first introduced and systematically utilized by \cite{FV:17}. It was subsequently adoped by \cite{wu2022tutela}. \newline 
+This heuristic relies on the prevalent practice of crypto exchanges generating unique deposit addresses for each user. These addresses then forward the funds to an exchange's main address. It is highly likely that multiple addresses sending funds to the same deposit address are controlled by the same entity. They key challenge of this approach lies in identifying these deposit addresses, which could either be EOAs or smart contracts. \newline
+Deposit addresses share the characteristic that they forward the received funds to a major exchange account. Two parameters are essential for deposit address detection: the discrepancy between the amount received and forwarded (since the exchange must pay gas fees), and the time lag between receiving and forwarding funds.
+However, our dataset only includes the direct transactions or token transfers associated with the addresses. The transactions between deposit and main exchange address are absent. Consequently, this clustering heuristic is not applicable to our data.
+
+
+\iffalse
+\cite{FV:17} was the first to formulate and systematically exploit this heuristic, which was also applied later on by \cite{wu2022tutela}. This heuristic exploits the common practice of crypto exchanges creating so-called deposit addresses for each user, which forward funds to a main address. Multiple addresses that send funds to the same deposit address are highly likely controlled by the same entity. The main challenge of this approach is detecting deposit addresses, which can be either EOAs but also smart contracts.
+- Exchanges typically create so-called deposit addresses, which will forward received funds to a main address. As these deposit addresses are created per customer, multiple addresses that send funds to the same deposit address are highly likely to be controlled by the same entity. 
+The key challeng lies in identifying these deposit addresses. Their characteristic property is that they forward received amounts to a major exchange account. The forwarded amount is often slightly less than what was received, as the exchange has to pay for the transaction costs. In most cases, deposit addresses are EOAs, but they can also be smart contracts. Identifying deposit addresses relies on two parameters: the maximum amount difference between what was received and forwarded and the maximum time difference between receiving and forwarding.
+In this project, we only collected the addresses' direct transactions or token transfers. This would allow us to see deposit addresses, however, with this data we cannot find the second step: the deposit address forwarding the asset to the exchanges main address. Therefore, we do not apply this clustering heuristic here.
+Since we only collected the addresses' direct transactions or token transfers, the second step between deposit and exchange address is not available/present in our dataset. 
+\fi
 
 \subsection{Airdrop multi participation}
 Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. A famous example is Uniswap's UNI airdrop, where each address that interacted with the protocol received a fixed amount of UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. These distribution mechanisms are often not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
