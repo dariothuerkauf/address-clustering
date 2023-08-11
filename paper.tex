@@ -249,7 +249,7 @@ The starting point for our work was a dataset comprising 473,927 distinct (Web3)
 The address subsets were used to collect transaction and token transfer event data from Ethereum and Polygon. Ethereum or Polygon data can be accessed directly through a node or an application programming interface (API) provider like Infura or Etherscan. The absence of account indexing in Ethereum or Polygon poses a challenge for retrieving all past transactions and token transfers of a specific address, as it requires scanning through all blocks and token transfer events emitted by designated token contracts. Fortunately, Etherscan offers an API Endpoint Module for ``Accounts`` that facilitates the retrieval of transactions and token transfer events for a given address. By using our network-specific address subsets, we were able to significantly decrease the number of required API calls. 
 We gathered all transactions and token transfers up until block \texttt{17,670,000} on Ethereum (July 11, 2023) and block \texttt{44,990,000} on Polygon (July 12, 2023). In total, we collected more than 30 million %30,689,978
 token transfer events and more than 16 million %16,092,531
- normal transactions. While the amount of transactions is similar between the two networks, there are three times more transfer events on Polygon. \newline The output was stored in separate CSV files and also imported into a MongoDB\footnote{\url{https://www.mongodb.com/}} database.The database contains distinct collections for transactions and transfers. For information on the different data fields, see Appendix. 
+ normal transactions. While the amount of transactions is similar between the two networks, there are three times more transfer events on Polygon. \newline The output was stored in separate CSV files and also imported into a MongoDB\footnote{\url{https://www.mongodb.com/}} database. The database contains distinct collections for transactions and transfers. For additional information on the different data fields, see Appendix. 
  
 
 \iffalse
@@ -375,20 +375,17 @@ In Section 5, we will implement and evaluate the heuristics we determine to be s
 %In Section 5 we will then apply  and, if possible, evaluate the heuristics deemed suited for us.
 %intuition
 
-\subsection{Self-authorization}
-This heuristic was formulated in \cite{FV:17}. 
-	All three token standards have/require functionality to allow another address to spend/transfer tokens on behalf of the actual owner. 
-	
-	For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
-	For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
-	For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
-
-This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility or testing. \citep{FV:17} 
-
-Since we have all the addresses transactions, we can find transactions where someone approved another address from our set. 
+\subsection{Self-authorization} 
+	All three token standards require functions to allow another address to transfer tokens on behalf of the actual owner. For the ERC-20 standard, this is achieved through the \texttt{`approve`} function, accepting the spender's address and the token amount as parameters\footnote{\texttt{approve(address spender, uint256 amount)}}. The ERC-721 has two functions dedicated to approvals: One for authorizing the transfer of a specific NFT\footnote{\texttt{approve(address to, uint256 tokenId)}} and one to permit transferring all of the owner's NFTs within the collection\footnote{\texttt{setApprovalForAll(address operator, bool approved)}}. The latter function also appears in the ERC-1155 standard. The approval functionality of these tokens is primarily used in connection with smart contracts (DEX or NFT Marketplace), but can also be applied for regular EOAs. \newline
+The ``self authorization`` heuristic, proposed by \cite{FV:17}, suggests that users might authorize another address they own, possibly for risk distribution across several addresses or for testing purposes. \citep{FV:17} \newline
+Given our dataset includes all address transactions, we can easily employ this heuristic. %Since all the addresses' transactions are available in our dataset, we are able to apply this heuristic.
 
 
 \iffalse
+	For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
+	For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
+	For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
+	
 	- approve(address,uint256)
 	- setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
 	
@@ -397,8 +394,7 @@ The first step is to get all approval transactions. We achieve this using the 'i
 
 
 \subsection{Deposit address reuse}
-The concept of deposit address reuse was first introduced and systematically utilized by \cite{FV:17}. It was subsequently adoped by \cite{wu2022tutela}. \newline 
-This heuristic relies on the prevalent practice of crypto exchanges generating unique deposit addresses for each user. These addresses then forward the funds to an exchange's main address. It is highly likely that multiple addresses sending funds to the same deposit address are controlled by the same entity. They key challenge of this approach lies in identifying these deposit addresses, which could either be EOAs or smart contracts. \newline
+The concept of deposit address reuse was first introduced and systematically utilized by \cite{FV:17} and subsequently adoped by \cite{wu2022tutela}. This heuristic relies on the prevalent practice of crypto exchanges generating unique deposit addresses for each user. These addresses then forward the funds to an exchange's main address. It is highly likely that multiple addresses sending funds to the same deposit address are controlled by the same entity. They key challenge of this approach lies in identifying these deposit addresses, which could either be EOAs or smart contracts. \newline
 Deposit addresses share the characteristic that they forward the received funds to a major exchange account. Two parameters are essential for deposit address detection: the discrepancy between the amount received and forwarded (since the exchange must pay gas fees), and the time lag between receiving and forwarding funds.
 However, our dataset only includes the direct transactions or token transfers associated with the addresses. The transactions between deposit and main exchange address are absent. Consequently, this clustering heuristic is not applicable to our data.
 
@@ -412,7 +408,15 @@ Since we only collected the addresses' direct transactions or token transfers, t
 \fi
 
 \subsection{Airdrop multi participation}
-Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. A famous example is Uniswap's UNI airdrop, where each address that interacted with the protocol received a fixed amount of UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. These distribution mechanisms are often not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
+Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Often, these distribution mechanisms are not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
+
+\iffalse
+Airdrops are a popular mechanism to distribute tokens. On the Ethereum blockchain, they are performed through smart contracts. The owners of the smart contract choose recipients either based on past activity, or ask users to sign up through online forms. Some of these registration processes require users to perform certain actions on social media, such as posting articles or following users. The amount of tokens given to each user is either fixed, or based on existing account balances. If the amount is fixed, there is an incentive to cheat the system. 
+We identify Airdrops where a fixed number of tokens is distributed to many recipients. Then we search for addresses that have been forwarded the same amount from the initial recipients. 
+This heuristic depends on two inputs. First, a set of aidrops with equal mounts, characterized by a signature of a distributing address, a token network and an amount. Second, the minimum nuber of token aggregations into a single address. The second parameter is trivial to choose, as multi-participation in its smallest form consist of two aidrop recipient addresses forwarding their tokens to a third adddress. In this case, a single entity would be in control of at least 3 addresses.
+The main challenge lies in identying airdrops. To do so, we first examine all same-source, fixed amount token distributions.
+
+\fi
 
 \subsection{Graph-based network analysis}
 Token networks -> Victor, Casale Brunet
