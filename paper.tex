@@ -376,20 +376,25 @@ In Section 5, we will implement and evaluate the heuristics we determine to be s
 %intuition
 
 \subsection{Self-authorization}
+This heuristic was formulated in \cite{FV:17}. 
+	All three token standards have/require functionality to allow another address to spend/transfer tokens on behalf of the actual owner. 
+	
+	For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
+	For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
+	For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
 
-\iffalse
-	This heuristic was formulated in \cite{FV:17}. 
-	All three token standards have/require functionality around approvals. These functions allow another address to spend tokens on behalf of the actual owners. This is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own. Reasons for this might be risk distribution over several addresses with partial accessibility ...
-		- approve(address,uint256)
-		- setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
-		- safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
-\fi
-
-The \texttt{`approve`} function required in all three token standards allows another address to spend tokens on behalf of the actual owners. This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility. \citep{FV:17} 
+This functionality is mainly used in connection with smart contracts, but can also be applied for regular EOAs. Users could approve another address they own, a reason for this might be risk distribution over several addresses with partial accessibility or testing. \citep{FV:17} 
 
 Since we have all the addresses transactions, we can find transactions where someone approved another address from our set. 
 
-The first step is to get all approval transactions. We achieve this using the 'input'/calldata field. The first X bytes are always the function selector. We filter for the known function selectors for all standards. Next, we get the approved address/spender, also from the calldata, it is always at the same spot. We filter for spenders within the address set and for spenders who are different from the 'from' address. How many transactions are remaining? 
+
+\iffalse
+	- approve(address,uint256)
+	- setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
+	
+The first step is to get all approval transactions. We achieve this using the 'input'/calldata field. The first X bytes are always the function selector. We filter for the known function selectors for all standards. Next, we get the approved address/spender, also from the calldata, it is always at the same spot. We filter for spenders within the address set and for spenders who are different from the 'from' address. How many transactions are remaining? Finally, we extract all unique pairs of owners and spenders, disregarding the type of token or the amount.
+\fi
+
 
 \subsection{Deposit address reuse}
 The concept of deposit address reuse was first introduced and systematically utilized by \cite{FV:17}. It was subsequently adoped by \cite{wu2022tutela}. \newline 
