@@ -46,7 +46,6 @@ hist_df = compute_histogram(transaction_df_filtered, 6, 'ToD')
 combined_stats_hist_ToD = pd.concat([stats_df, hist_df], axis=1)
 combined_stats_hist_ToD.to_csv('../data/timeOfDay.csv')
 
-
 ################
 ### GasPrice ###
 ################
