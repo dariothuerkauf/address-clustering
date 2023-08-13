@@ -120,7 +120,7 @@ class DistCalculation:
         self.index.add(self.X)
         self.node_map = node_map
 
-    def get_dist_idx(self, idx):
+    def get_dist_idx(self, idx, k=None):
         """
         computes the distance and the indices of the nearest neighbors for the vector at index idx.
         Args:
@@ -128,6 +128,8 @@ class DistCalculation:
         Returns:
             tuple: Two numpy arrays. The first one contains the distances to the nearest neighbors and the second one contains the indices of these neighbors.
         """
+        if k is None:
+            k = self.X.shape[0]
         D, I = self.index.search(self.X[idx:idx + 1], self.X.shape[0])
         return D[0, 1:], I[0, 1:]
 
