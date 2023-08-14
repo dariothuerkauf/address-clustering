@@ -82,7 +82,7 @@ Center for Innovative Finance, University of Basel
 \end{center}
 Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his.  \\
 \vfill
-\textbf{Keywords:} Keyword 1, Keyword 2, Keyword 3, Keyword 4.\\
+\textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Node Embedding Algorithms.\\
 \noindent\textbf{JEL:} X00, X00, X00
 %\end{titlepage}
 
@@ -294,6 +294,7 @@ The intra-set asset transfer dataset is mainly used to generate the network grap
 \fi
 
 \subsection{ENS ground-truth pairs}
+\label{sec:ens}
 Similarly to \cite{Beres2020}, we use Ethereum Name Service (ENS) identifiers as ground truth information to evaluate some of the clustering methods.\newline
 \textit{ENS} is a naming system that relies on the Ethereum smart contracts. Its main purpose is to map human-readable names, such as \texttt{`alice.eth`}, to machine-readable identifiers, mostly Ethereum addresses. The architecture of ENS comprises two main components: the registry and resolvers. \newline
 The \textit{ENS registry} consists of a single smart contract\footnote{The registry contract is ERC-721 compliant, which means that .eth registrations can be transferred in the same way as other NFTs.} that maintains a list of all domains and subdomains, recording the ``owner`` and ``resolver`` for each. The registry allows the owner of a domain to make changes to that data. \citep{ENSdocs} %Domain owners may set the resolver for the domain.
@@ -404,7 +405,11 @@ Since we only collected the addresses' direct transactions or token transfers, t
 \fi
 
 \subsection{Airdrop multi participation}
-Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Often, these distribution mechanisms are not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17}
+Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Especially in the early days of DeFi, these distribution mechanisms were not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17} 
+
+Victor searches for aidrop events by ... This approach would be applicable to our dataset, however, we were not able to detect significant airdrop events.  
+
+For completeness, we searched for the addresses that forwarded the UNI airdrop to another address. We found X addresses and would cluster those.
 
 \iffalse
 Airdrops are a popular mechanism to distribute tokens. On the Ethereum blockchain, they are performed through smart contracts. The owners of the smart contract choose recipients either based on past activity, or ask users to sign up through online forms. Some of these registration processes require users to perform certain actions on social media, such as posting articles or following users. The amount of tokens given to each user is either fixed, or based on existing account balances. If the amount is fixed, there is an incentive to cheat the system. 
@@ -414,56 +419,66 @@ The main challenge lies in identying airdrops. To do so, we first examine all sa
 
 \fi
 
-\subsection{Network-representation learning - Node embeddings}
+\subsection{Node embeddings}
 
 According to \cite{Beres2020}, \textit{node embedding} methods form a class of network representation learning\footnote{Sometimes also referred to as ``graph representation learning``} methods that map graph nodes to vectors in a low-dimensional vector space. These methods aim to represent vertices with similar neighborhood structure by vectors that are close in the vector space. \newline
-\cite{Beres2020} first introduced this approach on a Ethereum transaction graph for the purpose of entity identification to pair Ethereum addresses associated with deposits and withdrawals from Tornado cash. Building on this, \cite{wu2022tutela} refined and expanded one particular node embedding method to deanonymize Ethereum users at scale. \newline
+\cite{Beres2020} first introduced this approach on a Ethereum transaction graph for the purpose of entity identification to pair Ethereum addresses associated with Tornado cash deposits and withdrawals. Building on this, \cite{wu2022tutela} refined and expanded one particular node embedding method to deanonymize Ethereum users at scale. \newline
 The foundation for these node-embedding methods is an undirected graph where nodes are composed of distinct addresses, and an edge is placed between two nodes if there is a transaction between them. \newline
-To construct the network graph, we use the intra-set asset transfers as described in section \ref{sec:intra-set}. This differs from the approach taken by \cite{Beres2020} and \cite{wu2022tutela}. \cite{Beres2020} collected all transactions and token transfer events of their address set, but did not refine this data to only include intra-set asset transfers. \cite{wu2022tutela} do not operate on a specific address set, but use all Ethereum transactions to build the network graph, ignoring token transfer events. \newline %vielleicht erklären wieso wir es anders gemacht haben
-Addresses that interact with the same set of addresses in the asset transfer graph should be close in Euclidean distance. The reasons for this are twofold. For one, users with multiple accounts may interact with the same addresses or services from most of them. For another, as users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
-\cite{karateclub} provide a variety of node embedding methods as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They further subdivide into neighborhood (proximity) preserving and structural node embeddings methods. We focus on the three methods that performed best in \cite{Beres2020} experiments, namely ``Diff2Vec`` \citep{rozemberczki2020difftovec}, ``Role2Vec`` \citep{ahmed2018roletovec}, and ``Deepwalk`` \citep{perozzi2014}. Diff2Vec and DeepWalk are both neighborhood preserving, while Role2Vec is a structural node embedding method. Explaining each method in detail would be out of scope for this thesis. However, we will briefly introduce the intuition behind each method and their main characteristics. 
+To construct the network graph, we use the intra-set asset transfers described in section \ref{sec:intra-set}. This approach differs from the methodologies adopted by \cite{Beres2020} and \cite{wu2022tutela}. On one hand, \cite{Beres2020} collected all transactions and token transfer events of their address set, but did not refine this data to only include intra-set asset transfers. On the other hand, \cite{wu2022tutela} do not operate on a specific address set, but use all Ethereum transactions to build the network graph, ignoring token transfer events. \newline %vielleicht erklären wieso wir es anders gemacht haben
+Using the network graph, node embedding methods seek to learn a function that projects a node to a $d$-dimensional vector representation (also called feature vector). This is a way of simplifying the graph information by associating each node with a point in the Euclidean space. Various node embedding methods have been developed and applied to different domains. \citep{rozemberczki2020difftovec} \newline
+The intuition behind node-embedding approaches is that addresses which interact with the same set of addresses within the network graph should be close in Euclidean distance. \cite{Beres2020} cites two main reasons for this. Firstly, users with multiple accounts often interact with the same addresses or services from most of them. Secondly, when users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
+\cite{karateclub} provide a variety of node embedding methods as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They categorize the methods into neighborhood (proximity) preserving and structural. \newline
+We focus on the three methods that performed best in \cite{Beres2020} experiments: ``Diff2Vec`` \citep{rozemberczki2020difftovec}, ``Role2Vec`` \citep{ahmed2018roletovec}, and ``Deepwalk`` \citep{perozzi2014}. Diff2Vec and DeepWalk are both neighborhood preserving, while Role2Vec is a structural node embedding method. Although all of these methods utilize random walks to capture graph information, they differ in their approaches to leveraging these random walks for constructing Euclidean feature vectors. A detailed explanation of each method is beyond the scope of this thesis. For a concise overview of Diff2Vec, please refer to \cite{wu2022tutela}. The interested reader can consult the originial publications. \newline
+Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Transactions must be treated as undirected edges and loops (self-transactions) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph includes 51,566 nodes and 249,302 edges. \newline
+It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether 3 times and Bob sent Alice Ether 2 times, the edge weight would correspond to 5. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to create a custom method. \newline
+Based on our network graph, we generate 128-dimensional feature vectors for each address and method. \newline
+Given an node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search) by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{In our case, we set k as the total number of nodes in the network}. \newline
+To evaluate and the three node embedding algorithms, we use ENS address pairs described in \ref{sec:ens} as ground truth. We run each node embedding method ten times and report the average rank of the target address. For comparison, we  compute the mean, median and standard deviation of the average rank for each method.
 
-All these methods use random walks/ a random process ...
-
+\iffalse
 \textbf{Diff2Vec} % Neighborhood preserving 
 The intuition of Diff2Vec is to summarize a node by its neighborhood through a diffusion-like random process. Specifically, there are four steps to Diff2Vec: 1) Generating a diffusion graph, 2) sampling a node sequence, 3) extracting features, 4) learning a neural network embedding
-
 \textbf{DeepWalk}
-
 \textbf{Role2Vec} % Structural node embedding, Structural Node Level Embedding
 Random walks will likely visit nearby vertices first, which makes them
 suitable for finding communities, rather than roles (structural
 similarity). To overcome the above problems, we propose the Role2Vec
 framework which serves as a basis for generalizing many existing methods that use traditional random walks. Strucural feature matrix.
 
+Research in node embedding has been accelerated by Word2Vec, which is an embedding method for natural language processing. This approach has been extended to learn graph/network embeddings.
 
-Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Firstly, transactions must be treated as undirected edges. Secondly, self-transactions (loops) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph has 51,566 nodes and 249,302 edges.
-
-It is worth noting that unlike \cite{wu2022tutela}'s approach, we decided not to include edge weights. This choice facilitated the easy application of Rozemberczki's library and eliminated the need to create a custom method. %used the class provided by Beres to do this
-
-Based on the network graph, we generate 128 dimensional representations (feature vectors) for the addresses using the three methods.
-Given an address/node embedding, to find its cluster/neighbors, we can search for the closest k vectors. In practice, we accomplish this efficiently using FAISS (Johnson et al., 2019). This will always return k addresses. ordered list
-
-Evaluation - run experiments ten times for each method and report the average rank of the target address.
-
-%Research in node embedding has been accelerated by Word2Vec, which is an embedding method for natural language processing. This approach has been extended to learn graph/network embeddings.
-
-%Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
-
-%At this abstraction layer, we seek to learn a ``node embedding function``that projects a node to a d-dimensional vector representation. Importantly I want this embedding to capture semantic information about the node, such as which other addresses it frequently interact with. To do so, we leverage popular graph representation learning algorithms. (Grover and Leskovec, 2016; Rozemberczki and Sarkar, 2018). In particular, we focus on Diff2Vec, Role2Vec and 
-
-%Token networks -> Victor, Casale Brunet
+Token networks -> Victor, Casale Brunet
+\fi
 
 
 \subsection{Time-of-day transaction activity and gas price selection}
-Transaction timestamps reveal the daily activity patterns of the account owner -> example
-Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram dividid into $b_{hour}$ bins. We chose 50 bins (from beres)
 
+In addition to node embedding methods on Ethereum transaction graphs, \cite{Beres2020} propose  clustering heuristics based on time-of-day transaction activity and gas price distribution. \newline
+Time-of-day transaction activity uses all transaction timestamps initiated by a given address. These UNIX timestamps are converted to hours of the day. Beres argues that this may reveal daily activity patterns of the account owner. He represents an address by a vector including the mean, median and standard deviation, as well as a activity histogram divided into 4-6 hour bins.
+
+Similarly, he argues that users may also reveal patterns.
+
+Transaction timestamps reveal the daily activity patterns of the account owner -> example
+Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram divided into $b_{hour}$ bins. Beres chose 50 bins.
+
+Before Ethereum 1559, user would set the gas price manually.
 Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
 
+We will not use/apply both methods since their performance is significantly worse than node embeddings. However, we tested a two-step approach. First we used node embedding to find the k nearest neighbors. Using this, we ordered the addresses by their euclidean distance based on time-of-day and gas price feature vectors. We checked if applying this two step approach significantly improved the average rank. -> do not show results now, just say that what we want to do.
 
-\subsection{Own heuristics}
+\subsection{Tornado cash heuristics}
+Address match: Same address making a deposit and withdrawal from the same tornado pool
+Unique gas price: Prior to EIP-1559, Ethereum users could specify the gas price when making a deposit or withdrawal to a Tornado Cash pool Those who do so tend to specify gas prices that are identidal for deposit and withdrawal transactions. 
 
+Linked addresses: Addresses that interacted, two sets, one corresponding to the unique Tornado Cash deposit addresses and one to the unique Tornado Cash withdraw addresses. Find transactions betwee transactions between addresses of each set.
+
+Multiple denomination: studies an address' history of transactions. Deposit portfolio == withdraw portfolio. Example:
+
+Torn minting -> not explain
+
+
+\subsection{LAND transfers}
+In addition to the existing clustering heuristics, we propose our own one. We argue, given the high value of land parcels, that if someone sends his LAND NFT to another address without any compensation, there is a large probability that this user transfers LAND between his wallets.
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -471,7 +486,9 @@ Gas price definition, often set by the wallet software (slow, medium, fast), giv
 %%%%%%%%%%%%%%%%%%%%%
 
 \section{Data Analysis}
-
+Self-authorization
+Airdrop
+Node embeddings
 
 
 
@@ -506,40 +523,52 @@ Gas price definition, often set by the wallet software (slow, medium, fast), giv
 \section{Appendix}
 
 
-Database
-
-
-
 %% Table
 \begin{table}[h!]
   \centering
-  \footnotesize
-  \begin{tabular}{l p{9cm} cc}
-    \hline\hline
-    Field & Description & Transfers & Transactions\\ \hline
-    \texttt{hash} & Transaction hash & \checkmark & \checkmark \\
-    \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch & \checkmark & \checkmark \\
-    \texttt{gasUsed} & Amount of gas used by the transaction & \checkmark & \checkmark \\
-    \texttt{gasPrice} & Gas price specified for this transaction & \checkmark & \checkmark \\
-    \texttt{nonce} &  \textbullet{ }EOAs: \newline \textbullet{ }CAs: & \checkmark & \checkmark \\
-    \texttt{from} & \textbullet{ }Transactions: Address initiating the transaction\newline \textbullet{ }Transfers: Sender address & \checkmark & \checkmark \\
-    \texttt{to} & \textbullet{ }The recipient's hexadecimal address. For transactions (native asset/token transfer or contract execution) \newline \textbullet{ }Transfers: Recipient address & \checkmark & \checkmark\\
-    \texttt{value} &  \textbullet{ }Transactions: Amount of native asset sent \newline \textbullet{ }Transfers: Amount of token sent (\texttt{NaN} for NFTs)  & \checkmark & \checkmark\\
-    \texttt{tokenID} &  Token identifier (\texttt{NaN} for ERC-20 tokens) & \checkmark & \\
-    \texttt{input} & Calldata & Contract execution or deployment instructions & \checkmark \\
-    \texttt{functionName} & Name of the function called, added by Etherscan / Polygonscan (\texttt{NaN} if not available) & \checkmark & \\
-    \texttt{type} & Token standard. Created manually to combine token transfer events from different standards & \checkmark & \\
-    \texttt{chainName} & Name of the blockchain. Created manually to combine Ethereum and Polygon data & \checkmark & \checkmark\\
-    \hline\hline
+  \tiny
+  \begin{tabular}{ll p{4cm} l}
+    \hline
+    \textbf{Collection} & \textbf{Fields} & \textbf{Description} & \textbf{Example} \\ \hline
+    Transactions & \texttt{\_id} & Unique identifier & 64b3c65ed2daf924bfdce72b
+ \\
+    (16,184,993 rows) & \texttt{hash} & Transaction hash & 0x8d9490e9f0992e68490cfcb126e76290eca3bf668a... \\
+     & \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch &  1657777314\\
+     & \texttt{gasUsed} & Amount of gas used by the transaction &  144176  \\
+     & \texttt{gasPrice} & Gas price specified for this transaction in Wei &  12449848873 \\
+     & \texttt{nonce} &   &   \\
+     & \texttt{from} & Address initiating the transaction &   \\
+     & \texttt{to} & Target (either native asset transfer or function call) &  \\
+     & \texttt{value} & The amount of Ether/Matic in Wei & 500 \\
+     & \texttt{input} & Calldata & 0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \\
+     & \texttt{functionName} & added by Etherscan & approve(address spender, uint256 rawAmount) \\
+     & \texttt{chainName} & Chain indicator & Ethereum or Polygon \\
+    \hline
+    Transfers & \texttt{\_id} & see above & see above\\
+    (36.4M rows) & \texttt{hash} & see above & see above \\
+     & \texttt{timeStamp} & see above & see above\\
+     & \texttt{gasUsed} & see above &  see above\\
+     & \texttt{gasPrice} & see above & see above \\
+     & \texttt{nonce} &  see above & see above \\
+     & \texttt{from} &  Sender address & see above \\
+     & \texttt{to} &  Recipient address & see above \\
+     & \texttt{value} & Amount of tokens transferred in Wei, only for fungible or semi-fungible tokens & 10000000000000000 or NaN (ERC-721) \\
+     & \texttt{tokenID} &  Identifier of the NFT or semi-fungible token &  or NaN (ERC20) \\
+     & \texttt{contractAddress} & The token contract address &  0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 \\
+     & \texttt{tokenName} & The specified token name &  Wrapped Ether\\
+     & \texttt{tokenType} & Token standard indicator &  20 or 721 or 1155\\
+     & \texttt{chainName} & see above &  see above \\
+     & \texttt{isSet} & Indicator if from or to address are from address set &  from or to \\
+     & \texttt{userAddress} & Address of interested user & 0x000000085d9a759bb5c3d459d638739c0f48deb0\\
+    \hline
   \end{tabular}
-  \caption{Database Collection Fields}
+  \caption{Database/Dataset Description}
   \label{tbl:database_schema}
 \end{table}
 
 
-Distinction: Transaction is a message sent from an externally owned account
-((isSet, userAddress))
-%%
+%Distinction: Transaction is a message sent from an externally owned account
+
 
 
 
