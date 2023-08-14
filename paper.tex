@@ -427,7 +427,7 @@ We focus on the three methods that performed best in \cite{Beres2020} experiment
 With our intra-set asset transfer data (\ref{sec:intra-set}) and ENS address pairs (\ref{sec:ens}), we were able to apply and evaluate the node embedding methods described above. Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Transactions must be treated as undirected edges and loops (self-transactions) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph includes 51,566 nodes and 249,302 edges. \newline
 It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether three times and Bob sent Alice Ether two times, the edge weight would correspond to five. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to create a custom method. \newline
 Based on our network graph, we generate 128-dimensional feature vectors for each address and method. \newline
-Given an node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search) by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{We set $k = 51,566$, the total number of nodes in the network graph}. \newline
+Given an node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search), developed by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{We set $k = 51566$, the total number of nodes in the network graph}. \newline
 To evaluate the three node embedding algorithms, we use our ENS address pairs as ground truth. We run each node embedding method ten times and report the average rank of the target address. For comparison, we  compute the mean, median and standard deviation of the average rank for each method.
 
 \iffalse
@@ -448,10 +448,10 @@ Token networks -> Victor, Casale Brunet
 
 \subsection{Time-of-day transaction activity and gas price selection}
 
-Apart from the node embedding methods applied to Ethereum transaction graphs, \cite{Beres2020} suggested employing clustering heuristics based on time-of-day transaction activity and gas price distribution. \newline
-Time-of-day transaction activity considers all transaction timestamps initiated by a particular address. These UNIX timestamps are transformed into hour-of-the-day based values. \cite{Beres2020} argues that this may expose daily activity patterns of the account owner. Address are represented by a vector including the mean, median and standard deviation, as well as a activity histogram divided into 4-6 hour bins. \newline
-Additionaly, they argue that users may reveal patterns when choosing their gas price. Prior to EIP-1559, users could set the gas price manually. In practice, most wallet user interfaces offered three levels of gas prices: slow, average, and fast. Selecting the the fast option would ensure almost immediate inclusion in the blockhain. They normalize the gas price by the daily network average to account for the changes in Ethereum traffic volume. The combination of gas price levels that a user select forms their personal gas price profile. An account is represented by a vector including the mean, median, and standard deviation of the normalized gas prices of the transactions sent. Additionally, the normalized gas price histogram divided into 50 bins is used, which they determined to be optimal for clustering performance. \newline
-We will not employ both methods due to their significantly poorer performance compared to node embeddings. Nevertheless, we tested a two-step approach: In the first step, we implemented node embedding methods to find the k nearest neighbors. In the second step, we ordered the addresses by their Euclidean distance derived from the time-of-day and/or gas price feature vectors. We analyzed the impact of this two-step approach on the average rank of a target address.
+Apart from the node embedding methods applied to Ethereum transaction graphs, \cite{Beres2020} suggest employing clustering heuristics based on time-of-day transaction activity and gas price distribution. \newline
+\textit{Time-of-day transaction activity} considers all transaction timestamps initiated by a particular address. These UNIX timestamps are transformed into hour-of-the-day based values. \cite{Beres2020} argue that account owners may expose daily activity patterns and represent addresses by a vector including the mean, median and standard deviation, as well as an activity histogram divided into 4-6 hour bins. \newline
+Additionaly, the \textit{gas price distribution} heuristic leverages the possibility of users revealing patterns when choosing their gas price. Prior to EIP-1559, users could set the gas price manually. In practice, most wallet user interfaces offered three levels of gas prices: slow, average, and fast. Selecting the the fast option would ensure almost immediate inclusion in the blockchain. They normalize the gas price by the daily network average to account for the changes in Ethereum traffic volume. The combination of gas price levels that a user select forms their personal gas price profile. An account is represented by a vector including the mean, median, and standard deviation of the normalized gas prices of the transactions sent. Additionally, the normalized gas price histogram divided into 50 bins is used, which they determined to be optimal for clustering performance. \newline
+We will not employ both methods due to their significantly poorer performance compared to node embeddings. Nevertheless, we test a two-step approach: In the first step, we implemented Diff2Vec to find the 10 nearest neighbors. In the second step, we ordered the remaining addresses by their Euclidean distance derived from the time-of-day and/or gas price feature vectors. We analyzed the impact of this two-step approach on the average rank of a target address.
 
 \subsection{Tornado cash heuristics}
 Address match: Same address making a deposit and withdrawal from the same tornado pool
@@ -465,7 +465,7 @@ Torn minting -> not explain
 
 
 \subsection{LAND transfers}
-In addition to the existing clustering heuristics, we propose our own one. We argue, given the high value of land parcels, that if someone sends his LAND NFT to another address without any compensation, there is a large probability that this user transfers LAND between his wallets.
+In addition to the existing clustering heuristics, we propose our heuristic utilizing transfers of high-value NFTs such as LAND. We argue, given the high value of land parcels, that if someone sends his LAND NFT to another address without any compensation, there is a large probability that this user transfers LAND between his wallets.
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -481,21 +481,57 @@ Node embeddings
 \begin{table}[h!]
 \scriptsize
   \centering
-  \begin{tabular}{lllll}
+  \begin{tabular}{llll}
     \hline
-	\textbf{ENS domain name} &  & \textbf{Average Rank} &\\
-	  & Diff2Vec & Role2Vec & DeepWalk \\
+	\textbf{ENS domain name} & \textbf{Diff2Vec} & \textbf{Role2Vec} & \textbf{DeepWalk} \\
 	\hline
-	blabla.eth & 2 & 3 & 4 \\
-	blabla.eth & 2 & 3 & 4 \\
-	blabla.eth & 2 & 3 & 4 \\
-	blabla.eth & 2 & 3 & 4 \\
+	anisofim.eth & 2.5 & 6.2 & 2.7 \\
+	arisalzberg.eth & 577.3 & 33.3 & 58.8 \\
+	atearnz.eth & 2.8 & 2.5 & 3.3 \\
+	awedjob.eth & 106.8 & 71.1 & 20.1 \\
+	captvicky.eth & NaN & NaN & NaN \\
+	disruptor.eth & 11.1 & 3.0 & 1.4 \\
+	dragonkiller.eth & 30.7 & 1.0 & 1.0 \\
+	eibriel.eth & 44.3 & 91.2 & 545.4 \\
+	epdrabbit.eth & 16.3 & 10.4 & 4.1 \\
+	erikarand.eth & 1.0 & 1.0 & 1.0 \\
+	hyperspek.eth & 129.1 & 10.0 & 605.4 \\
+	jamesmillerblog.eth & NaN & NaN & NaN \\
+	jasonhsu.eth & 1.0 & 1.0 & 1.8 \\
+	joeyz.eth & 1.9 & 1.0 & 1.0 \\
+	keastie.eth & 10.4 & 1.0 & 18.2 \\
+	linkg.eth & 4.0 & 1.0 & 10.3 \\
+	lulox.eth & 4.2 & 1.5 & 27.2 \\
+	maruudn.eth & 5.7 & 5.6 & 108.5 \\
+	maryana.eth & 52.3 & 373.8 & 9.0 \\
+	meanboss.eth & 9.0 & 9.0 & 51.8 \\
+	metatiger.dcl.eth & 474.2 & 86.7 & 2.4 \\
+	mgdivingnz.eth & 1.7 & 5.0 & 1.0 \\
+	mrcryp.eth & 2.7 & 1.0 & 2.3 \\
+	nicebhaiya.eth & 1.3 & 3.4 & 2.4 \\
+	niceguy.eth & 1.0 & 1.0 & 2.2 \\
+	ornellaweb3.eth & 3.7 & 2.0 & 284.0 \\
+	pinkboots.eth & 16.9 & 14.4 & 2.2 \\
+	remx.eth & 3.6 & 2.6 & 1.7 \\
+	rileybeans.eth & 1.5 & 2.0 & 1.6 \\
+	robertjames.eth & 2.7 & 1.0 & 1.1 \\
+	rsantos.eth & 2.0 & 13.6 & 101.2 \\
+	sannin.eth & 64.8 & 1.1 & 1.6 \\
+	smileface.eth & 3.0 & 19.3 & 1.7 \\
+	theartcollection.eth & 11.0 & 5.6 & 3.4 \\
+	turkii13.eth & 52.1 & 68.9 & 47.3 \\
+	tweetious.eth & 10.3 & 4.0 & 227.0 \\
+    \hline
+    Mean & 46.038 & 28.073 & 62.084 \\
+    Median & 4.2 & 3.4 & 3.3 \\
+    Standard deviation & 120.504 & 68.814 &  139.932\\
+    Within 5 nearest neighbors & 17 (0.5) & 19 (0.56) & 20 (0.59) \\
+    Within 10 nearest neighbors & 19 (0.56) & 24 (0.71) & 21 (0.62)\\
     \hline
   \end{tabular}
-  \caption{Database/Dataset Description}
-  \label{tbl:database_schema}
+  \caption{Average Rank of ENS Domain Names for Different Embedding Methods, Addresses outside of largest connected component have a NaN value}
+  \label{tbl:ENS_Domain_Ranks}
 \end{table}
-
 
 
 
