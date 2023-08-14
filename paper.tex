@@ -374,7 +374,7 @@ In Section 5, we will implement and evaluate the heuristics we determine to be s
 
 \subsection{Self-authorization} 
 	All three token standards require functions to allow another address to transfer tokens on behalf of the actual owner. For the ERC-20 standard, this is achieved through the \texttt{`approve`} function, accepting the spender's address and the token amount as parameters\footnote{\texttt{approve(address spender, uint256 amount)}}. The ERC-721 has two functions dedicated to approvals: One for authorizing the transfer of a specific NFT\footnote{\texttt{approve(address to, uint256 tokenId)}} and one to permit transferring all of the owner's NFTs within the collection\footnote{\texttt{setApprovalForAll(address operator, bool approved)}}. The latter function also appears in the ERC-1155 standard. The approval functionality of these tokens is primarily used in connection with smart contracts (DEX or NFT Marketplace), but can also be applied for regular EOAs. \newline
-The ``self authorization`` heuristic, proposed by \cite{FV:17}, suggests that users might authorize another address they own, possibly for risk distribution across several addresses or for testing purposes. \citep{FV:17} \newline
+The ``self authorization`` heuristic, proposed by \cite{FV:17}, suggests that users might authorize another address they own, possibly for risk distribution across several addresses or for testing purposes. \newline
 Given our dataset includes all address transactions, we can easily employ this heuristic. %Since all the addresses' transactions are available in our dataset, we are able to apply this heuristic.
 
 
@@ -405,18 +405,13 @@ Since we only collected the addresses' direct transactions or token transfers, t
 \fi
 
 \subsection{Airdrop multi participation}
-Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Especially in the early days of DeFi, these distribution mechanisms were not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. \citep{FV:17} 
-
-Victor searches for aidrop events by ... This approach would be applicable to our dataset, however, we were not able to detect significant airdrop events.  
-
-For completeness, we searched for the addresses that forwarded the UNI airdrop to another address. We found X addresses and would cluster those.
+Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Especially in the early days of airdrops, these distribution mechanisms were not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, \cite{FV:17} argues that managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. He finds around 500 same-source, fixed amount token distribution events with at least 1,000 recipients while also taking into account the block difference between the individual aidrop token transfers. He defines multi-participation when two airdrop recipients forward their tokens to a single address. Since we do not have a whole view of the airdrop distribution events, we are not able to find them using our data. One possible approach would be to manually select known airdrops. However, this process takes very long and is not guaranteed to cluster a lot of addresses, since most new airdrop events were made with some kind of sybil-resistance. Nevertheless, to test this approach we searched for addresses that forwarded the UNI airdrop to another address. We found X addresses that did that, but no two addresses forwarding the amount to a third address.
 
 \iffalse
 Airdrops are a popular mechanism to distribute tokens. On the Ethereum blockchain, they are performed through smart contracts. The owners of the smart contract choose recipients either based on past activity, or ask users to sign up through online forms. Some of these registration processes require users to perform certain actions on social media, such as posting articles or following users. The amount of tokens given to each user is either fixed, or based on existing account balances. If the amount is fixed, there is an incentive to cheat the system. 
 We identify Airdrops where a fixed number of tokens is distributed to many recipients. Then we search for addresses that have been forwarded the same amount from the initial recipients. 
 This heuristic depends on two inputs. First, a set of aidrops with equal mounts, characterized by a signature of a distributing address, a token network and an amount. Second, the minimum nuber of token aggregations into a single address. The second parameter is trivial to choose, as multi-participation in its smallest form consist of two aidrop recipient addresses forwarding their tokens to a third adddress. In this case, a single entity would be in control of at least 3 addresses.
 The main challenge lies in identying airdrops. To do so, we first examine all same-source, fixed amount token distributions.
-
 \fi
 
 \subsection{Node embeddings}
@@ -428,12 +423,12 @@ To construct the network graph, we use the intra-set asset transfers described i
 Using the network graph, node embedding methods seek to learn a function that projects a node to a $d$-dimensional vector representation (also called feature vector). This is a way of simplifying the graph information by associating each node with a point in the Euclidean space. Various node embedding methods have been developed and applied to different domains. \citep{rozemberczki2020difftovec} \newline
 The intuition behind node-embedding approaches is that addresses which interact with the same set of addresses within the network graph should be close in Euclidean distance. \cite{Beres2020} cites two main reasons for this. Firstly, users with multiple accounts often interact with the same addresses or services from most of them. Secondly, when users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
 \cite{karateclub} provide a variety of node embedding methods as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They categorize the methods into neighborhood (proximity) preserving and structural. \newline
-We focus on the three methods that performed best in \cite{Beres2020} experiments: ``Diff2Vec`` \citep{rozemberczki2020difftovec}, ``Role2Vec`` \citep{ahmed2018roletovec}, and ``Deepwalk`` \citep{perozzi2014}. Diff2Vec and DeepWalk are both neighborhood preserving, while Role2Vec is a structural node embedding method. Although all of these methods utilize random walks to capture graph information, they differ in their approaches to leveraging these random walks for constructing Euclidean feature vectors. A detailed explanation of each method is beyond the scope of this thesis. For a concise overview of Diff2Vec, please refer to \cite{wu2022tutela}. The interested reader can consult the originial publications. \newline
-Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Transactions must be treated as undirected edges and loops (self-transactions) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph includes 51,566 nodes and 249,302 edges. \newline
-It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether 3 times and Bob sent Alice Ether 2 times, the edge weight would correspond to 5. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to create a custom method. \newline
+We focus on the three methods that performed best in \cite{Beres2020} experiments: ``Diff2Vec`` \citep{rozemberczki2020difftovec}, ``Role2Vec`` \citep{ahmed2018roletovec}, and ``Deepwalk`` \citep{perozzi2014}. Diff2Vec and DeepWalk are both neighborhood preserving, while Role2Vec is a structural node embedding method. Although all of these methods utilize random walks to capture graph information, they differ in their approaches to leveraging these random walks for constructing Euclidean feature vectors. A detailed explanation of each method is beyond the scope of this thesis. For a concise overview of Diff2Vec, please refer to \cite{wu2022tutela}. The interested reader may consult the originial publications. \newline
+With our intra-set asset transfer data (\ref{sec:intra-set}) and ENS address pairs (\ref{sec:ens}), we were able to apply and evaluate the node embedding methods described above. Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Transactions must be treated as undirected edges and loops (self-transactions) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph includes 51,566 nodes and 249,302 edges. \newline
+It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether three times and Bob sent Alice Ether two times, the edge weight would correspond to five. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to create a custom method. \newline
 Based on our network graph, we generate 128-dimensional feature vectors for each address and method. \newline
-Given an node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search) by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{In our case, we set k as the total number of nodes in the network}. \newline
-To evaluate and the three node embedding algorithms, we use ENS address pairs described in \ref{sec:ens} as ground truth. We run each node embedding method ten times and report the average rank of the target address. For comparison, we  compute the mean, median and standard deviation of the average rank for each method.
+Given an node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search) by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{We set $k = 51,566$, the total number of nodes in the network graph}. \newline
+To evaluate the three node embedding algorithms, we use our ENS address pairs as ground truth. We run each node embedding method ten times and report the average rank of the target address. For comparison, we  compute the mean, median and standard deviation of the average rank for each method.
 
 \iffalse
 \textbf{Diff2Vec} % Neighborhood preserving 
@@ -453,18 +448,10 @@ Token networks -> Victor, Casale Brunet
 
 \subsection{Time-of-day transaction activity and gas price selection}
 
-In addition to node embedding methods on Ethereum transaction graphs, \cite{Beres2020} propose  clustering heuristics based on time-of-day transaction activity and gas price distribution. \newline
-Time-of-day transaction activity uses all transaction timestamps initiated by a given address. These UNIX timestamps are converted to hours of the day. Beres argues that this may reveal daily activity patterns of the account owner. He represents an address by a vector including the mean, median and standard deviation, as well as a activity histogram divided into 4-6 hour bins.
-
-Similarly, he argues that users may also reveal patterns.
-
-Transaction timestamps reveal the daily activity patterns of the account owner -> example
-Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram divided into $b_{hour}$ bins. Beres chose 50 bins.
-
-Before Ethereum 1559, user would set the gas price manually.
-Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
-
-We will not use/apply both methods since their performance is significantly worse than node embeddings. However, we tested a two-step approach. First we used node embedding to find the k nearest neighbors. Using this, we ordered the addresses by their euclidean distance based on time-of-day and gas price feature vectors. We checked if applying this two step approach significantly improved the average rank. -> do not show results now, just say that what we want to do.
+Apart from the node embedding methods applied to Ethereum transaction graphs, \cite{Beres2020} suggested employing clustering heuristics based on time-of-day transaction activity and gas price distribution. \newline
+Time-of-day transaction activity considers all transaction timestamps initiated by a particular address. These UNIX timestamps are transformed into hour-of-the-day based values. \cite{Beres2020} argues that this may expose daily activity patterns of the account owner. Address are represented by a vector including the mean, median and standard deviation, as well as a activity histogram divided into 4-6 hour bins. \newline
+Additionaly, they argue that users may reveal patterns when choosing their gas price. Prior to EIP-1559, users could set the gas price manually. In practice, most wallet user interfaces offered three levels of gas prices: slow, average, and fast. Selecting the the fast option would ensure almost immediate inclusion in the blockhain. They normalize the gas price by the daily network average to account for the changes in Ethereum traffic volume. The combination of gas price levels that a user select forms their personal gas price profile. An account is represented by a vector including the mean, median, and standard deviation of the normalized gas prices of the transactions sent. Additionally, the normalized gas price histogram divided into 50 bins is used, which they determined to be optimal for clustering performance. \newline
+We will not employ both methods due to their significantly poorer performance compared to node embeddings. Nevertheless, we tested a two-step approach: In the first step, we implemented node embedding methods to find the k nearest neighbors. In the second step, we ordered the addresses by their Euclidean distance derived from the time-of-day and/or gas price feature vectors. We analyzed the impact of this two-step approach on the average rank of a target address.
 
 \subsection{Tornado cash heuristics}
 Address match: Same address making a deposit and withdrawal from the same tornado pool
@@ -489,6 +476,26 @@ In addition to the existing clustering heuristics, we propose our own one. We ar
 Self-authorization
 Airdrop
 Node embeddings
+
+
+\begin{table}[h!]
+\scriptsize
+  \centering
+  \begin{tabular}{lllll}
+    \hline
+	\textbf{ENS domain name} &  & \textbf{Average Rank} &\\
+	  & Diff2Vec & Role2Vec & DeepWalk \\
+	\hline
+	blabla.eth & 2 & 3 & 4 \\
+	blabla.eth & 2 & 3 & 4 \\
+	blabla.eth & 2 & 3 & 4 \\
+	blabla.eth & 2 & 3 & 4 \\
+    \hline
+  \end{tabular}
+  \caption{Database/Dataset Description}
+  \label{tbl:database_schema}
+\end{table}
+
 
 
 
