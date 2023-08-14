@@ -273,6 +273,7 @@ Data Structure, Fields \\
 
 
 \subsection{Intra-set asset transfers}
+\label{sec:intra-set}
 In this thesis, we want to employ entity clustering heuristics to determine the number of entities represented by the remaining 137,544 addresses. Or, to phrase it differently, do users interact with Decentraland using multiple EOAs, and can we identify addresses that belong to the same user?
 \newline
 To achieve this, we often only need to consider transactions or token transfer events where both the ``\texttt{from}`` (sender) and the ``\texttt{to}`` (recipient) address are within the address set. We call this reduced dataset ``intra-set asset transfers``. Regarding normal transactions, this means that we only keep native asset transfers (Ether or Matic) as almost all addresses are EOAs. \newline
@@ -413,33 +414,51 @@ The main challenge lies in identying airdrops. To do so, we first examine all sa
 
 \fi
 
-\subsection{Graph-based network analysis}
-Token networks -> Victor, Casale Brunet
+\subsection{Network-representation learning - Node embeddings}
 
-%The set of addresses used in interactions characterize a users. Users with multiple accounts might interact with the same addresses from most of them. Furthermore, as users move funds between their personal addresses, they may unintetionally reveal their address clusters. Clustering experiments conducted on a transaction/transfer graph with nodes as addresses and edges as transactions/transfers. Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Preprocessing steps: transfers as undirected edges, remove loops and multi-edges, exlcude nodes outside the largest connected component. Resulting graph. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
-\textbf{Node embeddings}
+According to \cite{Beres2020}, \textit{node embedding} methods form a class of network representation learning\footnote{Sometimes also referred to as ``graph representation learning``} methods that map graph nodes to vectors in a low-dimensional vector space. These methods aim to represent vertices with similar neighborhood structure by vectors that are close in the vector space. \newline
+\cite{Beres2020} first introduced this approach on a Ethereum transaction graph for the purpose of entity identification to pair Ethereum addresses associated with deposits and withdrawals from Tornado cash. Building on this, \cite{wu2022tutela} refined and expanded one particular node embedding method to deanonymize Ethereum users at scale. \newline
+The foundation for these node-embedding methods is an undirected graph where nodes are composed of distinct addresses, and an edge is placed between two nodes if there is a transaction between them. \newline
+To construct the network graph, we use the intra-set asset transfers as described in section \ref{sec:intra-set}. This differs from the approach taken by \cite{Beres2020} and \cite{wu2022tutela}. \cite{Beres2020} collected all transactions and token transfer events of their address set, but did not refine this data to only include intra-set asset transfers. \cite{wu2022tutela} do not operate on a specific address set, but use all Ethereum transactions to build the network graph, ignoring token transfer events. \newline %vielleicht erklären wieso wir es anders gemacht haben
+Addresses that interact with the same set of addresses in the asset transfer graph should be close in Euclidean distance. The reasons for this are twofold. For one, users with multiple accounts may interact with the same addresses or services from most of them. For another, as users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
+\cite{karateclub} provide a variety of node embedding methods as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They further subdivide into neighborhood (proximity) preserving and structural node embeddings methods. We focus on the three methods that performed best in \cite{Beres2020} experiments, namely ``Diff2Vec`` \citep{rozemberczki2020difftovec}, ``Role2Vec`` \citep{ahmed2018roletovec}, and ``Deepwalk`` \citep{perozzi2014}. Diff2Vec and DeepWalk are both neighborhood preserving, while Role2Vec is a structural node embedding method. Explaining each method in detail would be out of scope for this thesis. However, we will briefly introduce the intuition behind each method and their main characteristics. 
 
-Projects addresses to points in a low-dimensional vector space based on who it interacts with. In this vector space, adresses belonging to the same entity should be close together in Euclidean distance.
+All these methods use random walks/ a random process ...
 
-Consider constructing an undirected graph from all Ethereum transactions where nodes are composed of distinct addresses, and an edge is placed between two nodes if there is a transaction between them.
+\textbf{Diff2Vec} % Neighborhood preserving 
+The intuition of Diff2Vec is to summarize a node by its neighborhood through a diffusion-like random process. Specifically, there are four steps to Diff2Vec: 1) Generating a diffusion graph, 2) sampling a node sequence, 3) extracting features, 4) learning a neural network embedding
 
-At this abstraction layer, we seek to learn a ``node embedding function``that projects a node to a d-dimensional vector representation. Importantly I want this embedding to capture semantic information about the node, such as which other addresses it frequently interact with. To do so, we leverage popular graph representation learning algorithms. (Grover and Leskovec, 2016; Rozemberczki and Sarkar, 2018). In particular, we focus on Diff2Vec, Role2Vec and 
+\textbf{DeepWalk}
+
+\textbf{Role2Vec} % Structural node embedding, Structural Node Level Embedding
+Random walks will likely visit nearby vertices first, which makes them
+suitable for finding communities, rather than roles (structural
+similarity). To overcome the above problems, we propose the Role2Vec
+framework which serves as a basis for generalizing many existing methods that use traditional random walks. Strucural feature matrix.
 
 
-Given an address, to find its cluster, we can search for the closest k vectors in Rd. In practice, we accomplish this efficiently using FAISS (Johnson et al., 2019). This will always return k addresses.
+Using the library described by \cite{karateclub} requires certain preprocessing steps for the network graph. Firstly, transactions must be treated as undirected edges. Secondly, self-transactions (loops) and multi-edges should be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph has 51,566 nodes and 249,302 edges.
 
-Node embedding methods form a class of network representation learning methods that map graph nodes to vectors in a low-dimensional space. They are designed to represent vertices with similar neighborhood structure by vectors that are close in the vector space. Intuitively, addresses that interact with the same set of addresses in the Ethereum transaction graph should be close in the embedded space. Research in node embedding has been catalyzed by Word2Vec, an embedding method for natural language processing. 
-... In this work, we use these techniques on the Ethereum transaction graph to link addresses owned by the same user.
-...
-The set of addresses used in interactions characterize a user. Users with multiple accounts might interact with the same addresses or services from most of the. Furthermore, they may unintentionally reveal their address clusters. Our deanonymization methods are conducted on a transaction graph with nodes as Ethereum addresses and edges as transactions. From the library of \cite
-Diff2Vec, Role2Vec, DeepWalk \\
-Transaction Graph Analysis
+It is worth noting that unlike \cite{wu2022tutela}'s approach, we decided not to include edge weights. This choice facilitated the easy application of Rozemberczki's library and eliminated the need to create a custom method. %used the class provided by Beres to do this
 
-\subsection{Time-of-day transaction activity}
+Based on the network graph, we generate 128 dimensional representations (feature vectors) for the addresses using the three methods.
+Given an address/node embedding, to find its cluster/neighbors, we can search for the closest k vectors. In practice, we accomplish this efficiently using FAISS (Johnson et al., 2019). This will always return k addresses. ordered list
+
+Evaluation - run experiments ten times for each method and report the average rank of the target address.
+
+%Research in node embedding has been accelerated by Word2Vec, which is an embedding method for natural language processing. This approach has been extended to learn graph/network embeddings.
+
+%Rozemberczki provides a library of node embedding methods to discover address pairs that might belong to the same user. Applied 3 node embedding methods to this graph (Diff2Vec, Role2Vec and deep walk.
+
+%At this abstraction layer, we seek to learn a ``node embedding function``that projects a node to a d-dimensional vector representation. Importantly I want this embedding to capture semantic information about the node, such as which other addresses it frequently interact with. To do so, we leverage popular graph representation learning algorithms. (Grover and Leskovec, 2016; Rozemberczki and Sarkar, 2018). In particular, we focus on Diff2Vec, Role2Vec and 
+
+%Token networks -> Victor, Casale Brunet
+
+
+\subsection{Time-of-day transaction activity and gas price selection}
 Transaction timestamps reveal the daily activity patterns of the account owner -> example
 Given the set of timestamps, an account is represented by the vector including the mean, median and standard deviation, as well as the time-of-day activity histogram dividid into $b_{hour}$ bins. We chose 50 bins (from beres)
 
-\subsection{Gas price distribution}
 Gas price definition, often set by the wallet software (slow, medium, fast), given the changes in traffic volume we normalice the gas price bxy the daily network average in our dataset. Make example. Given the normalized gas prices of the transactions sent, an account is represented by the mean, median and standard deviation, as well as the normalized gas price histogram divided into $b_{gas}$ bins. We chose 6 bins (4 hour intervals) according to Beres.
 
 
