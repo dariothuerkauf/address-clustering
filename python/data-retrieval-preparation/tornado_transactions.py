@@ -40,7 +40,7 @@ tornado_pools = pd.DataFrame(tornado, columns=['contract_address', 'pool'])
 tornado_pools['contract_address'] = tornado_pools['contract_address'].str.lower()
 tornado_pools.set_index('contract_address', inplace=True)
 tornado_pool_addresses = tornado_pools.index.tolist()
-#tornado_pools.to_csv('../data/tornado-pools.csv')
+#tornado_pools.to_csv('../../data/tornado-pools.csv')
 
 # Transactions
 tornado_transactions = pd.DataFrame(list(transactions.find({"$or": [{"from": {"$in": tornado_pool_addresses}}, {"to": {"$in": tornado_pool_addresses}}]})))
@@ -64,5 +64,5 @@ df['pool'] = df['contractAddress'].map(tornado_dict)
 
 # Save the DataFrame to a CSV file
 df.reset_index(drop=True, inplace=True)
-df.to_csv('../data/tornado.csv')
+df.to_csv('../../data/tornado_trx_transfers.csv')
 print(df)
