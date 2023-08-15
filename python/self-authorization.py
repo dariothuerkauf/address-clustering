@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import pandas as pd
 import re
+import networkx as nx
 
 # Connect to db collection
 client = MongoClient('mongodb://localhost:27017/')
@@ -8,12 +9,7 @@ db = client['address-clustering']
 transactions = db['transactions']
 users = pd.read_csv('../data/subsets.csv')['Address'].to_list()
 
-# Query all approval transactions
-# approvals = pd.DataFrame(list(transactions.find({"functionName": "approve(address spender, uint256 rawAmount)"})))
-# print(f'Total approvals: {len(approvals)}')
-
-
-# List of function signatures you're interested in
+# List of function signatures of approval functions
 signatures = [
     "0x095ea7b3",  # approve(address,uint256) for both ERC-20 and ERC-721
     "0xa22cb465",  # setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
@@ -43,4 +39,22 @@ filtered_self_approvals = filtered_self_approvals[['hash','from', 'to', 'spender
 grouped_df = filtered_self_approvals.groupby(['from']).size().reset_index(name='Number of Approvals given')
 print(grouped_df)
 print(filtered_self_approvals)
+
+
+# Build clusters
+
+G = nx.DiGraph()
+# Add edges from 'from' address to 'spender'
+for idx, row in filtered_self_approvals.iterrows():
+    G.add_edge(row['from'], row['spender'])
+clusters = list(nx.connected_components(G.to_undirected()))
+cluster_df = pd.DataFrame(columns=['Cluster_ID', 'Address'])
+
+# Assign a cluster ID to each address
+for cluster_id, cluster in enumerate(clusters):
+    for address in cluster:
+        cluster_df = cluster_df.append({'Cluster_ID': cluster_id, 'Address': address}, ignore_index=True)
+
+print(cluster_df)
+
 
