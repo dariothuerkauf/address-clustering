@@ -64,32 +64,40 @@ def address_txs(address_str):
     return txs.sort_values("timeStamp")
 
 
-def show_patterns(events_df, addresses, hour_bins=24, figsize=(15, 3), show_kde=False):
+def show_patterns(events_df, addresses, hour_bins=24, figsize=(15, 15), show_kde=True):
     """Show side channels distribution of the given addresses"""
     addresses = [addr.lower() for addr in addresses]
     events_df['timeStamp'] = pd.to_datetime(events_df['timeStamp'], unit='s')
     events_df['hour'] = events_df['timeStamp'].dt.hour * 3600 + events_df['timeStamp'].dt.minute * 60 + events_df[
         'timeStamp'].dt.second
     sns.set_theme(context='paper')
-    if show_kde:
-        fig, ax = plt.subplots(1, figsize=(7.5, 3))
-        for address in addresses:
-            user_txs = events_df[events_df["from"] == address]
-            print(address, len(user_txs))
-        try:
-            for address in addresses:
-                user_txs = events_df[events_df["from"] == address]
-                sns.kdeplot(user_txs['hour'], ax=ax)
-            format_x_axis(ax, hour_bins)
-        except Exception as e:
-            print(e)
 
-    fig, ax = plt.subplots(1, figsize=(7.5, 3))
-    bin_edges = np.linspace(events_df['hour'].min(), events_df['hour'].max(), hour_bins + 1)  # set common bin edges
+    # Create a 2x1 grid of subplots
+    fig, (ax_hist, ax_kde) = plt.subplots(2, 1, figsize=figsize, gridspec_kw={'height_ratios': [2, 1]})
+
+    # Plot histogram on ax_hist
+    bin_edges = np.linspace(events_df['hour'].min(), events_df['hour'].max(), hour_bins + 1)
     for address in addresses:
         user_txs = events_df[events_df["from"] == address]
-        sns.histplot(user_txs["hour"], bins=bin_edges, kde=False, ax=ax, alpha=0.5)  # use common bin edges
-        format_x_axis(ax, hour_bins)
+        sns.histplot(user_txs["hour"], bins=bin_edges, kde=False, ax=ax_hist, alpha=0.5)
+        format_x_axis(ax_hist, hour_bins) # assuming you have this function to format the x-axis
+
+    ax_hist.set_xlabel('Hour', fontsize=14)
+    ax_hist.set_ylabel('Frequency', fontsize=14)
+
+    # Plot KDE on ax_kde
+    if show_kde:
+        for address in addresses:
+            user_txs = events_df[events_df["from"] == address]
+            sns.kdeplot(user_txs['hour'], ax=ax_kde)
+            format_x_axis(ax_kde, hour_bins) # assuming you have this function to format the x-axis
+
+    ax_kde.set_xlabel('Hour', fontsize=14)
+    ax_kde.set_ylabel('Density', fontsize=14)
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+
+    return fig, (ax_hist, ax_kde)
 
 
 ### Helper function
