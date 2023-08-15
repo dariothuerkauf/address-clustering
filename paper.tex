@@ -497,15 +497,20 @@ For this clustering heuristic, we analyze the transaction data of the addresses,
 \textit{Third}, we implement two filters on the approval transactions. The first filter checks if the spender address is part of our address set, and the second ensures that the spender address is different from the address initiating the transaction, thus eliminating self-approvals, which may occur due to a user interface bug or testing transactions. \newline
 \textit{Fourth}, we group the remaining approvals by the initiating address and proceed to form the clusters.
 
-We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses that had all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or even faulty token distribution/minting scheme. \newline Ultimately, we discovered 35 addresses associated with 15 distinct entities.
+We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses that had all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. \newline Ultimately, we discovered 35 addresses associated with 15 distinct entities.
 
 
 \subsection{Node embeddings}
+As described in previous sections, we tested different datasets to create the network graph using our ENS address pairs as ground truth. Der Approach ist zwar stark an Beres angelehnt, jedoch wendet er es an um pairs of deposit und withdrawal addressen zu clustern.
 
-1. Show that we tested different datasets to build network graph, best performing was intra-set asset transfers\\
-2. Evaluated the performance by average rank for the three methods, show results, describe how this method may be flawed/ why maybe not ideal\\
-3. Show how we clustered addresses using a treshold of euclidean distance, describe and visualize clustering results (histograms) \\
-4. Describe two step approach test, may need further research and would be ideal to incorporate into node embedding feature vectors \\
+We found the intra-set asset transfers to perform best in terms of the average rank of a target address. 
+Create network graph
+Run ten separate experiments and calculate the average rank for each target address. The results of this are shown in Table X. Explain table, NaN values, within 5 nearest neighbors etc.
+
+
+
+%1. Show that we tested different datasets to build network graph, best performing was intra-set asset transfers\\
+%2. Evaluated the performance by average rank for the three methods, show results, describe how this method may be flawed/ why maybe not ideal\\
 
 \begin{table}[h!]
 \scriptsize
@@ -561,6 +566,9 @@ We identified 16 clusters across 126 self-authorizing transactions, comprising 1
   \caption{Average Rank of ENS Domain Names for Different Embedding Methods, Addresses outside of largest connected component have a NaN value}
   \label{tbl:ENS_Domain_Ranks}
 \end{table}
+
+3. Show how we clustered addresses using a treshold of euclidean distance, describe and visualize clustering results (histograms) \\
+4. Describe two step approach test, may need further research and would be ideal to incorporate into node embedding feature vectors \\
 
 
 \subsection{LAND transfers}
