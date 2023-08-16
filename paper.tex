@@ -421,7 +421,8 @@ The main challenge lies in identying airdrops. To do so, we first examine all sa
 According to \cite{Beres2020}, \textit{node embedding} methods form a class of network representation learning\footnote{Sometimes also referred to as ``graph representation learning``} methods that map graph nodes to vectors in a low-dimensional vector space. These methods aim to represent vertices with similar neighborhood structure by vectors that are close in the vector space. \newline
 \cite{Beres2020} first introduced this approach on a Ethereum transaction graph for the purpose of entity identification to pair Ethereum addresses associated with Tornado cash deposits and withdrawals. Building on this, \cite{wu2022tutela} refined and expanded one particular node embedding method to deanonymize Ethereum users at scale. \newline
 The foundation for these node-embedding methods is an undirected graph where nodes are composed of distinct addresses, and an edge is placed between two nodes if there is a transaction between them. \newline
-To construct the network graph, we use the intra-set asset transfers described in section \ref{sec:intra-set}. This approach differs from the methodologies adopted by \cite{Beres2020} and \cite{wu2022tutela}. On one hand, \cite{Beres2020} collected all transactions and token transfer events of their address set, but did not refine this data to only include intra-set asset transfers. On the other hand, \cite{wu2022tutela} do not operate on a specific address set, but use all Ethereum transactions to build the network graph, ignoring token transfer events. After comparing these two methodologies with ours, we determined that intra-set asset transfers were the most effective for clustering a pre-defined set of addresses using node-embedding methods.\newline
+To construct the network graph, we use the intra-set asset transfers described in section \ref{sec:intra-set}. This approach differs from the methodologies adopted by \cite{Beres2020} and \cite{wu2022tutela}. On one hand, \cite{Beres2020} collected all transactions and token transfer events of their address set, but did not refine this data to only include intra-set asset transfers. On the other hand, \cite{wu2022tutela} do not operate on a specific address set, but use all Ethereum transactions to build the network graph, ignoring token transfer events. After comparing these two methodologies with ours, we determined that intra-set asset transfers were the most effective for clustering a pre-defined set of addresses. %using node-embedding methods.
+\newline
 Using the network graph, node embedding methods seek to learn a function that projects a node to a $d$-dimensional vector representation (also called feature vector). This is a way of simplifying the graph information by associating each node with a point in the Euclidean space. Various node embedding methods have been developed and applied to different domains. \citep{rozemberczki2020difftovec} \newline
 The intuition behind node-embedding approaches is that addresses which interact with the same set of addresses within the network graph should be close in Euclidean distance. \cite{Beres2020} cites two main reasons for this. Firstly, users with multiple accounts often interact with the same addresses or services from most of them. Secondly, when users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
 \cite{karateclub} provide a variety of node embedding methods as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They categorize the methods into neighborhood (proximity) preserving and structural. \newline
@@ -498,20 +499,33 @@ For this clustering heuristic, we analyze the transaction data of the addresses,
 \textit{Third}, we implement two filters on the approval transactions. The first filter checks if the spender address is part of our address set, and the second ensures that the spender address is different from the address initiating the transaction, thus eliminating self-approvals, which may occur due to a user interface bug or testing transactions. \newline
 \textit{Fourth}, we group the remaining approvals by the initiating address and proceed to form the clusters.
 
-We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses that had all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. \newline Ultimately, we discovered 35 addresses associated with 15 distinct entities.
-
+We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses that had all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. Ultimately, we discovered 35 addresses associated with 15 distinct entities.
 
 \subsection{Node embeddings}
-As described in previous sections, we tested different datasets to create the network graph using our ENS address pairs as ground truth. Der Approach ist zwar stark an Beres angelehnt, jedoch wendet er es an um pairs of deposit und withdrawal addressen zu clustern.
 
-We found the intra-set asset transfers to perform best in terms of the average rank of a target address. 
-Create network graph
-Run ten separate experiments and calculate the average rank for each target address. The results of this are shown in Table X. Explain table, NaN values, within 5 nearest neighbors etc.
+Our analysis of node embeddings begins with the network graph discussed in Section 4.4. The graph, which represents the largest connected component of intra-set asset transfers, contains no multi-edges or self-loops. This allows us to employ \cite{karateclub} Python library. \newline
+Next, we conduct ten independent experiments for each method, using the same input parameters as \cite{Beres2020}. Each experiment yields a node embedding in the form of a matrix with 51,566 rows corresponding to the number of embedded nodes, and 128 columns, representing feature vector dimensions. We use this matrix to generate a list of the k nearest neighbors of each node ranked by the Euclidean distance. This is accomplished by using the FAISS similarity search library. \newline
+The ranked list allows to search pairs of ENS addresses and report their relative rank. Table \ref{tbl:ENS_Domain_Ranks} shows the results for each address pair averaged over the ten experiments. Additionally, we calculated the method's mean, median, standard deviation and the rate of the target address being within the 5 or 10 nearest neighbors.
+
+Two addresses are not part of the largest connected component (network graph) and therefore show NaN values, for completeness they are still shown in the table.
+We can say that for these addresses/pairs, the methods are all surprisingly good in finding the target address -> node embedding methoden schreiben den beiden addressen/nodes sehr ähnliche feature vectoren zu.
+
+On average, the target address is found within the X nearest neighbors. Random guess would yield an average of 25k. Maximum is 51,566. 
+
+In 50\% of cases, the target address has a rank of 4.2 or less.
+
+We find the target address within the 5 nearest neighbors in xxx.
+and within the 10 nearest neighbors in xxx
+
+Role2Vec seems to work best
+
+Still small sample, we cannot definitely say that role2vec is clearly better than the other methods. Luckily all methods are good.
+
+Average rank may not always be the best method, since a user can control more than two addresses. Make example: If someone has 20 addresses and all are found within the twenty nearest neighbors, but our address pairs only has found the twentieth address as a ground truth pair.
 
 
-
-%1. Show that we tested different datasets to build network graph, best performing was intra-set asset transfers\\
-%2. Evaluated the performance by average rank for the three methods, show results, describe how this method may be flawed/ why maybe not ideal\\
+%Evaluated the performance by average rank for the three methods, show results, describe how this method may be flawed/ why maybe not ideal
+%As described in previous sections, we tested different datasets to create the network graph using our ENS address pairs as ground truth. Der Approach ist zwar stark an Beres angelehnt, jedoch wendet er es an um pairs of deposit und withdrawal addressen zu clustern. We found the intra-set asset transfers to perform best in terms of the average rank of a target address. 
 
 \begin{table}[h!]
 \scriptsize
