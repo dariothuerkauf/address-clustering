@@ -279,9 +279,9 @@ Data Structure, Fields \\
 %In this thesis
 We want to employ entity clustering heuristics to determine the number of entities represented by the remaining 137,544 addresses. Or, to phrase it differently, do users interact with Decentraland using multiple EOAs, and can we identify addresses that belong to the same user?
 \newline
-To achieve this, we often only consider transactions or token transfer events where both the ``\texttt{from}`` (sender) and the ``\texttt{to}`` (recipient) address are within the address set. We call this reduced dataset ``intra-set asset transfers``. Regarding normal transactions, this means that we only keep native asset transfers (Ether or Matic) as almost all addresses are EOAs. \newline
+To achieve this, we often only consider transactions or token transfer events where both the ``\texttt{from}`` (sender) and the ``\texttt{to}`` (recipient) address are within the address set. We call this reduced dataset ``intra-set asset transfers``. Regarding normal transactions, this means that we only keep native asset transfers/payments (Ether or Matic) as almost all addresses are EOAs. \newline
 The intra-set asset transfer dataset is mainly used to generate the network graphs (see Section \ref{sec:node}). %used for the node embedding methods
-When clustering addresses using graph-based approaches, this has the advantage that we do not need to differentiate between EOA and smart contract account later on. Furthermore, it allows us to observe and visualize the asset flows between users. In total, we have 974,478 intra-set token transfers and 210,548 intra-set native asset transfers (101,621 Matic, 108,927 Ether). 
+When clustering addresses using graph-based approaches, this has the advantage that we do not need to differentiate between EOA and smart contract account later on. Furthermore, it allows us to observe and visualize the asset flows between users. In total, we have 974,478 intra-set token transfers and 210,548 intra-set native asset transfers/payments (101,621 Matic, 108,927 Ether). 
 
 \iffalse
 %further simplifies the clustering process. \newline
@@ -475,7 +475,7 @@ We identified 84 transactions tied to Tornado cash pools, including 72 deposits,
 
 \subsection{LAND transfers}
 In addition to the existing clustering heuristics, we propose our own heuristic based on transfers of high-value NFTs such as LAND. We argue that, given the high value of Decentraland land parcels, there is a strong likelihood that addresses are controlled by the same entity when LAND is transferred without any compensation. A user might perform such transfers to rearrange their LAND holdings, e.g., by upgrading to a more secure wallet implementation. \newline
-The primary challenge of this approach is to detect LAND transfers without any compensation. To accomplish this, we identify token or native asset transfers that took place within the same transaction as a LAND transfer. Upon manually examining various implementations of LAND trades on the most popular NFT marketplace contracts, we noticed a recurring pattern: the user address appears in both the ``from`` and ``to`` fields if a trade takes place. Figure \ref{fig:LAND_example} illustrates an example of this pattern. 
+The primary challenge of this approach is to detect LAND transfers without any compensation. To accomplish this, we identify token or native asset transfers/payments that took place within the same transaction as a LAND transfer. Upon manually examining various implementations of LAND trades on the most popular NFT marketplace contracts, we noticed a recurring pattern: the user address appears in both the ``from`` and ``to`` fields if a trade takes place. Figure \ref{fig:LAND_example} illustrates an example of this pattern. 
 In the case of pure LAND transfers, the sending and receiving addresses are the same for all transfers within a transaction. However, this approach does not consider other LAND trading schemes, including off-chain compensation or non-atomic (within multiple transactions) trade settlement.
 
 \begin{figure}[h!]
@@ -496,27 +496,24 @@ This section analyzes clustering heuristics applicable to our address set using 
 
 \subsection{Self-authorization}
 
-To find self-authorizations, we analyze the transaction data of the addresses, focusing on the transaction's ``calldata``. The first four bytes of the calldata represent the selector of the function signature, which specifies the smart contract function to be invoked. \newline
-\textit{First}, we query all transactions that begin with a function signature related to the approval functions corresponding to ERC-20, ERC-721 and ERC-1155 token standards. This step helps us identify all approval transactions. \textit{Second}, we extract the approved address (spender address), which is always located at the same position within the calldata due to token standardization. We then record the spender address in a new field within our dataframe. \textit{Third}, we implement two filters on the approval transactions. The first filter checks if the spender address is part of our address set, and the second ensures that the spender address is different from the address initiating the transaction, which may occur due to a user interface bug or testing transactions. \textit{Fourth}, we group the remaining approvals by the initiating address and proceed to form the clusters.
+We analyze the addresses' transaction data to find self-authorizations, focusing on the transaction's ``calldata``. The first four bytes of the calldata represent the function selector, which unambiguously specifies the smart contract function the transaction originator wants to invoke. \newline
+\textit{First}, we identify all transactions that begin with a function signature related to the approval functions corresponding to ERC-20, ERC-721, and ERC-1155 token standards. \textit{Second}, we extract the approved (spender) address, which is always located at the same position within the calldata due to token standardization. We then record the spender address in a new field within our dataframe. \textit{Third}, we implement two filters on the approval transactions. The first filter checks if the spender address is part of our address set, and the second ensures that the spender address is different from the address initiating the transaction, which may occur due to a user interface bug or testing transactions. \textit{Fourth}, we group the remaining approvals by the initiating address and form the clusters.
 
-We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses that had all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. Ultimately, we discovered 35 addresses associated with 15 distinct entities.
+We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses with all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. Ultimately, we discovered 35 addresses associated with 15 distinct entities.
 
 \subsection{Node embeddings}
 
-Our analysis of node embedding methods starts with a network graph built from intra-set asset transfers. We treat addresses as nodes and add undirected edges between them if they interacted with each other. \newline
-To use the Python library developed by \cite{karateclub}, we remove multi-edges and loops (transfers with same sender and recipient address) and only consider nodes within the largest connected component. The resulting network graph includes 51,566 nodes and 249,302 edges. As previously stated, we utilize the Diff2Vec, Role2Vec and DeepWalk methods from the library. \newline
+Our analysis of node embedding methods starts with a network graph built from intra-set asset transfers. We treat addresses as nodes and add undirected edges between them if they interact with each other. \newline
+To use the Python library developed by \cite{karateclub}, we remove multi-edges and loops (transfers with the same sender and recipient address) and only consider nodes within the largest connected component. The resulting network graph includes 51,566 nodes and 249,302 edges. As previously stated, we utilize the Diff2Vec, Role2Vec, and DeepWalk methods from the library. \newline
 Subsequently, we run ten independent experiments for each method. Our choice of input parameters is identical to \cite{Beres2020}. Each experiment returns a node embedding in the form of a matrix with 51,566 rows corresponding to the number of nodes in the graph, and 128 columns, representing the feature vector dimensions. \newline
-For any node within the embedding, we can easily order all other nodes by the Euclidean distance. %We can easily order nodes by the Euclidean distance to a given node. 
-We achieve this through the Faiss library, which is suitable for efficient similarity search and clustering of dense vectors. \newline
-This enables us to search for our ENS ground truth pairs and report their relative rank. The results for each address pair, averaged over ten experiments are presented in Table \ref{tbl:ENS_Domain_Ranks}. Additionally, we calculated the mean, median, standard deviation and the rate of the target address appearing within the five or ten nearest neighbors for each method. \newline
-All three methods demonstrated remarkable efficacy in locating the target address, which indicates their ability to find multiple addresses controlled by a single entity. %Ability to assign highly similar feature vectors to both addresses within a ground truth pair.
-Role2Vec seems to be the most effective method, with the target address, on average, being found within the 28 nearest neighbors. In contrast, Diff2Vec and DeepWalk produced slightly higher averages of 46 and 62, respectively. Furthermore, Role2Vec found the target address within the ten nearest neighbors in 24 out of 34 cases (71\%). Diff2Vec is slightly less effective than Role2Vec or DeepWalk, although still generally successful. \newline
-It is noteworthy that two address pairs are not included in the network graph and therefore display no values. However, they have been included to demonstrate that the intra-set asset transfer approach may not always be applicable to cluster all addresses of a predefined set. \newline
-We also need to consider, that average rank may not be the most appropriate evaluation metric, particularly when a user controls significantly than two addresses. For example, if a single entity controls 20 addresses. Only one pair of addresses is detected as ground truth. Even if the algorithm finds all 20 addresses within the nearest neighbors but identifies our ground truth pair as the last one, we will score it lower than another algorithm that finds only one of the twenty addresses but within, for example, the ten nearest neighbors.
+For any node within the embedding, we can easily order all other nodes by the Euclidean distance. We achieve this through the Faiss library, which is suitable for efficient similarity search and clustering of dense vectors. \newline 
+This enables us to search for our ENS ground truth pairs and report their relative rank. The results for each address pair, averaged over ten experiments, are presented in Table \ref{tbl:ENS_Domain_Ranks}. Additionally, we calculated the mean, median, standard deviation, and the rate of the target address appearing within the five or ten nearest neighbors for each method.
 
-%Role2Vec seems to work best out of the three, it has the lowest mean (28) and standard deviation and almost the same median as deepwalk.
-%In contrast to Beres, where diff2vec worked best, in our case it is slightly less good then the other methods but still good overall.
-%Average rank may not always be the best method, since a user can control more than two addresses. Make example: If someone has 20 addresses and all are found within the twenty nearest neighbors, but our address pairs only has found the twentieth address as a ground truth pair.
+All three methods demonstrated remarkable efficacy in locating the target address, which indicates their ability to find multiple addresses controlled by a single entity.
+Role2Vec is the most effective method, with the target address, on average, found within the 28 nearest neighbors. In contrast, Diff2Vec and DeepWalk produced slightly higher averages of 46 and 62, respectively. Furthermore, Role2Vec found the target address within the ten nearest neighbors in 24 out of 34 cases (71\%). Diff2Vec is barely less effective than Role2Vec or DeepWalk, although still generally successful. \newline
+Notably, two address pairs are not present within the network graph and therefore display no values. However, they have been included to demonstrate that the intra-set asset transfer approach may only sometimes be applicable to cluster all addresses of a predefined set. \newline
+We also need to consider that average rank may not be the most appropriate evaluation metric, particularly when a user controls more than two addresses. Suppose a single entity controlling 20 addresses, but only one pair of addresses is detected as ground truth. Even if the algorithm finds all 20 addresses within the nearest neighbors but identifies the ground truth pair as the last one, we will score it lower than another algorithm that finds only one of the twenty addresses but within the ten nearest neighbors.
+
 %As described in previous sections, we tested different datasets to create the network graph using our ENS address pairs as ground truth. Der Approach ist zwar stark an Beres angelehnt, jedoch wendet er es an um pairs of deposit und withdrawal addressen zu clustern. We found the intra-set asset transfers to perform best in terms of the average rank of a target address. 
 
 \begin{table}[h!]
@@ -574,11 +571,10 @@ We also need to consider, that average rank may not be the most appropriate eval
   \label{tbl:ENS_Domain_Ranks}
 \end{table}
 
-After evaluating the different node embedding methods, we want to cluster addresses to assess the number of entities represented by the 51,566 nodes in the network. %to make a statement about the real number of users
-We use the node embedding generated by Role2Vec.
-One approach might involve assigning the $k$ nearest neighbours of a node to a cluster and subsequently merging clusters until each node is assigned to exactly one cluster. However, selecting an appropriate $k$ is challenging, and it is hard to make the case that each address belongs to a cluster of at least $k$ for entity identification. \newline
-Instead, we choose to build clusters based on the Euclidean distance. All neighbors of a node below a certain treshold are considered a cluster (entity). Subsequently, we merge overlapping clusters; for instance, if node A is clustered with nodes B and C, and node C is clustered with X, we form a cluster comprising A, B, C, and X. \newline
-We explore the senstitivity of clusters to various treshold values. The impact of changing the threshold value is shown in Figure \ref{fig:threshold_sensitivity} and Table \ref{tbl:cluster_table}. We chose these tresholds after manual inspection of ground truth pair distances. For better visibility, we only display clusters smaller than 20. At thresholds of 0.6, 0.7, and 0.8, we find 23,608, 18,592, and 14,793 clusters, respectively. Regardless of the threshold, the largest cluster always consists of more than 500 addresses. Unsurprisingly, higher tresholds result in fewer single-address clusters. The effect of the threshold is most pronounced for single address clusters, while affecting other cluster sizes much less. 
+After evaluating the different node embedding methods, we want to cluster the addresses to assess the number of entities represented by the 51,566 nodes in the network. We use the node embedding generated by Role2Vec. \newline
+One approach might involve grouping a node's $k$ nearest neighbours to a cluster and subsequently merging clusters until each node is assigned to exactly one cluster. However, selecting an appropriate $k$ is challenging, and it is hard to make the case that each address belongs to a cluster of at least $k$ nodes. \newline
+Instead, we choose to build clusters based on the Euclidean distance. All neighbors of a node below a certain threshold are considered a cluster. Afterward, we merge overlapping clusters; for instance, if node A is clustered with nodes B and C, and node C is clustered with nodes A and X, we form a cluster comprising A, B, C, and X. \newline
+We explore the sensitivity of clusters to various Euclidean distance threshold values. Figure \ref{fig:threshold_sensitivity} shows the histogram of cluster sizes and Table \ref{tbl:cluster_table} displays the number of resulting clusters depending on various threshold values. We chose said values after looking at the distance between ground truth pairs. For better visibility, we only display clusters below 20 addresses in Figure \ref{fig:threshold_sensitivity}. At thresholds of 0.6, 0.7, and 0.8, we find 23,608, 18,592, and 14,793 clusters, respectively. Regardless of the threshold, the largest cluster has more than 500 addresses. Unsurprisingly, higher thresholds result in fewer single-address clusters and more large sized clusters. The effect of the threshold is most pronounced for single address clusters, while affecting other cluster sizes much less. 
 
 \begin{figure}[h]
 	\centering
@@ -589,18 +585,18 @@ We explore the senstitivity of clusters to various treshold values. The impact o
 
 
 \begin{table}[h!]
-\scriptsize
+\small
   \centering
-  \begin{tabular}{lrrr}
+  \begin{tabular}{lrrrrrrr}
     \hline
-	\textbf{Threshold} & \textbf{0.6} & \textbf{0.7} & \textbf{0.8} \\
+	\textbf{Threshold} & \textbf{0.5} & \textbf{0.55} &\textbf{0.6} & \textbf{0.65} & \textbf{0.7} & \textbf{0.75} & \textbf{0.8} \\
 	\hline
-Total clusters & 23,608 & 18,592 & 14,793 \\
-Size of largest cluster & 516 & 532 & 544\\
-Clusters of size >50 & 3 & 9 & 14\\
+Total clusters 			& 29,502 & 26,762 & 23,608 & 21,229 & 18,592 & 16,361 & 14,793 \\
+Size of largest cluster & 499 & 	512 & 516 & 	524 & 532 & 535 & 544\\
+Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
     \hline
   \end{tabular}
-  \caption{A table}
+  \caption{Clustering results for different threshold values}
   \label{tbl:cluster_table}
 \end{table}
 
@@ -611,7 +607,10 @@ Clusters of size >50 & 3 & 9 & 14\\
 
 \subsection{LAND transfers}
 
-For the LAND transfer heuristic, we started by selecting all LAND transfer events from our intra-set token transfer dataframe. We store the transaction hash as a list and later collect all transactions and token transfers for transactions within the hash list. Afterwards we delete duplicates. We detect purchases by .... If a transaction consisted of a purchase, we mark it in a new column. Later on, we filter for all simple transfers and build clusters.
+To implement the LAND transfer heuristic, we select all hashes of transactions where LAND was transferred between two Decentraland addresses. Then, we gather all token and native asset transfers associated with the previously selected transaction hashes, and remove any duplicates. We group the data by transaction hash and examine the sender (from) and recipient (to) fields for each transaction. If the same user address appears as both the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases from our intra-set LAND transfers and create address clusters based on the remaining LAND transfers.
+
+413 addresses, 161 clusters, most clusters of 2 or 3 addresses, one cluster of 71 addresses.
+From the remaining 413 addresses, we can form 161 clusters. Most clusters consists of 2 or 3 addresses. There is one cluster of 71 addresses which is likely 
 
 For visualization we ....
 
@@ -682,11 +681,11 @@ Limitations
     (16,184,993 rows) & \texttt{hash} & Transaction hash & 0x8d9490e9f0992e68490cfcb126e76290eca3bf668a... \\
      & \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch &  1657777314\\
      & \texttt{gasUsed} & Amount of gas used by the transaction &  144176  \\
-     & \texttt{gasPrice} & Gas price specified for this transaction in Wei &  12449848873 \\
+     & \texttt{gasPrice} & The price of gas the originator is willing to pay &  12449848873 \\
      & \texttt{nonce} &   &   \\
      & \texttt{from} & Address initiating the transaction &   \\
-     & \texttt{to} & Target (either native asset transfer or function call) &  \\
-     & \texttt{value} & The amount of Ether/Matic in Wei & 500 \\
+     & \texttt{to} & The destination address (either native asset transfer or function call) &  \\
+     & \texttt{value} & The amount of Ether/Matic to send to the destination & 500 \\
      & \texttt{input} & Calldata & 0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \\
      & \texttt{functionName} & added by Etherscan & approve(address spender, uint256 rawAmount) \\
      & \texttt{chainName} & Chain indicator & Ethereum or Polygon \\
