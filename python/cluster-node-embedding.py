@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 from utils import *
 
 all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0], low_memory=False)
@@ -37,7 +35,7 @@ embeddings_dw = emb_dw_df.values
 faiss_index_deepWalk = DistCalculation(embeddings_dw, node_map)
 
 #Get clusters
-threshold = 0.5
+threshold = 0.75
 nn = 10
 
 class UnionFind:
@@ -86,25 +84,13 @@ cluster_df = pd.DataFrame({'ClusterID': range(len(clusters)), 'Nodes': clusters}
 cluster_sizes = [len(cluster) for cluster in clusters] # Get cluster sizes
 sorted_cluster_sizes = sorted(cluster_sizes, reverse=True)
 
-# Plot histogram
-plt.figure(figsize=(10, 6))
-plt.hist(cluster_sizes, bins=max(cluster_sizes)-min(cluster_sizes), align='left', edgecolor='black', color='blue', alpha=0.7)
-plt.title(f'Histogram of Cluster Sizes with {threshold} threshold')
-plt.xlabel('Cluster Size')
-plt.ylabel('Number of Clusters')
-plt.xlim([0.5, 30])
-plt.ylim([0, 15000])
-
-#plt.xticks([max(cluster_sizes)])
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.savefig(f'../figures/cluster_histogram_{threshold}.png')
-plt.show()
 print(cluster_df)
 
 # Find the indices of clusters with sizes greater than 50
 indices_large_clusters = [i for i, size in enumerate(cluster_sizes) if size > 50]
 
-# Print the clusters with sizes greater than 100
+# Print the clusters with sizes greater than 50
 for index in indices_large_clusters:
     print(f'Cluster {index}: {clusters[index]}')
+
+print(sorted_cluster_sizes[0])

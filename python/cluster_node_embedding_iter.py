@@ -79,9 +79,8 @@ for i, threshold in enumerate(thresholds):
                  label=f'{threshold}', edgecolor='black', linewidth=0.5)
 
     # Largest cluster
-    largest_cluster = clusters[cluster_sizes.index(max(cluster_sizes))]
-    print(f'Largest cluster nodes: {largest_cluster}')
-
+    #largest_cluster = clusters[cluster_sizes.index(max(cluster_sizes))]
+    #print(f'Largest cluster nodes: {largest_cluster}')
 
 # Customize plot
 #plt.title('Histogram of Cluster Sizes', fontsize=20)
