@@ -2,7 +2,6 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 # Get all transfers as a pandas dataframe except the '_id', 'userAddress' and 'isSet' column
 df_transfer = pd.read_csv('../data/raw_transfer_events.csv', usecols=lambda x: x not in ['_id', 'userAddress', 'isSet'])
 
