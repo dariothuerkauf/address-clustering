@@ -36,7 +36,7 @@ for i,address in tqdm(enumerate(ens_users)):
 
 # Create ens_list.csv
 df = pd.DataFrame(data, columns=['Address', 'ENS Name'])
-df.to_csv('../data/ens_list.csv')
+df.to_csv('../../data/ens_list.csv')
 
 # Create ens_pairs.csv
 # group by ENS Name and find instances where exactly 2 addresses point to the same name
@@ -47,4 +47,4 @@ for ens_name, group in grouped_df.groupby('ENS Name'):
     data.append([ens_name, addresses[0], addresses[1]])
 
 ens_addresses_df = pd.DataFrame(data, columns=['ens_name', 'addr1', 'addr2']).set_index('ens_name')
-ens_addresses_df.to_csv('../data/ens_pairs.csv')
+ens_addresses_df.to_csv('../../data/ens_pairs.csv')
