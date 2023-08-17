@@ -609,8 +609,23 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
 
 To implement the LAND transfer heuristic, we select all hashes of transactions where LAND was transferred between two Decentraland addresses. Then, we gather all token and native asset transfers associated with the previously selected transaction hashes, and remove any duplicates. We group the data by transaction hash and examine the sender (from) and recipient (to) fields for each transaction. If the same user address appears as both the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases from our intra-set LAND transfers and create address clusters based on the remaining LAND transfers.
 
-413 addresses, 161 clusters, most clusters of 2 or 3 addresses, one cluster of 71 addresses.
-From the remaining 413 addresses, we can form 161 clusters. Most clusters consists of 2 or 3 addresses. There is one cluster of 71 addresses which is likely 
+From the remaining 413 addresses, we can form 161 clusters. The clusters are visualized in Figure \ref{fig:LAND_clusters}. Most clusters consist of 2 or 3 addresses, one cluster of 71 addresses. Marked in green.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{../figures/land_clusters.png}
+	\caption{LAND clusters}
+	\label{fig:LAND_clusters}
+\end{figure}
+
+This cluster is also observable when we visualize the LAND token network.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{../figures/land_network.png}
+	\caption{LAND token network, edges blue indicate a purchase}
+	\label{fig:LAND_network}
+\end{figure} 
 
 For visualization we ....
 
