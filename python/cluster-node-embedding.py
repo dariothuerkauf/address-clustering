@@ -1,6 +1,8 @@
+import matplotlib.pyplot as plt
+
 from utils import *
 
-all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0])
+all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0], low_memory=False)
 
 # Create network graph
 G = nx.from_pandas_edgelist(all_transfers_df, 'from', 'to', create_using=nx.MultiDiGraph())
@@ -35,7 +37,8 @@ embeddings_dw = emb_dw_df.values
 faiss_index_deepWalk = DistCalculation(embeddings_dw, node_map)
 
 #Get clusters
-threshold = 0.7
+threshold = 0.5
+nn = 10
 
 class UnionFind:
     def __init__(self, n):
@@ -58,17 +61,17 @@ class UnionFind:
                 if self.rank[rootX] == self.rank[rootY]:
                     self.rank[rootY] += 1
 
-uf = UnionFind(embeddings_d2v.shape[0])
+uf = UnionFind(embeddings_r2v.shape[0])
 
-for i in tqdm(range(embeddings_d2v.shape[0]), desc="Creating initial clusters"):
-    D, I = faiss_index_r2v.get_dist_idx(i, 5)
+for i in tqdm(range(embeddings_r2v.shape[0]), desc="Creating initial clusters"):
+    D, I = faiss_index_r2v.get_dist_idx(i)
     neighbours = set(I[0][D[0] < threshold])
     for neighbor in neighbours:
         uf.union(i, neighbor)
 
 # Extract clusters from union-find
 clusters_dict = {}
-for i in range(embeddings_d2v.shape[0]):
+for i in range(embeddings_r2v.shape[0]):
     root = uf.find(i)
     if root not in clusters_dict:
         clusters_dict[root] = set()
@@ -81,17 +84,27 @@ cluster_df = pd.DataFrame({'ClusterID': range(len(clusters)), 'Nodes': clusters}
 
 # Visualize clusters
 cluster_sizes = [len(cluster) for cluster in clusters] # Get cluster sizes
+sorted_cluster_sizes = sorted(cluster_sizes, reverse=True)
 
 # Plot histogram
 plt.figure(figsize=(10, 6))
 plt.hist(cluster_sizes, bins=max(cluster_sizes)-min(cluster_sizes), align='left', edgecolor='black', color='blue', alpha=0.7)
-plt.title('Histogram of Cluster Sizes')
+plt.title(f'Histogram of Cluster Sizes with {threshold} threshold')
 plt.xlabel('Cluster Size')
 plt.ylabel('Number of Clusters')
+plt.xlim([0.5, 30])
+plt.ylim([0, 15000])
 
-plt.xticks([max(cluster_sizes)])
+#plt.xticks([max(cluster_sizes)])
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
-
+plt.savefig(f'../figures/cluster_histogram_{threshold}.png')
 plt.show()
 print(cluster_df)
+
+# Find the indices of clusters with sizes greater than 50
+indices_large_clusters = [i for i, size in enumerate(cluster_sizes) if size > 50]
+
+# Print the clusters with sizes greater than 100
+for index in indices_large_clusters:
+    print(f'Cluster {index}: {clusters[index]}')
