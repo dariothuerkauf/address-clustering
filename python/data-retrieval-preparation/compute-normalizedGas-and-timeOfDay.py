@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-
 def add_ToD(df):
     df['timeStamp'] = pd.to_datetime(df['timeStamp'], unit='s')
     df['ToD'] = df['timeStamp'].dt.hour * 3600 + df['timeStamp'].dt.minute * 60 + df['timeStamp'].dt.second
@@ -21,12 +20,10 @@ def compute_histogram(data, bins, col_name='ToD'):
     hist_data = data.groupby(['from', 'bin']).size().unstack(fill_value=0)
     return hist_data
 
-
 # Load data
-ethereum_trx = pd.read_csv('../data/raw_ethereum_transactions.csv', index_col=[0])
-polygon_trx = pd.read_csv('../data/raw_polygon_transactions.csv', index_col=[0])
+ethereum_trx = pd.read_csv('../../data/raw_ethereum_transactions.csv', index_col=[0])
+polygon_trx = pd.read_csv('../../data/raw_polygon_transactions.csv', index_col=[0])
 transaction_df = pd.concat([ethereum_trx, polygon_trx])
-
 
 #################
 ### TimeOfDay ###
@@ -44,7 +41,7 @@ hist_df = compute_histogram(transaction_df_filtered, 6, 'ToD')
 
 # Save to csv
 combined_stats_hist_ToD = pd.concat([stats_df, hist_df], axis=1)
-combined_stats_hist_ToD.to_csv('../data/timeOfDay.csv')
+combined_stats_hist_ToD.to_csv('../../data/timeOfDay.csv')
 
 ################
 ### GasPrice ###
@@ -76,4 +73,4 @@ hist_df = compute_histogram(transaction_df_normalizedGas, 50, 'normalized_gasPri
 
 # Save to csv
 combined_stats_hist_nG = pd.concat([stats_df, hist_df], axis=1)
-combined_stats_hist_nG.to_csv('../data/normalizedGas.csv')
+combined_stats_hist_nG.to_csv('../../data/normalizedGas.csv')

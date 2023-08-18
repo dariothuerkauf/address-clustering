@@ -40,9 +40,7 @@ grouped_df = filtered_self_approvals.groupby(['from']).size().reset_index(name='
 print(grouped_df)
 print(filtered_self_approvals)
 
-
 # Build clusters
-
 G = nx.DiGraph()
 # Add edges from 'from' address to 'spender'
 for idx, row in filtered_self_approvals.iterrows():

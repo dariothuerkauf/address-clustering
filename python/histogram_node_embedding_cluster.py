@@ -1,5 +1,3 @@
-import numpy as np
-
 from utils import *
 
 all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0], low_memory=False)
@@ -25,7 +23,6 @@ print(f'Nodes: {len(G_cc.nodes())}\nEdges: {len(G_cc.edges())}')
 emb_r2v_df = pd.read_csv('../data/embeddings/role2vec.csv', index_col='address')
 embeddings_r2v = emb_r2v_df.values
 faiss_index_r2v = DistCalculation(embeddings_r2v, node_map)
-
 
 class UnionFind:
     def __init__(self, n):
@@ -71,16 +68,10 @@ for i, threshold in enumerate(thresholds):
             clusters_dict[root] = set()
         clusters_dict[root].add(k)
     clusters = list(clusters_dict.values())
-
-    cluster_sizes = [len(cluster) for cluster in clusters]  # Get cluster sizes
-
-    # Plot histogram using Seaborn
+    cluster_sizes = [len(cluster) for cluster in clusters]
     sns.histplot(cluster_sizes, bins=max(cluster_sizes) - min(cluster_sizes), color=colors[i], alpha=0.5,
                  label=f'{threshold}', edgecolor='black', linewidth=0.5)
 
-    # Largest cluster
-    #largest_cluster = clusters[cluster_sizes.index(max(cluster_sizes))]
-    #print(f'Largest cluster nodes: {largest_cluster}')
 
 # Customize plot
 #plt.title('Histogram of Cluster Sizes', fontsize=20)

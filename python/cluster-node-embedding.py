@@ -5,21 +5,13 @@ all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0],
 # Create network graph
 G = nx.from_pandas_edgelist(all_transfers_df, 'from', 'to', create_using=nx.MultiDiGraph())
 G = clean_graph(G)
-
-# Get the largest connected component
 largest_cc = max(nx.connected_components(G), key=len)
 G_cc = G.subgraph(largest_cc)
-
-# Recode the graph's nodes, node_map maps from address to index
-G_cc, node_map = recode_graph(G_cc)
-
-# Create reverse map (from indices to addresses)
-idx_map = dict(zip(node_map.values(),node_map.keys()))
+G_cc, node_map = recode_graph(G_cc) # Recode the graph's nodes, node_map maps from address to index
+idx_map = dict(zip(node_map.values(),node_map.keys())) # Create reverse map (from indices to addresses)
 ordered_addresses = [idx_map[idx] for idx in range(len(node_map))]
 
 print(f'Nodes: {len(G_cc.nodes())}\nEdges: {len(G_cc.edges())}')
-
-#Get the embeddings
 
 #Diff2Vec
 emb_d2v_df = pd.read_csv('../data/embeddings/diff2vec.csv', index_col='address')
@@ -34,9 +26,9 @@ emb_dw_df = pd.read_csv('../data/embeddings/deepWalk.csv', index_col='address')
 embeddings_dw = emb_dw_df.values
 faiss_index_deepWalk = DistCalculation(embeddings_dw, node_map)
 
-#Get clusters
-threshold = 0.75
-nn = 10
+# Parameters
+threshold = 0.5 # Threshold for clustering
+nn = 10 # Number of nearest neighbours to consider
 
 class UnionFind:
     def __init__(self, n):
@@ -64,8 +56,8 @@ uf = UnionFind(embeddings_r2v.shape[0])
 for i in tqdm(range(embeddings_r2v.shape[0]), desc="Creating initial clusters"):
     D, I = faiss_index_r2v.get_dist_idx(i)
     neighbours = set(I[0][D[0] < threshold])
-    for neighbor in neighbours:
-        uf.union(i, neighbor)
+    for neighbour in neighbours:
+        uf.union(i, neighbour)
 
 # Extract clusters from union-find
 clusters_dict = {}
@@ -86,11 +78,10 @@ sorted_cluster_sizes = sorted(cluster_sizes, reverse=True)
 
 print(cluster_df)
 
-# Find the indices of clusters with sizes greater than 50
+# Show clusters with sizes greater than 50
 indices_large_clusters = [i for i, size in enumerate(cluster_sizes) if size > 50]
-
-# Print the clusters with sizes greater than 50
 for index in indices_large_clusters:
     print(f'Cluster {index}: {clusters[index]}')
 
+# Print the size of the largest cluster
 print(sorted_cluster_sizes[0])
