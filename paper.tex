@@ -297,7 +297,7 @@ When clustering addresses using graph-based approaches, this has the advantage t
 -Since all of our addresses are EOAs (some multisig smart contract wallets). -> Check this?
 \fi
 
-\subsection{ENS ground-truth pairs}
+\subsection{ENS address pairs}
 \label{sec:ens}
 Similarly to \cite{Beres2020}, we use Ethereum Name Service (ENS) identifiers as ground truth information to evaluate some of the clustering methods.\newline
 \textit{ENS} is a naming system that relies on the Ethereum smart contracts. Its main purpose is to map human-readable names, such as \texttt{`alice.eth`}, to machine-readable identifiers, mostly Ethereum addresses. The architecture of ENS comprises two main components: the registry and resolvers. \newline
@@ -607,35 +607,27 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
 
 \subsection{LAND transfers}
 
-To implement the LAND transfer heuristic, we select all hashes of transactions where LAND was transferred between two Decentraland addresses. Then, we gather all token and native asset transfers associated with the previously selected transaction hashes, and remove any duplicates. We group the data by transaction hash and examine the sender (from) and recipient (to) fields for each transaction. If the same user address appears as both the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases from our intra-set LAND transfers and create address clusters based on the remaining LAND transfers.
+To implement the LAND transfer heuristic, we select all transaction hashes of LAND transfers between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transaction's sender (from) and recipient (to) address. If the same user address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases and create address clusters based on the remaining LAND transfers.
 
-From the remaining 413 addresses, we can form 161 clusters. The clusters are visualized in Figure \ref{fig:LAND_clusters}. Most clusters consist of 2 or 3 addresses, one cluster of 71 addresses. Marked in green.
+A total of 740 LAND transfers were recorded, involving 413 unique addresses. Of these transfers, none involved any form of compensation within the same transaction. Upon analysis, we were able to group these addresses into 161 distinct clusters. The distribution of these clusters is shown in Figure \ref{fig:LAND_clusters}. Notably, the majority of clusters consist of two or three addresses. However, one cluster stands out, containing a significantly higher count of 71 addresses. This prominent cluster has been marked in green for ease of identification.
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{../figures/land_clusters.png}
+	\includegraphics[width=0.5\textwidth]{../figures/land_clusters.png}
 	\caption{LAND clusters}
 	\label{fig:LAND_clusters}
 \end{figure}
 
-This cluster is also observable when we visualize the LAND token network.
-
+LAND transfers between Decentraland addresses can also be visualized as a token network graph. Figure \ref{fig:LAND_network} presents the resulting graph. In this graph, red edges signify simple transfers, whereas blue edges represent LAND transfers made as part of a trade/purchase. Notably, the big cluster previously mentioned is visible on the top-right of the largest connected component. \newline
+A few key observations can be made from this network graph. First, most LAND transfers involve some form of compensation, in line with expectations. Second, certain nodes play a central role in LAND trading, indicated by their high connectivity within the network. Lastly, a recurring behavior pattern is observed wherein an individual address purchases LAND and subsequently transfers it to a third address. %This could reflect a common strategy among participants in the LAND market.
+ 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.6\textwidth]{../figures/land_network.png}
-	\caption{LAND token network, edges blue indicate a purchase}
+	\includegraphics[width=\textwidth]{../figures/land_network.png}
+	\caption{LAND token network}
 	\label{fig:LAND_network}
 \end{figure} 
 
-For visualization we ....
-
-
-\iffalse
-Intra-token-transfer events -> select all LAND transfers -> report the transaction hash\\
-find all transfer events and transactions for the list of transaction hashes, drop duplicates, combine transactions and token transfers\\
-Detect purchases, report in new column\\
-Filter for simple transfers, build clusters\\
-\fi
 
 
 %%%%%%%%%%%%%%%%%%
@@ -653,8 +645,15 @@ Discuss which approach worked best for clustering a predefined address set and w
 
 Despite the findings of \cite{Beres2020}, it appears that Diff2Vec is slightly less effective than Role2Vec or DeepWalk, although it is still generally successful. 
 
+Vergleichen mit \cite{wu2022tutela} und \cite{Beres2020}
+
+
+The large cluster may incorrectly be marked/maybe off-chain compensation? -> auction address
+
 Limitations
 %A reference implementation for clustering a predefined address set using node embeddings on Github
+
+Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his. 
 
 %%%%%%%%%%%%%%%%%%
 %%% Conclusion %%%
@@ -666,6 +665,9 @@ Limitations
 %Conclusions section: Re-state the main points in a new concise way that you want your readers to remember.
 %CONCLUSION is to write the output of the work/ investigations in summarized form
 
+
+Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his. Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his. 
+Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Literaturverzeichnis %%%
