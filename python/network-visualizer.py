@@ -27,37 +27,39 @@ class NetworkVisualizer:
 
         # Graph
         G = nx.from_pandas_edgelist(data, 'from', 'to', edge_attr='weight', create_using=nx.MultiDiGraph())
-        pos = nx.spring_layout(G, scale=100, k=5)
+        pos = nx.spring_layout(G, scale=1, k=2)
 
         fig, ax = plt.subplots(figsize=(20, 20))
 
         # Nodes
         color_map = ['orange' if node in self.addresses else 'black' for node in G]
         node_size = [v * 10 for v in dict(G.degree(weight='weight')).values()]
-        nx.draw_networkx_nodes(G, pos, node_color=color_map, node_size=node_size, alpha=0.5, ax=ax)
+        node_alpha = [1 if node in self.addresses else 0.3 for node in G]
+        nx.draw_networkx_nodes(G, pos, node_color=color_map, node_size=node_size, alpha=node_alpha, ax=ax)
 
         # Edges
         edge_colors = ['red' if u in self.addresses else 'lightgreen' for u, v in G.edges()]
-        edge_widths = [0.05 * data.get('weight', 1) for u, v, data in G.edges(data=True)]
+        edge_widths = [0.07 * data.get('weight', 1) for u, v, data in G.edges(data=True)]
         nx.draw_networkx_edges(G, pos, edge_color=edge_colors, width=edge_widths, alpha=1, ax=ax, arrowstyle="-")
 
         # Labels
         degree_weight = dict(G.degree(weight='weight'))
         sorted_nodes = sorted(degree_weight.items(), key=lambda x: x[1], reverse=True)
-        top_nodes = [n for n, d in sorted_nodes[:5]]
+        top_nodes = [n for n, d in sorted_nodes[:1]]
         labels = {node: node[:7] for node in top_nodes}
-        nx.draw_networkx_labels(G, pos, labels=labels, font_color='black', font_weight='bold', ax=ax)
+        nx.draw_networkx_labels(G, pos, labels=labels, font_color='black', font_size=20, font_weight='bold', ax=ax)
 
         plt.axis('off')
+        plt.tight_layout()
         plt.savefig(filename, dpi=500, transparent=False)
         plt.show()
-        print(labels)
 
 
 if __name__ == "__main__":
     #addresses = ["0x85e5472752a6f00775faca4d5179bde1081571b0", "0xbf886e3069d0dfd64e384c93da322f775faa8876"]
     #addresses = ['0xb4955ba9d1fda0c45e1eaa9c5c103d79b9622413']
-    addresses = ['0x59d2c715aB5bEecA6649b8d4B5F45072EDC37073']
+    #addresses = ['0x59d2c715aB5bEecA6649b8d4B5F45072EDC37073']
+    addresses = ['0xE2e2F2240a84A61B7dFF50a86ee10d5FaF7faCa8']
     network_visualizer = NetworkVisualizer(addresses)
     data = network_visualizer.get_data()
     network_visualizer.draw_network(data)
