@@ -32,9 +32,9 @@ class NetworkVisualizer:
         fig, ax = plt.subplots(figsize=(20, 20))
 
         # Nodes
-        color_map = ['orange' if node in self.addresses else 'skyblue' if node == '0x0000000000000000000000000000000000000000' else 'darkgrey' for node in G]
+        color_map = ['orange' if node in self.addresses else 'black' for node in G]
         node_size = [v * 10 for v in dict(G.degree(weight='weight')).values()]
-        nx.draw_networkx_nodes(G, pos, node_color=color_map, node_size=node_size, ax=ax)
+        nx.draw_networkx_nodes(G, pos, node_color=color_map, node_size=node_size, alpha=0.5, ax=ax)
 
         # Edges
         edge_colors = ['red' if u in self.addresses else 'lightgreen' for u, v in G.edges()]
