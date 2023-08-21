@@ -46,13 +46,16 @@ G = nx.DiGraph()
 for idx, row in filtered_self_approvals.iterrows():
     G.add_edge(row['from'], row['spender'])
 clusters = list(nx.connected_components(G.to_undirected()))
-cluster_df = pd.DataFrame(columns=['Cluster_ID', 'Address'])
+cluster_df = pd.DataFrame(columns=['ClusterID', 'Address'])
 
 # Assign a cluster ID to each address
 for cluster_id, cluster in enumerate(clusters):
     for address in cluster:
-        cluster_df = cluster_df.append({'Cluster_ID': cluster_id, 'Address': address}, ignore_index=True)
+        cluster_df = cluster_df.append({'ClusterID': cluster_id, 'Address': address}, ignore_index=True)
 
 print(cluster_df)
 
+# Remove largest cluster
+cluster_df_clean = cluster_df[cluster_df['ClusterID']!=6]
+cluster_df_clean.to_csv('../data/clusters/clusters_selfAuthorization.csv', index=False)
 

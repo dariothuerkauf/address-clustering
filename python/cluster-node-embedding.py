@@ -54,7 +54,7 @@ class UnionFind:
 uf = UnionFind(embeddings_r2v.shape[0])
 
 for i in tqdm(range(embeddings_r2v.shape[0]), desc="Creating initial clusters"):
-    D, I = faiss_index_r2v.get_dist_idx(i)
+    D, I = faiss_index_r2v.get_dist_idx(i) # number of neighbors not specified, so it will return all
     neighbours = set(I[0][D[0] < threshold])
     for neighbour in neighbours:
         uf.union(i, neighbour)
@@ -71,17 +71,25 @@ clusters = list(clusters_dict.values())
 
 # Convert clusters to DataFrame
 cluster_df = pd.DataFrame({'ClusterID': range(len(clusters)), 'Nodes': clusters})
-
-# Visualize clusters
-cluster_sizes = [len(cluster) for cluster in clusters] # Get cluster sizes
-sorted_cluster_sizes = sorted(cluster_sizes, reverse=True)
-
 print(cluster_df)
 
+# Restructure DataFrame to have one row per node and convert node indices to addresses
+cluster_list = []
+for cluster_id, nodes in cluster_df.iterrows():
+    for node in nodes['Nodes']:
+        address = idx_map[node]
+        cluster_list.append([cluster_id, address])
+
+new_cluster_df = pd.DataFrame(cluster_list, columns=['ClusterID', 'Address'])
+print(new_cluster_df)
+new_cluster_df.to_csv('../data/clusters_R2V_0_5.csv', index=False)
+
+
 # Show clusters with sizes greater than 50
+cluster_sizes = [len(cluster) for cluster in clusters] # Get cluster sizes
+sorted_cluster_sizes = sorted(cluster_sizes, reverse=True)
 indices_large_clusters = [i for i, size in enumerate(cluster_sizes) if size > 50]
 for index in indices_large_clusters:
     print(f'Cluster {index}: {clusters[index]}')
 
-# Print the size of the largest cluster
-print(sorted_cluster_sizes[0])
+print(sorted_cluster_sizes[0]) # Size of the largest cluster
