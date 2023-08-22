@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 
 def add_ToD(df):
+    """ Add time of day column to DataFrame """
     df['timeStamp'] = pd.to_datetime(df['timeStamp'], unit='s')
     df['ToD'] = df['timeStamp'].dt.hour * 3600 + df['timeStamp'].dt.minute * 60 + df['timeStamp'].dt.second
     return df

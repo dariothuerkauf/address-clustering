@@ -11,20 +11,18 @@ transactions = db['transactions']
 users = pd.read_csv('../../data/subsets.csv')
 user_addresses = list(set(users.loc[users['Polygon'] == 1, 'Address']).union(users.loc[users['Ethereum'] == 1, 'Address']))
 
-## Intra-set token transfers
+# Intra-set token transfers
 query_conditions = {
     "from": {"$in": user_addresses},
     "to": {"$in": user_addresses}
 }
-
 transfer_df = pd.DataFrame(list(transfers.find(query_conditions)))
 
 # Drop duplicates
 transfer_df = transfer_df.drop(['_id', 'isSet', 'userAddress'], axis=1).drop_duplicates().reset_index(drop=True)
 transfer_df.to_csv('../../data/intra_token_transfers.csv')
 
-
-## Intra-set native asset transfers
+# Intra-set native asset transfers
 query_conditions = {
     "input": "0x",
     "from": {"$in": user_addresses},
