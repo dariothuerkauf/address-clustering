@@ -440,8 +440,6 @@ In the case of pure LAND transfers, the sending and receiving addresses are the 
 	\label{fig:LAND_example}
 \end{figure}
 
-\vspace{2em}
-
 %%%%%%%%%%%%%%%%%%%%%
 %%% Data Analysis %%%
 %%%%%%%%%%%%%%%%%%%%%
@@ -522,7 +520,7 @@ We also need to consider that average rank may not be the most appropriate evalu
     Within 10 nearest neighbors & 19 (0.56) & 24 (0.71) & 21 (0.62)\\
     \hline
   \end{tabular}
-  \caption{Average Rank of ENS Domain Names for Different Embedding Methods, Addresses outside of largest connected component have a NaN value}
+  \caption{Average Rank of ENS Domain Names for Different Embedding Methods}
   \label{tbl:ENS_Domain_Ranks}
 \end{table}
 
@@ -540,7 +538,7 @@ We explore the sensitivity of clusters to various Euclidean distance threshold v
 
 
 \begin{table}[h!]
-\small
+\scriptsize
   \centering
   \begin{tabular}{lrrrrrrr}
     \hline
@@ -577,7 +575,7 @@ A few key observations can be made from this network graph. In line with our exp
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.65\textwidth]{../figures/land_network.png}
+	\includegraphics[width=\textwidth]{../figures/land_network.png}
 	\caption{LAND token network}
 	\label{fig:LAND_network}
 \end{figure} 
@@ -628,15 +626,13 @@ Similarly, a two-step approach for clustering, re-ranking the nearest neighbors 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.7\textwidth]{../figures/network_visualization_0xe2e.png}
+	\includegraphics[width=0.65\textwidth]{../figures/network_visualization_0xe2e.png}
 	\caption{Token Transfer Graph for \texttt{0xE2e2F$\dots$faCa8}}
 	\label{fig:cluster}
 \end{figure}
 
-%\textbf{LAND transfers}\\
 The \textit{LAND transfer} heuristic is targeted at users revealing address clusters by sending high-value assets to other addresses. In this specific case, we use the information that all addresses are related to Decentraland and therefore analyze LAND transfers. However, the approach could be applied (more generally) to other NFT collections or large asset transfers in general. \newline
 The main assumption behind this approach is that users may want to reorganize their accounts from time to time, mostly to increase security guarantees or spread the risk across multiple accounts. As a concrete example, some users may have started with a simple browser-based wallet but as the value of their assets increased and their knowledge grew, they switched to a more secure hardware wallet. We detect 161 entities with 413 addresses applying this approach. One cluster with 70 address is very likely a not a single entity. It includes an address that participated in the intial LAND auction and subsequently distributed LAND. This may have happened through off-chain compensation. The advantage of this method is that it is relatively easy to visualise and understand. The disadvantage is that it demands a specific on-chain behaviour and is only scalable with significant effort. Additionally, many events that occur off-chain are not detectable in the data, resulting in an increased occurrence of false positives. 
-%740 transfers, 413 addressen und 161 or 160 entities with 342 addresses. -The large cluster may incorrectly be marked/maybe off-chain compensation? -> auction address
 
 Ultimately, we combined the results for each clustering heuristic mentioned above. Consequently, we managed to cluster 51,518 addresses, corresponding to 29,680 distinct entities. When adding the unclustered addresses, we identified 115,643 active users during the nine months, with 8,483 entities interacting through multiple addresses. \newline
 These results, however, are heavily influenced by the assumptions we made. We were conservative by setting a low distance threshold and treating all other addresses as individual entities. Raising the threshold would result in larger clusters and fewer entities. \newline 
@@ -747,7 +743,6 @@ Address clustering will  make further advancements. From a user perspective it i
     \hline
   \end{tabular}
   \caption{Database/data set Description}
-  \label{tbl:database_schema}
 \end{table}
 
 
