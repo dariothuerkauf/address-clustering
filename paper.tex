@@ -83,8 +83,8 @@ Center for Innovative Finance, University of Basel
 \end{center}
 Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his.  \\
 \vfill
-\textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Node Embedding Algorithms.\\
-\noindent\textbf{JEL:} X00, X00, X00
+\textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Graph Representation Learning.\\
+%\noindent\textbf{JEL:} X00, X00, X00
 %\end{titlepage}
 
 
@@ -136,7 +136,6 @@ This circumstance has opened up a nascent scientific field dealing with entity i
 Conversely, the lack of privacy is also detrimental to most financial use cases. As a response, multiple privacy-enhancing tools and protocols have been proposed to obfuscate transaction tracing. 
 Nonetheless, these protocols have yet to be widely adopted, and careless user behavior can undermine the privacy guarantees they offer. \newline
 With these considerations in mind, the topic of privacy, or lack thereof, will remain significant for future blockchain development and research.
-
 %If someone obtains information that allows them to link a blockchain address to an entity, they may effectively observe that entity’s entire transaction history and associated activity. Even if the entity uses multiple addresses, any link between these addresses may expose the fact that they belong to the same person.
 
 \textbf{Related work}\\
@@ -189,10 +188,7 @@ Two main reasons make Decentraland an ideal platform for empirical research.
 \textit{Second}, users who connect their Web3 account can own various digital assets, such as monetary units, land parcels, and avatar collectibles (e.g., wearables, emotes, and names). Smart contracts on Ethereum and Polygon track and manage the ownership of these assets \citep{goldbergschaer2023}. This allows us to analyze the entire transaction history and derive information about the avatars' economic activity. \newline
 Initially, Decentraland launched with two native tokens. \textit{LAND}, an NFT compliant with ERC-721, manages the ownership of land parcels in Decentraland. \textit{MANA}, a fungible token compliant with ERC-20, is the in-world currency used to purchase digital goods and services. The majority of purchases and trades are settled in MANA. \newline 
 Moreover, the Decentraland core developers provide a smart-contract-based marketplace where users can buy or trade LAND or other in-game collectibles.
- 
-%Owners of multiple adjacent land parcels can combine them into an ESTATE, which acts as a wrapper token for the land parcels.
 %The term metaverse refers to Neal Stephenson’s 1992 novel Snow Crash and describes an immersive virtual world that is populated by humans-as-avatars.
-%Goods: in-world assets, such as avatar wearables, merchandise, or tickets, as well as tokenized vouchers that can be redeemed for real-world goods or services.
 
 \subsection{Non-custodial crypto asset mixers}
 According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. At a high level, we can distinguish between custodial and non-custodial crypto-asset mixers. \newline
@@ -205,7 +201,6 @@ In the context of this thesis, it is sufficient to know that third parties can s
 In theory, a larger anonymity set will provide a higher level of privacy since any withdrawal address could be linked to more deposit addresses. However, in practice, this does not always hold.
 Some users reveal the link between their withdrawal and deposit addresses, which also affects the privacy of other depositors, for example, by withdrawing from the pool with the same address they deposited or directly sending funds between the two addresses. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions, or external incentive mechanisms might be reasons for this behavior. \newline
 In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
-
 %In theory, a larger anonymity set will provide a higher level of privacy as third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users (might) withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
 %In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
 %it is more difficult to link a withdrawal address to a specific depositor address)
@@ -234,14 +229,12 @@ token transfer events and more than 16 million %16,092,531
  normal transactions. While the amount of transactions is similar between the two networks, Polygon has roughly three times more transfer events. \newline The output was stored in separate CSV files and also imported into a MongoDB\footnote{\url{https://www.mongodb.com/}} database. The database contains distinct collections for transactions and transfers. For additional information on the data fields of each collection, see Appendix \ref{sec:database}. 
 
 \iffalse
-Transfer Events: 30,689,978
-Transfer Events Ethereum: 7,832,778
-Transfer Events Polygon: 22,857,200
-
-Transactions = 16,092,531
-Transactions Ethereum = 8,448,584
-Transactions Polygon = 7,643,947
-
+%Transfer Events: 30,689,978
+%Transfer Events Ethereum: 7,832,778
+%Transfer Events Polygon: 22,857,200
+%Transactions = 16,092,531
+%Transactions Ethereum = 8,448,584
+%Transactions Polygon = 7,643,947
 Figure X visualizes the number of daily transactions and token transfers for each chain.
 \begin{figure}[h!]
 	\centering
@@ -249,10 +242,6 @@ Figure X visualizes the number of daily transactions and token transfers for eac
 	\caption{Monthly Transactions and Token Transfers by chain}
 	\label{fig:Data}
 \end{figure} 
-Transfer Events, adding Information (isInSet) \\
-Transactions \\
-Filtering, Intra-set transfers\\
-Data Structure, Fields \\
 \fi
 
 \subsection{Intra-set asset transfers}
@@ -335,24 +324,16 @@ From this, we identified 11,440 reverse records and 40 pairs of addresses pointi
 \section{Clustering Heuristics}
 In this section, we present an overview of clustering heuristics in the context of account-based blockchains and on-chain data. We will provide a detailed explanation of the mechanics and rationale behind the heuristic and assess its applicability to our case. 
 In Section 5, we will implement and evaluate the heuristics we determine to be suitable for our objectives.
-%Goal: explain each heuristic, categorize, and discuss applicability to our address set
-%In Section 5 we will then apply  and, if possible, evaluate the heuristics deemed suited for us.
 
 \subsection{Self-authorization} 
 	All three token standards require functions to allow another address to transfer tokens on behalf of the actual owner. For the ERC-20 standard, this is achieved through the \texttt{`approve`} function, accepting the spender's address and the token amount as parameters\footnote{\texttt{approve(address spender, uint256 amount)}}. The ERC-721 has two functions dedicated to approvals: One for authorizing the transfer of a specific NFT\footnote{\texttt{approve(address to, uint256 tokenId)}} and one to permit transferring all of the owner's NFTs within the collection\footnote{\texttt{setApprovalForAll(address operator, bool approved)}}. The latter function also appears in the ERC-1155 standard. The approval functionality of these tokens is primarily used in connection with smart contracts (e.g., Decentralized Exchanges or NFT Marketplaces), but can also be applied for regular EOAs. \newline
 The ``self authorization`` heuristic, proposed by \cite{FV:17}, suggests that users might authorize another address they own, possibly for risk distribution across several addresses or for testing purposes. \newline
-Since all the addresses' transactions are available in our data set, we can easily employ this heuristic. %Since our data set includes all address transactions, we can easily employ this heuristic. %
-
+Since all the addresses' transactions are available in our data set, we can easily employ this heuristic.
 
 \iffalse
-	For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
-	For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
-	For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
-	
-	- approve(address,uint256)
-	- setApprovalForAll(address,bool) for both ERC-721 and ERC-1155
-	
-The first step is to get all approval transactions. We achieve this using the 'input'/calldata field. The first X bytes are always the function selector. We filter for the known function selectors for all standards. Next, we get the approved address/spender, also from the calldata, it is always at the same spot. We filter for spenders within the address set and for spenders who are different from the 'from' address. How many transactions are remaining? Finally, we extract all unique pairs of owners and spenders, disregarding the type of token or the amount.
+For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
+For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
+For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
 \fi
 
 
@@ -361,14 +342,6 @@ The concept of deposit address reuse was first introduced and systematically uti
 Deposit addresses share the characteristic that they forward the received funds to a major exchange account. Two parameters are essential for deposit address detection: the discrepancy between the amount received and forwarded (since the exchange must pay gas fees), and the time lag between receiving and forwarding funds.
 However, our data set only includes the direct transactions or token transfers associated with the addresses. The transactions between deposit and main exchange address are absent. Consequently, this clustering heuristic is not applicable %with our data
  and it would require significantly more effort for gathering the required data.
-
-\iffalse
-\cite{FV:17} was the first to formulate and systematically exploit this heuristic, which was also applied later on by \cite{wu2022tutela}. This heuristic exploits the common practice of crypto exchanges creating so-called deposit addresses for each user, which forward funds to a main address. Multiple addresses that send funds to the same deposit address are highly likely controlled by the same entity. The main challenge of this approach is detecting deposit addresses, which can be either EOAs but also smart contracts.
-- Exchanges typically create so-called deposit addresses, which will forward received funds to a main address. As these deposit addresses are created per customer, multiple addresses that send funds to the same deposit address are highly likely to be controlled by the same entity. 
-The key challeng lies in identifying these deposit addresses. Their characteristic property is that they forward received amounts to a major exchange account. The forwarded amount is often slightly less than what was received, as the exchange has to pay for the transaction costs. In most cases, deposit addresses are EOAs, but they can also be smart contracts. Identifying deposit addresses relies on two parameters: the maximum amount difference between what was received and forwarded and the maximum time difference between receiving and forwarding.
-In this project, we only collected the addresses' direct transactions or token transfers. This would allow us to see deposit addresses, however, with this data we cannot find the second step: the deposit address forwarding the asset to the exchanges main address. Therefore, we do not apply this clustering heuristic here.
-Since we only collected the addresses' direct transactions or token transfers, the second step between deposit and exchange address is not available/present in our data set. 
-\fi
 
 \subsection{Airdrop multi participation}
 Airdrops are popular token distribution mechanisms, and recipients are mostly chosen based on past protocol activity. Probably the most well known example is Uniswap's UNI airdrop, where each address that interacted with the protocol until a specified cutoff date received a fixed amount of 400 UNI tokens\footnote{\url{https://blog.uniswap.org/uni}}. Especially in the early days of airdrops, these distribution mechanisms were not Sybil-resistant, leading to people creating multiple addresses in anticipation of an airdrop. However, \cite{FV:17} argues that managing the tokens on all of these addresses is impractical, which is why they are often aggregated into one address. He finds around 500 same-source, fixed amount token distribution events with at least 1,000 recipients while also taking into account the block difference between the individual aidrop token transfers. He defines multi-participation when two airdrop recipients forward their tokens to a single address. Since we do not have a whole view of the airdrop distribution events, we are not able to find them within our data. One possible approach would include manual selection of known airdrops. However, this process takes very long and is not guaranteed to cluster a lot of addresses, since most new airdrop events were made with some kind of sybil-resistance. Nevertheless, to test this approach we searched for addresses that forwarded the UNI airdrop to another address. We found eight such transfers, but none involved two addresses sending funds to a third address.
@@ -392,23 +365,10 @@ To evaluate the three node embedding algorithms, we use our ENS address pairs as
 
 \iffalse
 %write here that we tested different data sets to create the network graph but intra-set asset transfers performed best for our task.
-\textbf{Diff2Vec} % Neighborhood preserving 
 The intuition of Diff2Vec is to summarize a node by its neighborhood through a diffusion-like random process. Specifically, there are four steps to Diff2Vec: 1) Generating a diffusion graph, 2) sampling a node sequence, 3) extracting features, 4) learning a neural network embedding
-\textbf{DeepWalk}
-\textbf{Role2Vec} % Structural node embedding, Structural Node Level Embedding
-Random walks will likely visit nearby vertices first, which makes them
-suitable for finding communities, rather than roles (structural
-similarity). To overcome the above problems, we propose the Role2Vec
-framework which serves as a basis for generalizing many existing methods that use traditional random walks. Strucural feature matrix.
-
-Research in node embedding has been accelerated by Word2Vec, which is an embedding method for natural language processing. This approach has been extended to learn graph/network embeddings.
-
-Token networks -> Victor, Casale Brunet
 \fi
 
-
 \subsection{Time-of-day transaction activity and gas price selection}
-
 Apart from the node embedding methods applied to Ethereum transaction graphs, \cite{Beres2020} suggest employing clustering heuristics based on time-of-day transaction activity and gas price selection patterns. \newline
 \textit{Time-of-day transaction activity} considers all transaction timestamps initiated by a particular address. These UNIX timestamps are transformed into hour-of-the-day-based values. The authors argue that account owners may expose daily activity patterns and represent addresses by a vector including the mean, median and standard deviation, as well as an activity histogram divided into four to six hour bins \citep{Beres2020}.  Figure \ref{fig:ToD} illustrates the time-of-day activity histogram and kernel density estimation (KDE) for a selected ENS address pair, divided into two hour intervals.\newline
 Additionaly, the \textit{gas price distribution} heuristic leverages the possibility of users revealing patterns when choosing their gas price. Prior to EIP-1559\footnote{\url{https://eips.ethereum.org/EIPS/eip-1559}}, users could set the gas price manually. In practice, most wallet user interfaces offered three levels of gas prices: slow, average, and fast. Selecting the the fast option would ensure almost immediate inclusion in the blockchain. To account for changes in Ethereum traffic volume, the gas price is normalized by the daily network average. The combination of gas price levels users select forms their personal gas price profile. An account is represented by a vector including the mean, median, and standard deviation and a normalized gas price histogram divided into 50 bins, which they determined to be optimal for clustering performance. \citep{Beres2020} \newline
@@ -422,7 +382,6 @@ We will not employ both methods due to their significantly poorer stand-alone pe
 \end{figure} 
 
 \subsection{Tornado cash heuristics}
-
 \cite{wu2022tutela} propose five heuristics targeted at Tornado cash, highlighting that careless user behavior can still reveal identity, despite using a mixer. The heuristics they identified are as follows: \newline
 ``Address match`` refers to instances where individuals use the same address for both depositing and withdrawing from the Tornado pool. ``Unique gas price`` involves users selecting a distinct gas price for both their deposit and withdrawal transactions (prior to EIP-1559). ``Linked ETH addresses`` examines whether a deposit address has interacted with a withdrawal address outside of Tornado Cash. ``Multiple denomination`` assesses an address' transaction history; two addresses with matching deposit and withdrawal portfolios are considered a pair. ``Torn minting`` identifies a specific user behavior when withdrawing so-called Anonymity points, an incentive scheme reward for increasing the anonymity set when depositing assets into Tornado cash.
 
@@ -448,14 +407,12 @@ In the case of pure LAND transfers, the sending and receiving addresses are the 
 This section analyzes clustering heuristics applicable to our address set using the collected data. These include self-authorization, node embedding, and our proposed approach involving LAND transfers. %we describe our approach/method and the results.
 
 \subsection{Self-authorization}
-
 We analyze the addresses' transaction data to find self-authorizations, focusing on the transaction's ``calldata``. The first four bytes of the calldata represent the function selector, which unambiguously specifies the smart contract function the transaction originator wants to invoke. \newline
 \textit{First}, we identify all transactions that begin with a function signature related to the approval functions corresponding to ERC-20, ERC-721, and ERC-1155 token standards. \textit{Second}, we extract the approved (spender) address, which is always located at the same position within the calldata due to token standardization. We then record the spender address in a new field within our dataframe. \textit{Third}, we implement two filters on the approval transactions. The first filter checks if the spender address is part of our address set, and the second ensures that the spender address is different from the address initiating the transaction, which may occur due to a user interface bug or testing transactions. \textit{Fourth}, we group the remaining approvals by the initiating address and form the clusters.
 
 We identified 16 clusters across 126 self-authorizing transactions, comprising 115 distinct addresses. After manual inspection, we excluded a cluster containing 80 addresses with all approvals issued by the same address for the same token contract. The token contract represents a collection of wearable NFTs on Polygon called ``Renaissance King by René Mäkelä`` and may use an uncommon or potentially even faulty token minting scheme. Ultimately, we discovered 35 addresses associated with 15 distinct entities.
 
 \subsection{Node embeddings}
-
 Our analysis of node embedding methods starts with a network graph built from intra-set asset transfers. We treat addresses as nodes and add undirected edges between them if they interacted with each other. \newline
 To use the Python library developed by \cite{karateclub}, we remove multi-edges and loops (transfers with the same sender and recipient address) and only consider nodes within the largest connected component. The resulting network graph includes 51,566 nodes and 249,302 edges. As previously stated, we utilize the Diff2Vec, Role2Vec, and DeepWalk methods from the library. \newline
 Subsequently, we run ten independent experiments for each method. Our choice of input parameters is identical to \cite{Beres2020}. Each experiment returns a node embedding in the form of a matrix with 51,566 rows corresponding to the number of nodes in the graph, and 128 columns, representing the feature vector dimensions. \newline
@@ -466,8 +423,6 @@ All three methods demonstrated remarkable efficacy in locating the target addres
 Role2Vec is the most effective method, with the target address, on average, found within the 28 nearest neighbors. In contrast, Diff2Vec and DeepWalk produced slightly higher averages of 46 and 62, respectively. Furthermore, Role2Vec found the target address within the ten nearest neighbors in 24 out of 34 cases (71\%). Diff2Vec is barely less effective than Role2Vec or DeepWalk, although still generally successful. \newline
 Notably, two address pairs are not present within the network graph and therefore display no values. However, they have been included to demonstrate that the intra-set asset transfer approach may only sometimes be applicable to cluster all addresses of a predefined set. \newline
 We also need to consider that average rank may not be the most appropriate evaluation metric, particularly when a user controls more than two addresses. Suppose a single entity controlling 20 addresses, but only one pair of addresses is detected as ground truth. Even if the algorithm finds all 20 addresses within the nearest neighbors but identifies the ground truth pair as the last one, we will score it lower than another algorithm that finds only one of the twenty addresses but within the ten nearest neighbors.
-
-%As described in previous sections, we tested different data sets to create the network graph using our ENS address pairs as ground truth. Der Approach ist zwar stark an Beres angelehnt, jedoch wendet er es an um pairs of deposit und withdrawal addressen zu clustern. We found the intra-set asset transfers to perform best in terms of the average rank of a target address. 
 
 \begin{table}[h!]
 \scriptsize
@@ -553,13 +508,7 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
   \label{tbl:cluster_table}
 \end{table}
 
-
-%4. Describe two step approach test, may need further research and would be ideal to incorporate into node embedding feature vectors \\
-%Performing an inner merge for the largest clusters of each threshold results in a cluster consisting of 516 addresses, this means the clusters overlap perfectly.
-
-
 \subsection{LAND transfers}
-
 To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same user address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases and create address clusters based on the remaining LAND transfers.
 
 A total of 740 LAND transfers were recorded, involving 413 unique addresses. Of these transfers, none involved any form of compensation within the same transaction. Upon analysis, we were able to group these addresses into 161 distinct clusters. The distribution of these clusters is shown in Figure \ref{fig:LAND_clusters}. Notably, the majority of clusters consist of two or three addresses. However, one cluster stands out, containing a significantly higher count of 71 addresses. This prominent cluster has been marked in green for ease of identification. \newline
@@ -581,7 +530,6 @@ A few key observations can be made from this network graph. In line with our exp
 \end{figure} 
 
 \subsection{Combining clustering results}
-
 To conclude our clustering analysis, we combine the results of self-authorization, learned node embedding and LAND transfer heuristics. By doing so, we can cluster 51,581 out of 137,544 (37.5\%) addresses that represent 29,680 entities. 
 For the remaining addresses, we consider each as an individual entity. 
 We applied a strict distance threshold of 0.5 for clustering embeddings generated by Role2Vec and excluded the 80-address cluster identified in self-authorization.
@@ -668,7 +616,7 @@ Clustering based on distance threshold, clusters dependent on this threshold...
 
 Visualizations ...
 
-Sth about bots ...
+Somethin about bots ...
 
 Still a lot of natural activity on Decentraland and open infrastructure allows us to analyze it in detail as in this paper, exciting to analyze other things, endless possibilities.
 Address clustering will  make further advancements. From a user perspective it is important that privacy enhancing protocols are also further developed and users educated how to preserve privacy when transacting on blockchains. / in the context of blockchains
