@@ -598,41 +598,20 @@ Role2Vec performed best for our small test sample, but is not necessarily always
 %...intended to help the reader understand why your research should matter to them after they have finished reading the paper.
 %...not merely a summary of your points or a re-statement of your research problem but a synthesis of key points. For most essays, one well-developed paragraph is sufficient for a conclusion, although in some cases, a two-or-three paragraph conclusion may be required.
 
-The goal of this thesis was to identify the number of entities represented by the 473,927 addresses observed in Decentraland between July 16, 2022 and April 23, 2023. \newline
-By exploiting activity patterns within the publicly available on-chain data, we are apble to apply various heuristics for clustering addresses controlled by the same entity. Focusing on Ethereum and Polygon on-chain data, we narrowed the address set down to 137,544.
-After introducing various concepts needed to understand this complex topic, we efficiently collected the required on-chain data. This feat was achieved by using information if an address was active on Ethereum and Polygon and subsequently gathering all transactions and token transfers related to the addresses via Etherscan.
+This thesis aimed to determine how many unique entities correspond to the 473,927 addresses observed in Decentraland from July 16, 2022, to April 23, 2023. \newline
+By focusing on Ethereum and Polygon on-chain data, we narrowed the set down to 137,544 addresses. The required data was efficiently sourced by gathering all transactions and token transfers related to the addresses via Etherscan. Furthermore, with the help of ENS, we found a way to detect address pairs that have a very high probability of being controlled by the same user. These address pairs served as our ground truth when evaluating the node embedding algorithms. \newline
+We discussed several existing clustering heuristics and evaluated their suitability in our context. Among these heuristics, two were found to be appropriate for clustering a pre-defined set of addresses with the available data: self-authorization \citep{FV:17} and graph representation learning \citep{Beres2020}. We modified the graph representation learning approach for our research goal. %to align with our research goals, this is the first attempt to utilize intra-set asset transfers in constructing the network graph
+To the best of our knowledge, we are the first to employ intra-set asset transfers for constructing the network graph. Moreover, we introduced a novel clustering heuristic that identifies uncompensated transfers of high-value NFTs, particularly LAND. \newline
+Due to its general applicability, graph representation learning proved to be the most successful clustering heuristic, while the other two heuristics yielded far fewer address clusters. In our exploration of node embedding algorithms, the Role2Vec algorithm stood out, correctly identifying the ground truth pair within the five nearest neighbors in 71 percent of the cases. \newline
+From the 137,544 addresses transacting on Polygon or Ethereum, we identified an estimated 115,643 as active Decentraland users. A subset of these entities, representing 7.3\%, operated through multiple addresses. Notably, the largest address cluster we observed was an entity with 500 distinct addresses. Based on our analysis, we believe this entity is likely a bot targeting Decentraland NFT airdrops, with intentions to resell them later. \newline
+To enhance clustering performance, node embeddings could incorporate time-of-day activity and gas price selection patterns. This approach holds significant promise for future research in entity identification. \newline
+A significant challenge with graph representation learning is the formation of clusters after node embedding. In our study, we relied on a Euclidean distance threshold for this purpose. However, the resulting number and size of clusters are highly sensitive to the precise selection of this threshold. \newline
+Notably, our approach is versatile and can be applied to other predefined address sets. This adaptability is particularly significant given the increasing importance of determining the true number of users in various protocols, especially in areas like Decentralized Finance and on-chain governance. \newline
+Although we were able to detect entity clusters, Decentraland still exhibits a lot of natural activity. Its open infrastructure presents vast opportunities for in-depth analysis of the virtual world, as demonstrated in this thesis. \newline
+Address clustering will continue to make further advancements. From a user perspective, it is crucial that privacy-enhancing protocols continue to evolve and gain large-scale adoption. Additionally, education on preserving privacy when transacting on blockchains becomes increasingly important.
 
-ENS pairs ...
-
-We looked at the existing clustering heuristics and discussed their applicablilty to our research question/setting.
-We found thee clustering heuristics, namely self-authorization, graph representation learning and non-compensated LAND transfers to be applicable to cluster a predefined address set. Self-authorization and graph representation learning through Ethereum transaction data were approaches proposed by \cite{FV:17} and \cite{Beres2020} respectively, while the LAND transfer heuristic was proposed by ourselves. We modified and extended the learned graph representation approach to best work with our research goal. As of our best knowledge, we are the first to work with intra-set asset transfers to construct the network graph for graph-representation learning.\newline 
-The most successful clustering heuristic was graph representation learning, the reason being its general applicability, as it does not require participation in specific on-chain event / usage pattern. Topic for future research ... \newline
-The node embedding approach could be possibly further extended by incorporating time-of-day activity or gas price selection patterns for better clustering performance of predefined address sets. \newline
-Specifically looking at node embedding algorithms, we found the Role2Vec algorithm to be the most effective, finding the ground truth pair within the five nearest neighbors in 71 percent.
-
-Results/ Evaluation ...
-
-Clustering based on distance threshold, clusters dependent on this threshold...
-
-Visualizations ...
-
-Somethin about bots ...
-
-Still a lot of natural activity on Decentraland and open infrastructure allows us to analyze it in detail as in this paper, exciting to analyze other things, endless possibilities.
-Address clustering will  make further advancements. From a user perspective it is important that privacy enhancing protocols are also further developed and users educated how to preserve privacy when transacting on blockchains. / in the context of blockchains
-
-
-%1. Public blockchain -> all data available -> allows us to analyse it and find information
-%2. Clustering heuristics for account-based blockchains using on-chain data and on specific predefined address set
-%3. sehr vielversprechend
-%4. From the various methods Role2Vec best
-%5. Summarize Final results
-%6. For researchers -> extend this approach -> apply it to other address sets -> add activity patterns ->
-%7. Sth about bots
-
-
-%Clustering heuristics -> specific on-chain events, user patterns, graph representation learning
-%All blockchain transaction and token transfer data is publicly available. This allows us to apply various heuristics to cluster addresses belonging to the same entity by exploiting activity patterns.
+ %The major drawback of graph representation learning is the cluster formation after performing the node embedding. In our case, we utilize a Euclidean distance threshold for this task. However, the number of clusters and their size is very senstive to the exact choice of this threshold value. \newline
+%Address clustering will make further advancements. From a user perspective it is important that privacy enhancing protocols are also further developed and users educated how to preserve privacy when transacting on blockchains. / in the context of blockchains
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Literaturverzeichnis %%%
