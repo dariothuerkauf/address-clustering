@@ -30,7 +30,7 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning, intersections}
 \usepackage{subcaption}
-
+\usepackage{seqsplit}
 
 %%% Math Packages %%%
 \usepackage{amsmath}
@@ -49,8 +49,8 @@ headsep=10mm, footskip=12mm}
 \setlength{\parindent}{0mm}
 
 %%% Document Specifications %%%
-\title{Template Master's Thesis}
-\author{John Doe}
+\title{Developing Address Clustering Heuristics for Account-Based Blockchain Networks: An Analysis based on a Specific Address Set}
+\author{Dario Thürkauf}
 
 
 %%%%%%%%%%%%%%%%%%
@@ -58,7 +58,7 @@ headsep=10mm, footskip=12mm}
 %%%%%%%%%%%%%%%%%%
 
 \begin{document}
-%\begin{titlepage}
+\begin{titlepage}
 \begin{center}
 \vspace{1em}
 \large{Master Thesis}\\
@@ -87,7 +87,7 @@ This paper examines heuristics to cluster blockchain addresses using Ethereum an
 \vfill
 \textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Graph Representation Learning.\\
 %\noindent\textbf{JEL:} X00, X00, X00
-%\end{titlepage}
+\end{titlepage}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -398,7 +398,7 @@ In the case of pure LAND transfers, the sending and receiving addresses are the 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{../figures/land-opensea.png}
-	\caption{Example of LAND trade on Opensea, Source: \href{https://etherscan.io/tx/0x2c2a70114e9080596bf5da6ad9c9b9f6d7e4c85a9d3b06e992f7248f9457a2ec}{Etherscan}}
+	\caption{LAND trade on Opensea, Source: \href{https://etherscan.io/tx/0x2c2a70114e9080596bf5da6ad9c9b9f6d7e4c85a9d3b06e992f7248f9457a2ec}{Etherscan}}
 	\label{fig:LAND_example}
 \end{figure}
 
@@ -478,7 +478,7 @@ We must also consider that average rank may not be the most appropriate evaluati
     Within 10 nearest neighbors & 19 (0.56) & 24 (0.71) & 21 (0.62)\\
     \hline
   \end{tabular}
-  \caption{Average Rank of ENS Domain Names for Different Embedding Methods}
+  \caption{Average Rank of Target Address}
   \label{tbl:ENS_Domain_Ranks}
 \end{table}
 
@@ -521,7 +521,7 @@ A few key observations can be drawn from this network graph. In line with our ex
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{../figures/land_clusters.png}
-	\caption{Resulting LAND clusters, with largest cluster marked in green}
+	\caption{LAND clusters, largest cluster marked in green}
 	\label{fig:LAND_clusters}
 \end{figure}
 
@@ -577,7 +577,7 @@ Similarly, a two-step approach for clustering, re-ranking the nearest neighbors 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.65\textwidth]{../figures/network_visualization_0xe2e.png}
+	\includegraphics[width=0.8\textwidth]{../figures/network_visualization_0xe2e.png}
 	\caption{Token Transfer Graph for \texttt{0xE2e2F$\dots$faCa8}}
 	\label{fig:cluster}
 \end{figure}
@@ -630,6 +630,13 @@ Address clustering will continue to make further advancements. From a user persp
 
 \section{Appendix}
 
+
+%\subsection{List of Figures}
+
+
+%\subsection{List of Tables}
+
+
 \subsection{Database Schema}
 \label{sec:database}
 
@@ -637,12 +644,12 @@ Address clustering will continue to make further advancements. From a user persp
 \begin{table}[h!]
   \centering
   \tiny
-  \begin{tabular}{ll p{4cm} l}
+  \begin{tabular}{ll p{4cm} p{5.5cm}}
     \hline
     \textbf{Collection} & \textbf{Fields} & \textbf{Description} & \textbf{Example} \\ \hline
     Transactions & \texttt{\_id} & Unique identifier & 64b3c65ed2daf924bfdce72b
  \\
-    (16.1M rows) & \texttt{hash} & Transaction hash & 0x8d9490e9f0992e68490cfcb126e76290eca3bf668a... \\
+    (16.1M rows) & \texttt{hash} & Transaction hash & 0x8d9490e9f0992e68490cfcb126e76290eca3bf... \\
      & \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch &  1657777314\\
      & \texttt{gasUsed} & Amount of gas used by the transaction &  144176  \\
      & \texttt{gasPrice} & The price of gas the originator is willing to pay &  12449848873 \\
@@ -650,7 +657,7 @@ Address clustering will continue to make further advancements. From a user persp
      & \texttt{from} & Address initiating the transaction &   \\
      & \texttt{to} & The destination address (either native asset transfer or function call) &  \\
      & \texttt{value} & The amount of Ether/Matic to send to the destination & 500 \\
-     & \texttt{input} & Calldata & 0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff \\
+     & \texttt{input} & Calldata & \seqsplit{0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff} \\
      & \texttt{functionName} & added by Etherscan & approve(address spender, uint256 rawAmount) \\
      & \texttt{chainName} & Chain indicator & Ethereum or Polygon \\
     \hline
@@ -668,16 +675,16 @@ Address clustering will continue to make further advancements. From a user persp
      & \texttt{tokenName} & The specified token name &  Wrapped Ether\\
      & \texttt{tokenType} & Token standard indicator &  20 or 721 or 1155\\
      & \texttt{chainName} & see above &  see above \\
-     & \texttt{isSet} & Indicator if from or to address are from address set &  from or to \\
+     & \texttt{isSet} & Indicator if `from` or `to` address are from address set &  from or to \\
      & \texttt{userAddress} & Address of interested user & 0x000000085d9a759bb5c3d459d638739c0f48deb0\\
     \hline
   \end{tabular}
-  \caption{Database/data set Description}
+  %\caption{Database/data set Description}
 \end{table}
-
-
 %Distinction: Transaction is a message sent from an externally owned account
 
+
+\subsection{Github Repos}
 
 
 
