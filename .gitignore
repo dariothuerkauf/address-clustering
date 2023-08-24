@@ -650,3 +650,4 @@ cython_debug/
 .Rhistory
 data
 paper.ps
+figures/signature.jpeg
