@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Create the three dataframes
-df1 = pd.read_csv('../data/clusters/clusters_R2V_0_5.csv')
+df1 = pd.read_csv('../data/clusters/clusters_role2vec_05.csv')
 df2 = pd.read_csv('../data/clusters/clusters_selfAuthorization.csv')
 df3 = pd.read_csv('../data/clusters/clusters_LAND.csv', usecols=['ClusterID', 'Address'])
 

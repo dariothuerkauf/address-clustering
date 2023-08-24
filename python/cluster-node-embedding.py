@@ -82,7 +82,7 @@ for cluster_id, nodes in cluster_df.iterrows():
 
 new_cluster_df = pd.DataFrame(cluster_list, columns=['ClusterID', 'Address'])
 print(new_cluster_df)
-new_cluster_df.to_csv('../data/clusters_R2V_0_5.csv', index=False)
+new_cluster_df.to_csv('../data/clusters/clusters_role2vec_05.csv', index=False)
 
 
 # Show clusters with sizes greater than 50

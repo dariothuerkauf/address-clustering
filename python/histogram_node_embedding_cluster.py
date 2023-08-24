@@ -1,6 +1,6 @@
 from utils import *
 
-all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0], low_memory=False)
+all_transfers_df = pd.read_csv('../data/intra_all_transfers.csv', index_col=[0], low_memory=False)
 
 # Create network graph
 G = nx.from_pandas_edgelist(all_transfers_df, 'from', 'to', create_using=nx.MultiDiGraph())
