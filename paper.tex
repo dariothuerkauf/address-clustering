@@ -310,17 +310,9 @@ If this special case occurs, we assume that both addresses belong to the same en
 We applied the following methodology to find ground truth pairs: \textit{First}, we gathered all addresses that interacted with ENS to reduce the amount of name look-ups. \textit{Second}, we iterated over each address and checked if it reverse-resolved to an ENS domain\footnote{This was done via the ENS module within web3.py \url{https://web3py.readthedocs.io/en/stable/ens_overview.html}, which provides an interface to look up domains and addresses.}. If so, we logged the ENS domain and address in a CSV file. \textit{Third}, using our new list, we identified if two addresses referenced the same ENS domain. If matched, we recorded both addresses alongside the ENS domain. \newline
 From this, we identified 11,440 reverse records and 40 pairs of addresses pointing to the same ENS name, which we utilized as our ground truth to evaluate various clustering heuristics. Although this sample is relatively small, it allows us to assess and draw conclusions about the effectiveness of the methods.
 
-%Check for each address in the list if the address points to an human-readable name. (reverse mapping must be set/configured) From the web3.py documentation \url{https://web3py.readthedocs.io/en/stable/ens_overview.html } %The ens module is included with web3.py. It provides an interface to look up domains and addresses, add resolver records, or get and set metadata.
-%If two addresses point to the same ENS name we consider them belonging to the same entity. 
-%Normally, one .eth domain cannot point/map to multiple Ethereum addresses. Forward resolution. This is likely due to the owner change and the record not updated.
-%Only the forward resolution from the name to the address is changed. The reverse record resolution from the old address to the name is still there. For an visual explanation please see Figure \ref{fig:ENS}.
+%From the web3.py documentation \url{https://web3py.readthedocs.io/en/stable/ens_overview.html }
+%The ens module is included with web3.py. It provides an interface to look up domains and addresses, add resolver records, or get and set metadata.
 %Anyone who owns a domain at any level may configure subdomains - for themselves or others - as desired. For instance, if Alice owns 'alice.eth', she can create 'pay.alice.eth' and configure it as she wishes.
-%Currently, all the subdomains or non .eth domains are not NFTs, unless the domain registrar itself supports NFT such as (dcl.eth, and .kred).
-%If the owner sets a reverse resolution set with his new address, we have two addresses pointing to the same ens name. 
-%While 'regular' resolution involves mapping from a name to an address, reverse resolution maps from an address back to a name - or other metadata. ENS supports reverse resolution to allow applications to display ENS names in place of hexadecimal addresses. Before this can be done, the owner of the address has to configure reverse resolution for their address.
-%In spirit, it is similar to the well-known Domain Name Service (DNS). However, in ENS the registry is implemented in Ethereum smart contracts.
-%Therefore, ENS provides a more user-friendly way of transferring assets on Ethereum, where users can use ENS names as recipient addresses instead of the error-prone hexadecimal Ethereum addresses.
-%Resolving a name is a two-step process: First, ask the registry what resolver is responsible for the name, and second, ask that resolver for the answer to your query.\newline
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Clustering Heuristics %%%
@@ -366,11 +358,7 @@ With our intra-set asset transfer data (\ref{sec:intra-set}) and ENS address pai
 It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether three times and Bob sent Alice Ether two times, the edge weight would correspond to five. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to create a custom method. Based on our network graph, we generate 128-dimensional feature vectors for each address and method. \newline
 Given a node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search), developed by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{We set $k = 51566$, the total number of nodes in the network graph}. \newline
 To evaluate the three node embedding algorithms, we use our ENS address pairs as ground truth. We run each node embedding method ten times and report the average rank of the target address. For comparison, we compute the mean, median, and standard deviation of the average rank for each method.
-
-\iffalse
 %write here that we tested different data sets to create the network graph but intra-set asset transfers performed best for our task.
-The intuition of Diff2Vec is to summarize a node by its neighborhood through a diffusion-like random process. Specifically, there are four steps to Diff2Vec: 1) Generating a diffusion graph, 2) sampling a node sequence, 3) extracting features, 4) learning a neural network embedding
-\fi
 
 \subsection{Time-of-day transaction activity and gas price selection}
 Apart from applying node embedding methods to Ethereum transaction graphs, \cite{Beres2020} suggest employing clustering heuristics based on time-of-day transaction activity and gas price selection patterns. \newline
@@ -551,14 +539,6 @@ Under these assumptions, we estimate 115,643 active users during the time frame 
 %%%%%%%%%%%%%%%%%%
 
 \section{Discussion}
-
-%The results chapter or section simply and objectively reports what you found, without speculating on why you found these results. 
-%The discussion
-%... interprets the meaning of the results, puts them in context, and explains why they matter.
-%... is an in-depth exploration of the results, going into detail about the meaning of your findings and citing relevant sources to put them in context.
-%... Try to explain "What do your results mean?", and how they relate to the literature,
-%... provides the explanation and interpretation of results or findings by comparing with the findings in prior studies.
-
 Throughout our analysis, we successfully applied three heuristics to cluster our address set while making use of on-chain data. In the following discussion, we will examine each of the approaches step-by-step.
 
 Implementing the \textit{self-authorization} heuristic is straightforward but results in very few identified address clusters. This is because it requires a highly specific on-chain behavior, which is rarely observed in practice. In particular, approvals are seldom used to authorize another externally owned account one might own. We also encountered a significant number of false positives due to non-standard implementations. We are very confident that the large cluster is not controlled by the same entity, and therefore remove it. After excluding these instances, we identified a total of 15 entities consisting of 35 addresses. This outcome aligns with findings by \cite{FV:17}, who also observed that the heuristic captures only a small proportion of addresses. In his analysis of Ethereum transaction data up to block number 8,500,000, he identified 4,599 entities from 7,107 addresses.
@@ -595,12 +575,6 @@ Role2Vec performed best for our small test sample but may not always superior to
 %%%%%%%%%%%%%%%%%%
 
 \section{Conclusion}
-
-%...Re-state the main points in a new concise way that you want your readers to remember.
-%...write the output of the work/ investigations in summarized form
-%...intended to help the reader understand why your research should matter to them after they have finished reading the paper.
-%...not merely a summary of your points or a re-statement of your research problem but a synthesis of key points. For most essays, one well-developed paragraph is sufficient for a conclusion, although in some cases, a two-or-three paragraph conclusion may be required.
-
 This thesis aimed to determine how many unique entities correspond to the 473,927 addresses observed in Decentraland from July 16, 2022, to April 23, 2023. \newline
 By focusing on Ethereum and Polygon on-chain data, we narrowed the set down to 137,544 addresses. The required data was efficiently sourced by gathering all transactions and token transfers related to the addresses via Etherscan. Furthermore, with the help of ENS, we found a way to detect address pairs with a very high probability of being controlled by the same user. These address pairs served as our ground truth when evaluating the node embedding algorithms. \newline
 We discussed several existing clustering heuristics and evaluated their suitability in our context. Among these heuristics, two were found to be appropriate for clustering a pre-defined set of addresses with the available data: self-authorization \citep{FV:17} and graph representation learning \citep{Beres2020}. We modified the graph representation learning approach for our research goal. %to align with our research goals, this is the first attempt to utilize intra-set asset transfers in constructing the network graph
@@ -630,17 +604,13 @@ Address clustering will continue to make further advancements. From a user persp
 
 \section{Appendix}
 
-
 %\subsection{List of Figures}
-
-
 %\subsection{List of Tables}
-
 
 \subsection{Database Schema}
 \label{sec:database}
 
-%% Table
+
 \begin{table}[h!]
   \centering
   \tiny
@@ -683,26 +653,7 @@ Address clustering will continue to make further advancements. From a user persp
 \end{table}
 %Distinction: Transaction is a message sent from an externally owned account
 
-
 \subsection{Github Repos}
 
 
-
 \end{document}
-
-
-%%% Table
-%\begin{table}[h!]
-%  \center
-%  \begin{tabular}{lcc}
-%    \hline\hline
-%    Header & Header & Header \\ \hline
-%    Entry 1 & $0 \leq x<1$ & $\alpha$\\
-%    Entry 2 & $x=1$ & $\beta$\\
-%    Entry 3 & $x>1$ & $\gamma$\\
-%    \hline\hline
-%  \end{tabular}
-%  \caption{This is a table}
-%  \label{tbl:test}
-%\end{table}
-%%%
