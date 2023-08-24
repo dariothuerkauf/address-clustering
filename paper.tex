@@ -62,7 +62,7 @@ headsep=10mm, footskip=12mm}
 \begin{center}
 \vspace{1em}
 \large{Master Thesis}\\
-\huge Developing Address Clustering Heuristics for Account-Based Blockchain Networks:\\ An Analysis based on a Specific Address Set \\
+\LARGE Developing Address Clustering Heuristics for Account-Based Blockchain Networks:\\ An Analysis based on a Specific Address Set \\
 \Large \vspace{1em}
 Dario Thürkauf
 \end{center}
@@ -70,7 +70,7 @@ Dario Thürkauf
 \vspace{1em}
 \normalsize
 \begin{flushleft}
-Supervised by:\\ 
+Supervised by: \\
 Prof. Dr. Fabian Schär \\ 
 Professor for Distributed Ledger Technologies and Fintech \\
 Center for Innovative Finance, University of Basel
@@ -81,7 +81,9 @@ Center for Innovative Finance, University of Basel
 \begin{center}
 \section*{Abstract}
 \end{center}
-Assentiar consuetae ha opinionum mentemque ob ii. Ne conflantur de intelligat et me cohibendam. Imaginandi ob to at agnoscerem et mutationum. In methodum ob ii at quicquid lectorum. Procuravi ha dependent ob evidenter tangantur concipere. Immortalem objectivus deo eae rei attingebam ita advertebam quamprimum. Typis patet prius qua nia mem ens. Suppono sim ita pendere nam agnosci quopiam vestiri spondeo dum. Tes illum mundo vetus signa fit talem res his.  \\
+%Privacy, entity clustering, blockchains
+This paper examines heuristics to cluster blockchain addresses using Ethereum and Polygon PoS on-chain data. We investigate the number of entities represented by over 470 thousand addresses collected from Decentraland movement data over the course of nine months. For this purpose, we assess various existing heuristics, adapt them to our specific research context, and introduce a novel heuristic. Our findings suggest that graph representation learning, particularly our variation of node embedding algorithms, to be the most effective approach for clustering a pre-defined address set. However, the method does not come without its drawbacks, which is why we discuss extension possibilities for improving clustering performance. \\
+
 \vfill
 \textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Graph Representation Learning.\\
 %\noindent\textbf{JEL:} X00, X00, X00
@@ -220,7 +222,7 @@ The starting point for our work was a data set comprising 473,927 distinct Web3 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.6\textwidth]{../figures/venn_diagram.png}
-	\caption{Address Subsets Visualized in a Venn Diagram}
+	\caption{Network Specific Address Subsets}
 	\label{fig:Venn}
 \end{figure} 
 
@@ -396,7 +398,7 @@ In the case of pure LAND transfers, the sending and receiving addresses are the 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{../figures/land-opensea.png}
-	\caption{LAND trade on Opensea, Source: \href{https://etherscan.io/tx/0x2c2a70114e9080596bf5da6ad9c9b9f6d7e4c85a9d3b06e992f7248f9457a2ec}{Etherscan}}
+	\caption{Example of LAND trade on Opensea, Source: \href{https://etherscan.io/tx/0x2c2a70114e9080596bf5da6ad9c9b9f6d7e4c85a9d3b06e992f7248f9457a2ec}{Etherscan}}
 	\label{fig:LAND_example}
 \end{figure}
 
@@ -485,10 +487,10 @@ One approach might involve grouping a node's $k$ nearest neighbors to a cluster 
 Instead, we choose to build clusters based on the Euclidean distance. All neighbors of a node below a certain threshold are considered a cluster. Afterward, we merge overlapping clusters; for instance, if node A is clustered with nodes B and C, and node C is clustered with nodes A and X, we form a cluster comprising A, B, C, and X. \newline
 We explore the sensitivity of clusters to various Euclidean distance threshold values. Figure \ref{fig:threshold_sensitivity} shows the histogram of cluster sizes, and Table \ref{tbl:cluster_table} displays the number of resulting clusters depending on various threshold values. We chose said values after observing the distance between ground truth pairs. For better visibility, we only display clusters below 20 addresses in Figure \ref{fig:threshold_sensitivity}. At thresholds of 0.6, 0.7, and 0.8, we find 23,608, 18,592, and 14,793 clusters, respectively. Regardless of the threshold, the largest cluster has more than 500 addresses. Unsurprisingly, higher thresholds result in fewer single-address clusters and more large-sized clusters. The effect of the threshold is most pronounced for single address clusters while affecting other cluster sizes much less. 
 
-\begin{figure}[h]
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=\textwidth]{../figures/cluster_histogram.png}
-	\caption{Cluster Size Histogram for different distance thresholds}
+	\includegraphics[width=0.9\textwidth]{../figures/cluster_histogram.png}
+	\caption{Cluster Size Histogram for Different Distance Thresholds}
 	\label{fig:threshold_sensitivity}
 \end{figure}
 
@@ -505,7 +507,7 @@ Size of largest cluster & 499 & 	512 & 516 & 	524 & 532 & 535 & 544\\
 Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
     \hline
   \end{tabular}
-  \caption{Clustering results for different threshold values}
+  \caption{Clustering Results for Different Threshold Values}
   \label{tbl:cluster_table}
 \end{table}
 
@@ -539,7 +541,7 @@ Under these assumptions, we estimate 115,643 active users during the time frame 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{../figures/cluster-size-distribution.png}
-	\caption{Number of clusters by Cluster Size}
+	\caption{Number of Clusters by Cluster Size}
 	\label{fig:barplot_clusters}
 \end{figure}
 
@@ -600,13 +602,13 @@ Role2Vec performed best for our small test sample but may not always superior to
 %...not merely a summary of your points or a re-statement of your research problem but a synthesis of key points. For most essays, one well-developed paragraph is sufficient for a conclusion, although in some cases, a two-or-three paragraph conclusion may be required.
 
 This thesis aimed to determine how many unique entities correspond to the 473,927 addresses observed in Decentraland from July 16, 2022, to April 23, 2023. \newline
-By focusing on Ethereum and Polygon on-chain data, we narrowed the set down to 137,544 addresses. The required data was efficiently sourced by gathering all transactions and token transfers related to the addresses via Etherscan. Furthermore, with the help of ENS, we found a way to detect address pairs that have a very high probability of being controlled by the same user. These address pairs served as our ground truth when evaluating the node embedding algorithms. \newline
+By focusing on Ethereum and Polygon on-chain data, we narrowed the set down to 137,544 addresses. The required data was efficiently sourced by gathering all transactions and token transfers related to the addresses via Etherscan. Furthermore, with the help of ENS, we found a way to detect address pairs with a very high probability of being controlled by the same user. These address pairs served as our ground truth when evaluating the node embedding algorithms. \newline
 We discussed several existing clustering heuristics and evaluated their suitability in our context. Among these heuristics, two were found to be appropriate for clustering a pre-defined set of addresses with the available data: self-authorization \citep{FV:17} and graph representation learning \citep{Beres2020}. We modified the graph representation learning approach for our research goal. %to align with our research goals, this is the first attempt to utilize intra-set asset transfers in constructing the network graph
 To the best of our knowledge, we are the first to employ intra-set asset transfers for constructing the network graph. Moreover, we introduced a novel clustering heuristic that identifies uncompensated transfers of high-value NFTs, particularly LAND. \newline
 Due to its general applicability, graph representation learning proved to be the most successful clustering heuristic, while the other two heuristics yielded far fewer address clusters. In our exploration of node embedding algorithms, the Role2Vec algorithm stood out, correctly identifying the ground truth pair within the ten nearest neighbors in 71 percent of the cases. \newline
-From the 137,544 addresses transacting on Polygon or Ethereum, we identified an estimated 115,643 as active Decentraland users. A subset of these entities, 8,483 addresses, representing 7.3\%, operated through multiple addresses. Notably, the largest address cluster we observed was an entity with 500 distinct addresses. Based on our analysis, we believe this entity is likely a bot targeting Decentraland NFT airdrops, with intentions to resell them later. \newline
+From the 137,544 addresses transacting on Polygon or Ethereum, we identified an estimated 115,643 active Decentraland users. A subset of 8,483 entities, representing 7.3\%, operated through multiple addresses. Notably, the largest address cluster we observed was an entity with 500 distinct addresses. Based on our analysis, this entity is likely a bot targeting Decentraland NFT airdrops, with intentions to resell them later. \newline
 To enhance clustering performance, node embeddings could incorporate time-of-day activity and gas price selection patterns. This approach holds significant promise for future research in entity identification. \newline
-A significant challenge with graph representation learning is the formation of clusters after node embedding. In our study, we relied on a Euclidean distance threshold for this purpose. However, the resulting number and size of clusters are highly sensitive to the precise selection of this threshold. \newline
+A significant challenge for graph representation learning is the formation of clusters after node embedding. In our study, we relied on an Euclidean distance threshold for this purpose. However, the resulting number and size of clusters are highly sensitive to the precise selection of this threshold. \newline
 Notably, our approach is versatile and can be applied to other predefined address sets. This adaptability is particularly significant given the increasing importance of determining the true number of users in various protocols, especially in areas like Decentralized Finance and on-chain governance. \newline
 Although we were able to detect entity clusters, Decentraland still exhibits a lot of natural activity. Its open infrastructure presents vast opportunities for in-depth analysis of the virtual world, as demonstrated in this thesis. \newline
 Address clustering will continue to make further advancements. From a user perspective, it is crucial that privacy-enhancing protocols continue to evolve and gain large-scale adoption. Additionally, education on preserving privacy when transacting on blockchains becomes increasingly important.

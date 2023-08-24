@@ -48,7 +48,8 @@ bin_counts = bin_counts.reindex(labels)
 
 # Create a horizontal barplot with a bar for each bin
 plt.figure(figsize=(10, 5))
-ax = sns.barplot(x=bin_counts.values, y=bin_counts.index, color='blue')
+color_palette = sns.color_palette("deep")
+ax = sns.barplot(x=bin_counts.values, y=bin_counts.index, color=color_palette[0], alpha=0.7)
 plt.xlabel('')
 plt.ylabel('Cluster Size', fontsize=14)
 plt.title('Number of Clusters', fontsize=14)
