@@ -40,15 +40,6 @@ def fit_model(G, model, ordered_addresses):
     emb_df = emb_df.set_index('address')
     return embeddings, emb_df
 
-def address_txs(address_str):
-    """Get all intra-set transfers/transactions related to an address"""
-    transfer_df = pd.read_csv('../data/token_transfers.csv', index_col=[0])
-    transaction_df = pd.read_csv('../data/native_transfers.csv', index_col=[0])
-    all_df = pd.concat([transaction_df, transfer_df], ignore_index=True)
-    address = str(address_str).lower()
-    txs = all_df[(all_df["from"] == address) | (all_df["to"] == address)]
-    return txs.sort_values("timeStamp")
-
 
 ##################################
 ### Distance Calculation Class ###
