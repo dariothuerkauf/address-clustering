@@ -6,6 +6,7 @@ This directory encompasses all the Python scripts utilized during the research a
 
 1. **Root Directory**: 
     - Contains the scripts responsible for applying various heuristics to cluster the address set.
+    - Utility classes and functions reused across multiple scripts.
     
 2. **Data Retrieval**:
     - Located in: `./data-retrieval/`
@@ -14,7 +15,4 @@ This directory encompasses all the Python scripts utilized during the research a
 3. **Data Visualization**:
     - Located in: `./data-visualization/`
     - Scripts designed to visualize the datasets and outputs, helping in data analysis and presentation.
-
-4. **Utils**:
-    - Located in: `./utils/`
-    - Utility folder that includes classes and functions reused across multiple scripts.
+    
