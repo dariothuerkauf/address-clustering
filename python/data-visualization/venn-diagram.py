@@ -1,6 +1,5 @@
-import pandas as pd
+from utils import *
 from matplotlib_venn import venn2
-import matplotlib.pyplot as plt
 
 df = pd.read_csv('../../data/subsets.csv', index_col=[0])
 

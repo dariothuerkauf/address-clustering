@@ -1,8 +1,4 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
-
+from utils import *
 
 def format_x_axis(ax, hour_bins):
     """Formats the x-axis of the time histogram."""

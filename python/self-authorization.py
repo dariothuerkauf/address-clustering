@@ -1,7 +1,6 @@
+from utils import *
 from pymongo import MongoClient
-import pandas as pd
 import re
-import networkx as nx
 
 # Connect to db collection
 client = MongoClient('mongodb://localhost:27017/')

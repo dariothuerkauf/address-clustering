@@ -1,6 +1,4 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+from utils import *
 
 # Create the three dataframes
 df1 = pd.read_csv('../data/clusters/clusters_role2vec_05.csv')
