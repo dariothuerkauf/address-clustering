@@ -8,8 +8,7 @@ def format_x_axis(ax, hour_bins):
     x_labels = [f'{int(tick / 3600)}' for tick in x_ticks]
     ax.set_xticklabels(x_labels)
 
-
-def show_patterns(events_df, addresses, ens_name, hour_bins=24, figsize=(15, 15), show_kde=True):
+def show_ToD_pattern(events_df, addresses, ens_name, hour_bins=24, figsize=(15, 15), show_kde=True):
     """Show side channels distribution of the given addresses"""
     addresses = [addr.lower() for addr in addresses]
     events_df['timeStamp'] = pd.to_datetime(events_df['timeStamp'], unit='s')
@@ -46,12 +45,26 @@ def show_patterns(events_df, addresses, ens_name, hour_bins=24, figsize=(15, 15)
     return fig, (ax_hist, ax_kde)
 
 
-all_transfers_df = pd.read_csv('../data/all_intra_transfers.csv', index_col=[0])
-ens_pairs = pd.read_csv('../data/ens_pairs.csv', index_col=[0])
+def get_addresses(ens_name, ens_pairs):
+    # Extract addresses corresponding to the queried ENS name
+    query_result = ens_pairs[ens_pairs['ens_name'] == ens_name]
+    if query_result.empty:
+        print(f"No addresses found for {ens_name}")
+        return
+    else:
+        return query_result.iloc[0]['addr1'], query_result.iloc[0]['addr2']
 
-# Specify the addresses to be compared
-addresses = ['0xa5dbd5f2f45cec05ace6c08f0b75bec711ea9517','0xf1289a44a9e7f75809de380ffa261f6095387c72']
 
-show_patterns(all_transfers_df, addresses, 'erikarand.eth', hour_bins=12, show_kde=True, figsize=(15, 10))
-plt.savefig('../figures/time-of-day-activity.png', bbox_inches='tight', dpi=500)
+# ENS Pairs dataset
+ens_pairs = pd.read_csv('../../data/ens_pairs.csv')
+
+# ENS Name to query
+ens_name = 'erikarand.eth'
+# Get addresses corresponding to the queried ENS name
+addresses = get_addresses(ens_name, ens_pairs)
+# Get transactions corresponding to addresses
+transactions_df = address_txs(addresses)
+
+show_ToD_pattern(transactions_df, addresses, ens_name, hour_bins=12, show_kde=True, figsize=(15, 10))
+plt.savefig(f'../../figures/{ens_name[:-4]}.png', bbox_inches='tight', dpi=500)
 plt.show()
