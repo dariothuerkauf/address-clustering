@@ -1,6 +1,6 @@
 from utils import *
 
-all_transfers_df = pd.read_csv('../data/intra_all_transfers.csv', index_col=[0], low_memory=False)
+all_transfers_df = pd.read_csv('../../data/intra_all_transfers.csv', index_col=[0], low_memory=False)
 
 # Create network graph
 G = nx.from_pandas_edgelist(all_transfers_df, 'from', 'to', create_using=nx.MultiDiGraph())
@@ -20,7 +20,7 @@ ordered_addresses = [idx_map[idx] for idx in range(len(node_map))]
 print(f'Nodes: {len(G_cc.nodes())}\nEdges: {len(G_cc.edges())}')
 
 # Get Role2Vec embeddings
-emb_r2v_df = pd.read_csv('../data/embeddings/role2vec.csv', index_col='address')
+emb_r2v_df = pd.read_csv('../../data/embeddings/role2vec.csv', index_col='address')
 embeddings_r2v = emb_r2v_df.values
 faiss_index_r2v = DistCalculation(embeddings_r2v, node_map)
 
