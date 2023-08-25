@@ -111,9 +111,9 @@ def format_x_axis(ax, hour_bins):
 
 
 
-############################
-### Distance Calculation ###
-############################
+##################################
+### Distance Calculation Class ###
+##################################
 
 class DistCalculation:
     def __init__(self, X, node_map):
