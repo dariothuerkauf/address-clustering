@@ -172,28 +172,4 @@ class DistCalculation:
         else:
             return None, None
 
-    def foo(self, address1, address2):
-        """
-        returns the rank of a target vector with respect to a query vector in a nearest neighbor search.
-        Args:
-            address1 (str): Address corresponding to the query vector
-            address2 (str): Address corresponding to the target vector
-        Returns:
-            tuple: The rank of the target vector and the corresponding distance. If either address is not found in the node_map, it returns (None, None).
-        """
-        address1, address2 = address1.lower(), address2.lower()
-        if address1 in self.node_map and address2 in self.node_map:
-            query_idx = self.node_map[address1]
-            target_idx = self.node_map[address2]
-
-            distances, indices = self.get_dist_idx(query_idx)
-
-            if len(indices) > 0 and target_idx in indices:
-                trg_idx = np.where(indices == target_idx)[0]
-                return trg_idx.item() + 1, distances[trg_idx].item()
-            else:
-                return None, None
-        else:
-            return None, None
-
 
