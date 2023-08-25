@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Get all transfers as a pandas dataframe except the '_id', 'userAddress' and 'isSet' column
-df_transfer = pd.read_csv('../data/raw_transfer_events.csv', usecols=lambda x: x not in ['_id', 'userAddress', 'isSet'])
+df_transfer = pd.read_csv('../../data/raw_transfer_events.csv', usecols=lambda x: x not in ['_id', 'userAddress', 'isSet'])
 
 # Get all transactions as a pandas dataframe except the '_id' column
-df_transactions_eth = pd.read_csv('../data/raw_ethereum_transactions.csv', usecols=lambda x: x not in ['_id'])
-df_transactions_polygon = pd.read_csv('../data/raw_polygon_transactions.csv', usecols=lambda x: x not in ['_id'])
+df_transactions_eth = pd.read_csv('../../data/raw_ethereum_transactions.csv', usecols=lambda x: x not in ['_id'])
+df_transactions_polygon = pd.read_csv('../../data/raw_polygon_transactions.csv', usecols=lambda x: x not in ['_id'])
 df_tx = pd.concat([df_transactions_eth, df_transactions_polygon])
 
 # Drop duplicates
@@ -67,5 +67,5 @@ plt.ylim(bottom=-10)
 plt.xlim(left=df.timeStamp.min(), right=df.timeStamp.max())
 plt.xlabel("")
 plt.ylabel("")
-plt.savefig('../figures/transfers_tx_by_chain.png', dpi=300, bbox_inches='tight')
+plt.savefig('../../figures/transfers_tx_by_chain.png', dpi=300, bbox_inches='tight')
 plt.show()
