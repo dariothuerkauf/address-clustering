@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from tqdm import tqdm
+from pymongo import MongoClient
 
 
 def clean_graph(G, k=None):
@@ -44,14 +45,19 @@ def fit_model(G, model, ordered_addresses):
     return embeddings, emb_df
 
 
-def address_txs(address_str):
-    """Get all intra-set asset transfers related to an address"""
-    transfer_df = pd.read_csv('../data/token_transfers.csv', index_col=[0])
-    transaction_df = pd.read_csv('../data/native_transfers.csv', index_col=[0])
-    all_df = pd.concat([transaction_df, transfer_df], ignore_index=True)
-    address = str(address_str).lower()
-    txs = all_df[(all_df["from"] == address) | (all_df["to"] == address)]
-    return txs.sort_values("timeStamp")
+def address_txs(address_list):
+    """
+    Fetches transactions from the 'transactions' collection where any provided address
+    is in the 'from' field.
+    :param address_list: List of Ethereum addresses in string format.
+    :return: A pandas DataFrame containing the transactions.
+    """
+    client = MongoClient('mongodb://localhost:27017/')
+    db = client['address-clustering']
+    transactions = db['transactions']
+
+    return pd.DataFrame(list(transactions.find({"from": {"$in": address_list}})))
+
 
 
 ############################
