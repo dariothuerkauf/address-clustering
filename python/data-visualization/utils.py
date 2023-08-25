@@ -8,16 +8,6 @@ import seaborn as sns
 from tqdm import tqdm
 
 
-# Functions
-def compute_weights(df):  ### evtl direkt mit undirected graph arbeiten
-    # Sort from and to addresses lexicographically
-    df['from'], df['to'] = np.where(df['from'] > df['to'], [df['to'], df['from']], [df['from'], df['to']])
-    # Group by 'from' and 'to', and count the number of interactions
-    grouped_df = df.groupby(['from', 'to']).size().reset_index(name='weight')
-    # grouped_df = grouped_df.rename(columns={"from": "address1", "to": "address2"})
-    return grouped_df
-
-
 def clean_graph(G, k=None):
     """Convert to undirected graph and remove self loops"""
     G_undir = G.to_undirected()
@@ -31,7 +21,7 @@ def clean_graph(G, k=None):
 
 
 def recode_graph(G):
-    """Rename nodes to work with Diff2Vec"""
+    """Rename nodes to work with Node Embedding models"""
     N = G.number_of_nodes()
     node_map = dict(zip(G.nodes(), range(N)))
     edges_addr = list(G.edges())
@@ -55,60 +45,13 @@ def fit_model(G, model, ordered_addresses):
 
 
 def address_txs(address_str):
-    """Get all intra-set transfers/transactions related to an address"""
+    """Get all intra-set asset transfers related to an address"""
     transfer_df = pd.read_csv('../data/token_transfers.csv', index_col=[0])
     transaction_df = pd.read_csv('../data/native_transfers.csv', index_col=[0])
     all_df = pd.concat([transaction_df, transfer_df], ignore_index=True)
     address = str(address_str).lower()
     txs = all_df[(all_df["from"] == address) | (all_df["to"] == address)]
     return txs.sort_values("timeStamp")
-
-
-def show_patterns(events_df, addresses, hour_bins=24, figsize=(15, 15), show_kde=True):
-    """Show side channels distribution of the given addresses"""
-    addresses = [addr.lower() for addr in addresses]
-    events_df['timeStamp'] = pd.to_datetime(events_df['timeStamp'], unit='s')
-    events_df['hour'] = events_df['timeStamp'].dt.hour * 3600 + events_df['timeStamp'].dt.minute * 60 + events_df[
-        'timeStamp'].dt.second
-    sns.set_theme(context='paper')
-
-    # Create a 2x1 grid of subplots
-    fig, (ax_hist, ax_kde) = plt.subplots(2, 1, figsize=figsize, gridspec_kw={'height_ratios': [2, 1]})
-
-    # Plot histogram on ax_hist
-    bin_edges = np.linspace(events_df['hour'].min(), events_df['hour'].max(), hour_bins + 1)
-    for address in addresses:
-        user_txs = events_df[events_df["from"] == address]
-        sns.histplot(user_txs["hour"], bins=bin_edges, kde=False, ax=ax_hist, alpha=0.5)
-        format_x_axis(ax_hist, hour_bins) # assuming you have this function to format the x-axis
-
-    ax_hist.set_xlabel('Hour', fontsize=14)
-    ax_hist.set_ylabel('Frequency', fontsize=14)
-
-    # Plot KDE on ax_kde
-    if show_kde:
-        for address in addresses:
-            user_txs = events_df[events_df["from"] == address]
-            sns.kdeplot(user_txs['hour'], ax=ax_kde)
-            format_x_axis(ax_kde, hour_bins) # assuming you have this function to format the x-axis
-
-    ax_kde.set_xlabel('Hour', fontsize=14)
-    ax_kde.set_ylabel('Density', fontsize=14)
-
-    plt.tight_layout()  # Adjust layout to prevent overlap
-
-    return fig, (ax_hist, ax_kde)
-
-
-### Helper function
-def format_x_axis(ax, hour_bins):
-    """Formats the x-axis of the time histogram."""
-    ax.set_xlim([0, 86400])
-    x_ticks = np.linspace(0, 86400, hour_bins + 1)
-    ax.set_xticks(x_ticks)
-    x_labels = [f'{int(tick / 3600)}' for tick in x_ticks]
-    ax.set_xticklabels(x_labels)
-
 
 
 ############################
