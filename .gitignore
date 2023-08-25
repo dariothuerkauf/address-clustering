@@ -651,3 +651,5 @@ cython_debug/
 data
 paper.ps
 figures/signature.jpeg
+python/network-visualization.ipynb
+python/test_notebook.ipynb
