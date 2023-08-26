@@ -298,13 +298,6 @@ In Section 5, we will implement and evaluate the heuristics we determine to be s
 The ``self authorization`` heuristic, proposed by \cite{FV:17}, suggests that users might authorize another address they own, possibly for risk distribution across several addresses or for testing purposes. \newline
 Since all the addresses' transactions are available in our data set, we can easily employ this heuristic.
 
-\iffalse
-For the ERC-20 standard: \texttt{approve(address spender, uint256 amount)}
-For the ERC-721 standard: \texttt{approve(address to, uint256 tokenId)} and \texttt{setApprovalForAll(address operator, bool approved)}\\
-For the ERC-1155 standard: \texttt{setApprovalForAll(address operator, bool approved)}
-\fi
-
-
 \subsection{Deposit address reuse}
 The concept of deposit address reuse was first introduced and systematically utilized by \cite{FV:17} and subsequently adoped by \cite{wu2022tutela}. This heuristic relies on the prevalent practice of crypto exchanges generating unique deposit addresses for each user. These addresses then forward the funds to an exchange's main address. It is highly likely that multiple addresses sending funds to the same deposit address are controlled by the same entity. The key challenge of this approach lies in identifying these deposit addresses, which could either be EOAs or smart contracts. \citep{FV:17}\newline
 Deposit addresses share the characteristic that they forward the received funds to a major exchange account. Two parameters are essential for deposit address detection: the discrepancy between the amount received and forwarded (since the exchange must pay for gas fees), and the time lag between receiving and forwarding funds.
@@ -556,7 +549,7 @@ To enhance clustering performance, node embeddings could incorporate time-of-day
 A significant challenge for graph representation learning is the formation of clusters after node embedding. In our study, we relied on an Euclidean distance threshold for this purpose. However, the resulting number and size of clusters are highly sensitive to the precise selection of this threshold. \newline
 Notably, our approach is versatile and can be applied to other predefined address sets. This adaptability is particularly significant given the increasing importance of determining the true number of users in various protocols, especially in areas like Decentralized Finance and on-chain governance. \newline
 Although we were able to detect entity clusters, Decentraland still exhibits a lot of natural activity. Its open infrastructure presents vast opportunities for in-depth analysis of the virtual world, as demonstrated in this thesis. \newline
-Address clustering will continue to make further advancements. From a user perspective, it is crucial that privacy-enhancing protocols continue to evolve and gain large-scale adoption. Additionally, education on preserving privacy when transacting on blockchains becomes increasingly important.
+Address clustering will continue to make further advancements. From a user perspective, it is crucial that privacy-enhancing protocols continue to evolve and gain large-scale adoption. Additionally, education on preserving privacy when transacting on blockchains becomes an increasingly important.
 
  %The major drawback of graph representation learning is the cluster formation after performing the node embedding. In our case, we utilize a Euclidean distance threshold for this task. However, the number of clusters and their size is very senstive to the exact choice of this threshold value. \newline
 %Address clustering will make further advancements. From a user perspective it is important that privacy enhancing protocols are also further developed and users educated how to preserve privacy when transacting on blockchains. / in the context of blockchains
