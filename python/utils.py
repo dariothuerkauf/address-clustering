@@ -51,8 +51,7 @@ def fit_model(G, model, ordered_addresses):
 
 # This class is based on the 'ethereum-privacy' package available at:
 # https://github.com/ferencberes/ethereum-privacy/blob/master/ethprivacy/distance_calculation.py
-# It also uses the 'faiss' library for efficient similarity search and clustering of dense vectors.
-# 'faiss' is a library developed by Facebook AI Research.
+# It also uses the 'faiss' library developed by Facebook AI Research for efficient similarity search and clustering of dense vectors.
 # More information about 'faiss' can be found at: https://github.com/facebookresearch/faiss
 class DistCalculation:
     def __init__(self, X, node_map):
