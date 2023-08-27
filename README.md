@@ -1,11 +1,11 @@
 # address-clustering
 Master Thesis
 
-Title: Developing Address Clustering Heuristics for Account-Based Blockchain Networks: An Analysis based on a Specific Address Set
+**Title**: Developing Address Clustering Heuristics for Account-Based Blockchain Networks: An Analysis based on a Specific Address Set
 
-Author: Dario Thürkauf
+**Author**: Dario Thürkauf
 
-Supervisor: Prof. Dr. Fabian Schär
+**Supervisor**: Prof. Dr. Fabian Schär
 
 ## Structure
 - `python`: Contains all the source code used for data collection, analysis, and visualization.
