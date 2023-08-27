@@ -563,9 +563,6 @@ Address clustering will continue to make further advancements. From a user persp
 
 \section{Appendix}
 
-%\subsection{List of Figures}
-%\subsection{List of Tables}
-
 \subsection{Database Schema}
 \label{sec:database}
 
@@ -578,14 +575,14 @@ Address clustering will continue to make further advancements. From a user persp
     \textbf{Collection} & \textbf{Fields} & \textbf{Description} & \textbf{Example} \\ \hline
     Transactions & \texttt{\_id} & Unique identifier & 64b3c65ed2daf924bfdce72b
  \\
-    (16.1M rows) & \texttt{hash} & Transaction hash & 0x8d9490e9f0992e68490cfcb126e76290eca3bf... \\
+    (16.1M rows) & \texttt{hash} & Transaction hash & \seqsplit{0x8d9490e9f0992e68490cfcb126e76290eca3bf668a9ba0295d563e0553ed657d} \\
      & \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch &  1657777314\\
      & \texttt{gasUsed} & Amount of gas used by the transaction &  144176  \\
      & \texttt{gasPrice} & The price of gas the originator is willing to pay &  12449848873 \\
      & \texttt{nonce} &   &   \\
-     & \texttt{from} & Address initiating the transaction &   \\
-     & \texttt{to} & The destination address (either native asset transfer or function call) &  \\
-     & \texttt{value} & The amount of Ether/Matic to send to the destination & 500 \\
+     & \texttt{from} & Address initiating the transaction & \seqsplit{0xbf9645420578f66d29145dbe5c4a0ba6a85e7121}  \\
+     & \texttt{to} & The destination address (either native asset transfer or function call) & \seqsplit{0x000000000d5a50614bcdf08700fe6ceb1c7dad4b} \\
+     & \texttt{value} & The amount of Ether/Matic to send to the destination address & 500 \\
      & \texttt{input} & Calldata & \seqsplit{0x095ea7b30000000000000000000000001111111254fb6c44bac0bed2854e76f90643097dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff} \\
      & \texttt{functionName} & added by Etherscan & approve(address spender, uint256 rawAmount) \\
      & \texttt{chainName} & Chain indicator & Ethereum or Polygon \\
@@ -596,10 +593,10 @@ Address clustering will continue to make further advancements. From a user persp
      & \texttt{gasUsed} & see above &  see above\\
      & \texttt{gasPrice} & see above & see above \\
      & \texttt{nonce} &  see above & see above \\
-     & \texttt{from} &  Sender address & see above \\
-     & \texttt{to} &  Recipient address & see above \\
+     & \texttt{from} &  Sender address (zero address for mints) & \seqsplit{0x0000000000000000000000000000000000000000} \\
+     & \texttt{to} &  Recipient address & \seqsplit{0x000000000d5a50614bcdf08700fe6ceb1c7dad4b} \\
      & \texttt{value} & Amount of tokens transferred in Wei, only for fungible or semi-fungible tokens & 10000000000000000 or NaN (ERC-721) \\
-     & \texttt{tokenID} &  Identifier of the NFT or semi-fungible token &  or NaN (ERC20) \\
+     & \texttt{tokenID} &  Identifier of the NFT or semi-fungible token &  1314 or NaN (ERC20) \\
      & \texttt{contractAddress} & The token contract address &  0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 \\
      & \texttt{tokenName} & The specified token name &  Wrapped Ether\\
      & \texttt{tokenType} & Token standard indicator &  20 or 721 or 1155\\
@@ -612,7 +609,24 @@ Address clustering will continue to make further advancements. From a user persp
 \end{table}
 %Distinction: Transaction is a message sent from an externally owned account
 
-\subsection{Github Repos}
+\subsection{Github Repositories}
 
+The code, figures, and data sets used for this thesis are hosted on Github. The repository is organized into the following directories:
+
+\begin{itemize}
+	\item \texttt{python}: Contains all the source code used for data collection, analysis, and visualization.
+	\item \texttt{figures}: Contains all the figures and plots generated during the analysis.
+	\item \texttt{data}: Contains the small data sets used for the analysis.
+\end{itemize}
+
+For the complete repository including a documentation of each file and its purpose, please visit the following link:
+
+\texttt{\url{https://github.com/dariothuerkauf/address-clustering}}
+
+For raw data not available in the repository, please contact the authors directly.
+
+A early proof-of-concept for a generalized address clustering Python module can be found under the following link:
+
+\texttt{\url{}}
 
 \end{document}
