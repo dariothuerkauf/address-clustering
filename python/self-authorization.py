@@ -1,3 +1,23 @@
+'''
+This script is designed to filter and analyze Ethereum transaction data to identify 'self-authorization' events,
+where an Ethereum address approves another address to spend its tokens. The script first filters the transactions
+to only keep those where the 'input' field starts with the function signature of an approval function.
+
+The script then extracts the spender address from the transaction 'input' data and filters the transactions
+to only keep those where the spender is within the address set.
+Further filtering is applied to only keep transactions where the sender is different from the spender.
+
+The filtered transactions are then used to build a directed graph, where an edge from address A to address B
+indicates that address A has approved address B. Connected components of the graph are then identified as clusters,
+and each address is assigned a cluster ID.
+
+Finally, the largest cluster is removed, and the remaining clusters are saved to a CSV file.
+
+Overall, this script is used to identify self-authorization events in Ethereum transaction data and cluster addresses
+based on these events.
+'''
+
+
 from utils import *
 from pymongo import MongoClient
 import re

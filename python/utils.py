@@ -7,6 +7,8 @@ import numpy as np
 import seaborn as sns
 from tqdm import tqdm
 
+# This function is based on the 'ethereum-privacy' package available at:
+# https://github.com/ferencberes/ethereum-privacy/blob/master/ethprivacy/node_embeddings.py
 def clean_graph(G, k=None):
     """Convert to undirected graph and remove self loops"""
     G_undir = G.to_undirected()
@@ -18,6 +20,8 @@ def clean_graph(G, k=None):
         G_tmp = nx.k_core(G_tmp, k=2)
     return G_tmp
 
+# This function is based on the 'ethereum-privacy' package available at:
+# https://github.com/ferencberes/ethereum-privacy/blob/master/ethprivacy/node_embeddings.py
 def recode_graph(G):
     """Rename nodes to work with Diff2Vec"""
     N = G.number_of_nodes()
@@ -45,6 +49,11 @@ def fit_model(G, model, ordered_addresses):
 ### Distance Calculation Class ###
 ##################################
 
+# This class is based on the 'ethereum-privacy' package available at:
+# https://github.com/ferencberes/ethereum-privacy/blob/master/ethprivacy/distance_calculation.py
+# It also uses the 'faiss' library for efficient similarity search and clustering of dense vectors.
+# 'faiss' is a library developed by Facebook AI Research.
+# More information about 'faiss' can be found at: https://github.com/facebookresearch/faiss
 class DistCalculation:
     def __init__(self, X, node_map):
         """

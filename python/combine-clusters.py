@@ -1,3 +1,16 @@
+'''
+This script is used for processing and analyzing the three clusters resulting from Node Embedding,
+Self-Authorization and LAND Transfers.
+It combines these clusters into a single dataframe, updating the cluster IDs to ensure uniqueness across the combined set.
+Next, it identifies and resolves overlapping clusters by updating the cluster IDs in the concatenated
+dataframe based on overlapping addresses. Duplicate rows are then removed, and the dataframe is sorted
+by 'ClusterID' and the index is reset.
+
+The script then calculates the number of addresses in each cluster and identifies the number of clusters
+containing more than one address. Following this, it categorizes the clusters into different size bins
+and plots the distribution of cluster sizes as a bar plot.
+'''
+
 from utils import *
 
 # Create the three dataframes
