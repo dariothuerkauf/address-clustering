@@ -12,7 +12,7 @@
 
 ## Structure
 - `python`: Contains all the source code used for data collection, analysis, and visualization.
-- `figures`: Contains all the generated figures and plots generated.
+- `figures`: Contains all the figures and plots generated during the analysis.
 - `data`: Contains the small data sets used for the analysis.
 
 ## Abstract
