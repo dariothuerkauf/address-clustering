@@ -1,3 +1,5 @@
+# Not used in paper
+
 from utils import *
 
 # Get all transfers as a pandas dataframe except the '_id', 'userAddress' and 'isSet' column
