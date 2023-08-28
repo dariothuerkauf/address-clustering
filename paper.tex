@@ -270,7 +270,7 @@ If this special case occurs, we assume that both addresses belong to the same en
         \draw[red, thick, -] (pathAB.south east) -- (pathAB.north west);
 							
 		\end{tikzpicture}
-		\caption{Simplified Schematic Representation of a Record Change to Another Address}
+		\caption{Simplified Schematic Representation of an ENS Record Change to Another Address}
 		\label{fig:ENS}
 	\end{center}
 \end{figure*}
@@ -363,7 +363,7 @@ We identified 16 clusters across 126 self-authorizing transactions, comprising 1
 
 \subsection{Node Embeddings}
 Our analysis of node embedding methods starts with a network graph built from intra-set asset transfers. We treat addresses as nodes and add undirected edges between them if they interacted with each other. \newline
-To use the Python library developed by \cite{karateclub}, we remove multi-edges and loops (transfers with the same sender and recipient address) and only consider nodes within the largest connected component. The resulting network graph includes 51,566 nodes and 249,302 edges. As previously stated, we utilize the Diff2Vec, Role2Vec, and DeepWalk methods from the library. \newline
+To use the Python library developed by \cite{karateclub}, we remove multi-edges and loops (i.e., transfers with the same sender and recipient address) and only consider nodes within the largest connected component. The resulting network graph includes 51,566 nodes and 249,302 edges. As previously stated, we utilize the Diff2Vec, Role2Vec, and DeepWalk methods from the library. \newline
 Subsequently, we ran ten independent experiments for each method. Our choice of input parameters is identical to \cite{Beres2020}. Each experiment returns a node embedding in a matrix with 51,566 rows corresponding to the number of nodes in the graph and 128 columns representing the feature vector dimensions. \newline
 For any node within the embedding, we can easily order all other nodes by the Euclidean distance. We achieve this through the FAISS Python library, which is suitable for efficient similarity search and clustering of dense vectors \citep{johnson2019faiss}.\newline 
 This feature enables us to search for our ENS ground truth pairs and report their relative rank. The results for each address pair, averaged over ten experiments, are presented in Table \ref{tbl:ENS_Domain_Ranks}. Additionally, we calculated the mean, median, standard deviation, and the rate of the target address appearing within the five or ten nearest neighbors for each method.
@@ -579,7 +579,7 @@ Address clustering will continue to make further advancements. From a user persp
      & \texttt{timeStamp} & Timestamp in seconds from the UNIX epoch &  1657777314\\
      & \texttt{gasUsed} & Amount of gas used by the transaction &  144176  \\
      & \texttt{gasPrice} & The price of gas the originator is willing to pay &  12449848873 \\
-     & \texttt{nonce} &   &   \\
+     & \texttt{nonce} & Scalar value equal to the number of transaction sent from an EOA or, in the case of contract accounts, the number of contract-creations made by this account  & 23 \\
      & \texttt{from} & Address initiating the transaction & \seqsplit{0xbf9645420578f66d29145dbe5c4a0ba6a85e7121}  \\
      & \texttt{to} & The destination address (either native asset transfer or function call) & \seqsplit{0x000000000d5a50614bcdf08700fe6ceb1c7dad4b} \\
      & \texttt{value} & The amount of Ether/Matic to send to the destination address & 500 \\
@@ -602,7 +602,7 @@ Address clustering will continue to make further advancements. From a user persp
      & \texttt{tokenType} & Token standard indicator &  20 or 721 or 1155\\
      & \texttt{chainName} & see above &  see above \\
      & \texttt{isSet} & Indicator if `from` or `to` address are from address set &  from or to \\
-     & \texttt{userAddress} & Address of interested user & 0x000000085d9a759bb5c3d459d638739c0f48deb0\\
+     & \texttt{userAddress} & Address of user in set & 0x000000085d9a759bb5c3d459d638739c0f48deb0\\
     \hline
   \end{tabular}
   %\caption{Database/data set Description}
@@ -615,7 +615,7 @@ The code, figures, and data sets used for this thesis are hosted on Github. The 
 
 \begin{itemize}
 	\item \texttt{python}: Contains all the source code used for data collection, analysis, and visualization.
-	\item \texttt{figures}: Contains all the figures and plots generated during the analysis.
+	\item \texttt{figures}: Contains the figures and plots generated during the analysis. Network Graphs can be viewed as an interactive HTML file.
 	\item \texttt{data}: Contains the small data sets used for the analysis.
 \end{itemize}
 
