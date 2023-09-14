@@ -653,3 +653,10 @@ figures/signature.jpeg
 python/network-visualization.ipynb
 python/test_notebook.ipynb
 python/chromedriver
+data/results_average_rank.csv
+data/raw_transfer_events.csv
+data/raw_polygon_transactions.csv
+data/raw_ethereum_transactions.csv
+data/intra_token_transfers.csv
+data/intra_native_transfers.csv
+data/intra_all_transfers.csv
