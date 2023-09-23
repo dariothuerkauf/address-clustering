@@ -133,7 +133,7 @@ Dario Thürkauf
 Public permissionless blockchains such as Bitcoin \citep{nakamotoBitcoin2008} and Ethereum \citep{buterin2014ethereum} allow users to participate with multiple pseudonymous addresses, the creation of which is virtually cost-free. Contrary to popular belief, these blockchains are entirely transparent. All transactions are publicly observable and stored as part of the blockchain's history.
 This circumstance has opened up a nascent scientific field dealing with entity identification within blockchains. Researchers try to cluster addresses controlled by the same entity by analyzing on-chain data and detecting usage patterns. The frequent lack of ground truth makes it challenging to evaluate different clustering methods. As a result, most methods are heuristic. \newline
 On the one hand, identifying addresses that belong to the same real-world entity is beneficial as it allows for better evaluation of network properties concerning usage, distribution of wealth, and detecting fraudulent activities \citep{FV:17}. For instance, distributing voting power across various addresses could allow a user to manipulate an on-chain voting process that seems fair at the outset. \newline
-Conversely, the lack of privacy is detrimental to most financial use cases. If someone links an address to an entity, they can observe all its transactions and associated activities. Using multiple addresses does not ensure privacy, as any connection between them can reveal that they belong to the same individual. \citep{nadler2023tornado} \newline
+Conversely, the lack of privacy is detrimental to most financial use cases. If someone links an address to an entity, they can observe all its transactions and associated activities. Using multiple addresses does not ensure privacy, as any connection between them can reveal that they belong to the same individual. \citep{Beres2020, nadler2023tornado} \newline
 As a response, various privacy-enhancing tools and protocols have been proposed to obfuscate transaction tracing. 
 Nonetheless, these protocols have yet to be widely adopted, and careless user behavior can undermine the privacy guarantees they offer. \newline
 With these considerations in mind, privacy, or lack thereof, is and will remain an essential topic for blockchain development and research. %If someone obtains information that allows them to link an address to an entity, they may effectively observe that entity’s entire transaction history and associated activity. Even if the entity uses multiple addresses, any link between these addresses may expose the fact that they belong to the same person.
@@ -166,7 +166,7 @@ The remainder of this paper is structured as follows: In Section 2, we provide a
 \section{Preliminaries}
 
 \subsection{Contract Accounts and EOAs}
-Account-based blockchains usually distinguish between externally owned accounts (EOAs) and contract accounts (smart contracts). \textit{EOAs} are created and controlled by private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. \textit{Contract accounts} are controlled by the contract's code; their state can be modified through transactions sent to the contract, and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, it is usually the last 20 bytes of the Keccak-256 hash derived from the sender's address and account nonce. \citep{GW:14}
+Account-based blockchains usually distinguish between externally owned accounts (EOAs) and contract accounts (smart contracts). \textit{EOAs} derived and controlled by private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. \textit{Contract accounts} are controlled by the contract's code; their state can be modified through transactions sent to the contract, and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, the address is usually the last 20 bytes of the Keccak-256 hash derived from the sender's address and account nonce. \citep{GW:14}
 
 \subsection{Ethereum, Polygon PoS and the EVM}
 Ethereum and Polygon PoS are both smart contract-based account-model blockchains. They share the same execution logic - the Ethereum Virtual Machine (EVM).
@@ -174,7 +174,7 @@ The EVM provides a standardized framework for contract execution, ensuring that 
 \textit{Polygon PoS} (referred to as \textit{Polygon}) is a so-called sidechain and aims to address the scalability limitations of Ethereum. The adoption of the EVM means that both blockchains share the same user address schemes. It also enables developers to deploy and execute Ethereum-based smart contracts on the Polygon network with minimal changes. \citep{matic_whitepaper}
 
 \subsection{Tokens and Token Standards}
-\cite{roth2019tokenization} define \textit{tokens} as rivalrous, digital units of value that represent ownership of an asset or utility. Smart contracts are the primary method of creating tokens on EVM-based blockchains. In essence, a smart-contract-based token is a mapping of accounts with token balances and a set of functions defining how these balances can be changed. Any smart contract containing these elements can be interpreted as a token contract. \citep{roth2019tokenization} \newline
+Tokens are rivalrous, digital units of value \citep{roth2019tokenization} and may represent virtually any kind of asset or promise \citep{Rosenfeld2013}. Smart contracts are the primary method of creating tokens on EVM-based blockchains. In essence, a smart-contract-based token is a mapping of accounts with token balances and a set of functions defining how these balances can be changed. Any smart contract containing these elements can be interpreted as a token contract. \newline
 \textit{Token standards} specify basic interfaces that allow for interoperability between smart contracts. These standards do not prescribe an implementation but set minimum requirements without restricting the design beyond that \citep{mastering_ethereum}. 
 The most common token standards are ERC-20\footnote{\url{https://eips.ethereum.org/EIPS/eip-20}} for fungible tokens, ERC-721\footnote{\url{https://eips.ethereum.org/EIPS/eip-721}} for non-fungible tokens (NFTs) and ERC-1155\footnote{\url{https://eips.ethereum.org/EIPS/eip-1155}} for semi-fungible tokens.\newline
 When a transaction completes, it produces a transaction receipt that contains log entries providing information about the actions that occurred during its execution. Solidity\footnote{Solidity is the dominant high-level programming language for smart contracts targeting the EVM.} high-level objects called ``Events`` construct these logs, which can be queried from a full node and are stored separately from the state. \citep{mastering_ethereum} \newline
@@ -185,20 +185,22 @@ These transfer events include the \textit{sender} and \textit{recipient} address
 \textit{Decentraland} is the first large-scale blockchain-based virtual world, with well-known companies like Tommy Hilfiger, Samsung, PepsiCo, Diesel, Adidas, and Netflix actively engaging in it \citep{metaverse-retailing2023}.\newline
 Two main reasons make Decentraland an ideal platform for empirical research.
 \textit{First}, its open architecture allows compiling snapshots of user activity, including the users' location within the metaverse and Web3 address. Using this capability, \cite{metaverse-retailing2023} captured snapshots of avatar locations over a nine-month period and provided the collected addresses for this thesis.\newline
-\textit{Second}, users who connect their Web3 account can own various digital assets, such as monetary units, land parcels, and avatar collectibles (e.g., wearables, emotes, and names). Smart contracts on Ethereum and Polygon track and manage the ownership of these assets \citep{goldbergschaer2023}. This allows us to analyze the entire transaction history and derive information about the avatars' economic activity. \newline
+\textit{Second}, users who connect their Web3 account can own various digital assets, such as monetary units, land parcels, and avatar collectibles (e.g., wearables, emotes, and names). Smart contracts on Ethereum and Polygon track and manage the ownership of these assets. This allows us to analyze the entire transaction history and derive information about the avatars' economic activity. \newline
 Initially, Decentraland launched with two native tokens. \textit{LAND}, a NFT compliant with ERC-721, manages the ownership of land parcels in Decentraland. \textit{MANA}, a fungible token compliant with ERC-20, is the in-world currency used to purchase digital goods and services. The majority of purchases and trades are settled in MANA. \newline 
 Moreover, the Decentraland core developers provide a smart-contract-based marketplace where users can buy or trade LAND or other in-game collectibles.
 
-\subsection{Non-Custodial Crypto Asset Mixers}
-According to \cite{nadler2023tornado}, crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains. At a high level, we can distinguish between custodial and non-custodial crypto-asset mixers. \newline
-In the custodial setup, users send their assets to a centralized service provider's public deposit address. After some delay, the provider returns the assets to a privately relayed recipient address. This approach is fully trust-based, as the service provider has complete control over the assets and access to the identifying data. \citep{nadler2023tornado} \newline 
-In contrast, non-custodial crypto asset mixers, such as Tornado Cash, replace the trusted mixing party with a publicly verifiable smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This approach has the advantage that users do not have to share the identifying information with anyone, and there is no liquidity risk as the funds are locked. \citep{nadler2023tornado} \newline
-In a nutshell, the mixer works in the following way: Various entities deposit the same amount of a specific crypto asset to a mixer address acting as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the deposit and withdrawal addresses. This is achieved using zkSNARKs (zero-knowledge, succinct, non-interactive argument of knowledge). 
-Each depositor inserts a hash value in a Merkle tree. At the time of withdrawal, each legitimate withdrawer can prove unlinkably with a zero-knowledge proof that they know the pre-image of a previously inserted hash leaf in the Merkle tree. %Subsequently, users can withdraw their assets from the mixer whenever they consider that the size of the anonymity set is satisfactory.
-For a more detailed description of how Tornado Cash works, see \cite{nadler2023tornado} or \cite{Beres2020}. \newline
+\subsection{Privacy-enhancing Protocols}
+Crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains \citep{nadler2023tornado}. At a high level, they are categorized into a custodial and a non-custodial setup. \newline
+In the custodial setup, users send their assets to a centralized service provider's public deposit address. After some delay, the provider returns the assets to a privately relayed recipient address. This approach is fully trust-based, as the service provider has complete control over the assets and access to the identifying data. \citep{wu2022tutela, nadler2023tornado} \newline 
+In contrast, non-custodial crypto asset mixers (or privacy-enhancing protocols), such as Tornado Cash, replace the trusted mixing party with a publicly verifiable smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This approach has the advantage that users do not have to share the identifying information with anyone, and there is no liquidity risk as the funds are locked. \citep{nadler2023tornado} \newline
+In a nutshell, the mixer works in the following way: Various entities deposit the same amount of a specific crypto asset to a Tornado Cash smart contract acting as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the deposit and withdrawal addresses. This feature is achieved using zkSNARKs (zero-knowledge, succinct, non-interactive argument of knowledge). 
+Each depositor inserts a hash value in a Merkle tree.
+%Subsequently, users can withdraw their assets from the mixer whenever they consider that the size of the anonymity set is satisfactory.
+ At the time of withdrawal, each legitimate withdrawer can prove unlinkably with a zero-knowledge proof that they know the pre-image of a previously inserted hash leaf in the Merkle tree. For a detailed technical description of the Tornado Cash protocol, see \cite{khovratovich2019tornado} or \cite{pertsev2019tornado}.
+\newline
 In the context of this thesis, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The set of all deposits that a particular withdrawal could be originated from is defined as the \textit{anonymity set}. 
 In theory, a larger anonymity set will provide a higher level of privacy since any withdrawal address could be linked to more deposit addresses. However, in practice, this principle does not always hold.
-Some users reveal the link between their withdrawal and deposit addresses, for example, by withdrawing from the pool with the same address they deposited or directly sending funds between the two addresses. This behavior also affects the privacy of other depositors. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions, or external incentive mechanisms might be reasons for this behavior. \newline
+Some users reveal the link between their withdrawal and deposit addresses, for example, by withdrawing from the pool with the same address they deposited or directly sending funds between the two addresses. This behavior also affects the privacy of other depositors. Careless use of the protocol, testing transactions, or external incentive mechanisms might be reasons for this behavior. \newline
 In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
 %In theory, a larger anonymity set will provide a higher level of privacy as third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users (might) withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
 %In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
@@ -377,50 +379,50 @@ Notably, two address pairs are absent within the network graph and, therefore, d
   \centering
   \begin{tabular}{lrrr}
     \hline
-	\textbf{ENS domain name} & \textbf{Diff2Vec} & \textbf{Role2Vec} & \textbf{DeepWalk} \\
+	User & \textbf{Diff2Vec} & \textbf{Role2Vec} & \textbf{DeepWalk} \\
 	\hline
-	anisofim.eth & 2.5 & 6.2 & 2.7 \\
-	arisalzberg.eth & 577.3 & 33.3 & 58.8 \\
-	atearnz.eth & 2.8 & 2.5 & 3.3 \\
-	awedjob.eth & 106.8 & 71.1 & 20.1 \\
-	captvicky.eth & - & - & - \\
-	disruptor.eth & 11.1 & 3.0 & 1.4 \\
-	dragonkiller.eth & 30.7 & 1.0 & 1.0 \\
-	eibriel.eth & 44.3 & 91.2 & 545.4 \\
-	epdrabbit.eth & 16.3 & 10.4 & 4.1 \\
-	erikarand.eth & 1.0 & 1.0 & 1.0 \\
-	hyperspek.eth & 129.1 & 10.0 & 605.4 \\
-	jamesmillerblog.eth & - & - & - \\
-	jasonhsu.eth & 1.0 & 1.0 & 1.8 \\
-	joeyz.eth & 1.9 & 1.0 & 1.0 \\
-	keastie.eth & 10.4 & 1.0 & 18.2 \\
-	linkg.eth & 4.0 & 1.0 & 10.3 \\
-	lulox.eth & 4.2 & 1.5 & 27.2 \\
-	maruudn.eth & 5.7 & 5.6 & 108.5 \\
-	maryana.eth & 52.3 & 373.8 & 9.0 \\
-	meanboss.eth & 9.0 & 9.0 & 51.8 \\
-	metatiger.dcl.eth & 474.2 & 86.7 & 2.4 \\
-	mgdivingnz.eth & 1.7 & 5.0 & 1.0 \\
-	mrcryp.eth & 2.7 & 1.0 & 2.3 \\
-	nicebhaiya.eth & 1.3 & 3.4 & 2.4 \\
-	niceguy.eth & 1.0 & 1.0 & 2.2 \\
-	ornellaweb3.eth & 3.7 & 2.0 & 284.0 \\
-	pinkboots.eth & 16.9 & 14.4 & 2.2 \\
-	remx.eth & 3.6 & 2.6 & 1.7 \\
-	rileybeans.eth & 1.5 & 2.0 & 1.6 \\
-	robertjames.eth & 2.7 & 1.0 & 1.1 \\
-	rsantos.eth & 2.0 & 13.6 & 101.2 \\
-	sannin.eth & 64.8 & 1.1 & 1.6 \\
-	smileface.eth & 3.0 & 19.3 & 1.7 \\
-	theartcollection.eth & 11.0 & 5.6 & 3.4 \\
-	turkii13.eth & 52.1 & 68.9 & 47.3 \\
-	tweetious.eth & 10.3 & 4.0 & 227.0 \\
+    1 & 2.5 & 6.2 & 2.7 \\
+    2 & 577.3 & 33.3 & 58.8 \\
+    3 & 2.8 & 2.5 & 3.3 \\
+    4 & 106.8 & 71.1 & 20.1 \\
+    5 & - & - & - \\
+    6 & 11.1 & 3.0 & 1.4 \\
+    7 & 30.7 & 1.0 & 1.0 \\
+    8 & 44.3 & 91.2 & 545.4 \\
+    9 & 16.3 & 10.4 & 4.1 \\
+    10 & 1.0 & 1.0 & 1.0 \\
+    11 & 129.1 & 10.0 & 605.4 \\
+    12 & - & - & - \\
+    13 & 1.0 & 1.0 & 1.8 \\
+    14 & 1.9 & 1.0 & 1.0 \\
+    15 & 10.4 & 1.0 & 18.2 \\
+    16 & 4.0 & 1.0 & 10.3 \\
+    17 & 4.2 & 1.5 & 27.2 \\
+    18 & 5.7 & 5.6 & 108.5 \\
+    19 & 52.3 & 373.8 & 9.0 \\
+    20 & 9.0 & 9.0 & 51.8 \\
+    21 & 474.2 & 86.7 & 2.4 \\
+    22 & 1.7 & 5.0 & 1.0 \\
+    23 & 2.7 & 1.0 & 2.3 \\
+    24 & 1.3 & 3.4 & 2.4 \\
+    25 & 1.0 & 1.0 & 2.2 \\
+    26 & 3.7 & 2.0 & 284.0 \\
+    27 & 16.9 & 14.4 & 2.2 \\
+    28 & 3.6 & 2.6 & 1.7 \\
+    29 & 1.5 & 2.0 & 1.6 \\
+    30 & 2.7 & 1.0 & 1.1 \\
+    31 & 2.0 & 13.6 & 101.2 \\
+    32 & 64.8 & 1.1 & 1.6 \\
+    33 & 3.0 & 19.3 & 1.7 \\
+    34 & 11.0 & 5.6 & 3.4 \\
+    35 & 52.1 & 68.9 & 47.3 \\
+    36 & 10.3 & 4.0 & 227.0 \\
     \hline
     Mean & 46.038 & 28.073 & 62.084 \\
     Median & 4.2 & 3.4 & 3.3 \\
-    Standard deviation & 120.504 & 68.814 &  139.932\\
-    Within 5 nearest neighbors & 17 (0.5) & 19 (0.56) & 20 (0.59) \\
-    Within 10 nearest neighbors & 19 (0.56) & 24 (0.71) & 21 (0.62)\\
+    Standard Deviation & 120.504 & 68.814 &  139.932\\
+    Within 5 nearest & 17 (0.5) & 19 (0.56) & 20 (0.59) \\
+    Within 10 nearest & 19 (0.56) & 24 (0.71) & 21 (0.62)\\
     \hline
   \end{tabular}
   \caption{Average Rank of Target Address}
@@ -457,18 +459,18 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
 \end{table}
 
 \subsection{LAND Transfers}
-To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same user address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we filter for purchases and create address clusters based on the remaining LAND transfers.
-
-A total of 740 LAND transfers were recorded, involving 413 unique addresses. Of these transfers, none involved any form of compensation within the same transaction. Upon analysis, we were able to group these addresses into 161 distinct clusters. Figure \ref{fig:LAND_clusters} visualizes the clusters in a network graph. Notably, the majority of clusters consist of two or three addresses. However, one cluster stands out, containing a significantly higher count of 71 addresses. This prominent cluster has been marked in green for ease of identification. \newline
-LAND transfers between Decentraland addresses can also be visualized as a token network graph, as shown in Figure \ref{fig:LAND_network}. In this graph, red edges signify simple transfers, whereas blue edges represent LAND transfers made as part of a trade. Notably, the 71-address cluster previously mentioned is visible on the top-right of the largest connected component. \newline
+To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers that occurred between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same user address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases cluster addresses that sent each other LAND without compensation. \newline
+A total of 2159 intra-set LAND transfers were recorded, of those, 740 (X \%) were without compensation. We were able to group the 413 unique addresses from these uncompensated transfers into 161 distinct clusters. 
+Notably, the majority of clusters consist of two or three addresses. However, one cluster stands out, containing a significantly higher count of 71 addresses. \newline 
+Figure \ref{fig:LAND_network} visualizes LAND transfers between Decentraland addresses as a token network graph. In this graph, red edges signify non-compensated transfers, whereas blue edges represent LAND transfers made as part of a trade/purchase. Notably, the 71-address cluster previously mentioned is visible on the top-right of the largest connected component. \newline
 A few key observations can be drawn from this network graph. In line with our expectations, most LAND transfers involve some form of compensation. Moreover, certain nodes play a central role in LAND trading activity, indicated by their high connectivity within the network. Lastly, a recurring behavior pattern is observed wherein an individual address purchases LAND and subsequently transfers it to a third address.
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.5\textwidth]{../figures/land_clusters.png}
-	\caption{LAND Entity Clusters (largest cluster marked in green)}
-	\label{fig:LAND_clusters}
-\end{figure}
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[width=0.5\textwidth]{../figures/land_clusters.png}
+%	\caption{LAND Entity Clusters (largest cluster marked in green)}
+%	\label{fig:LAND_clusters}
+%\end{figure}
 
 \begin{figure}[h!]
 	\centering
