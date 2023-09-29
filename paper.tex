@@ -61,22 +61,30 @@ headsep=10mm, footskip=12mm}
 \begin{titlepage}
 \begin{center}
 \vspace{1em}
-\large{Master Thesis}\\
-\LARGE Developing Address Clustering Heuristics for Account-Based Blockchain Networks:\\ An Analysis based on a Specific Address Set \\
-\Large \vspace{1em}
-Dario Thürkauf
-\end{center}
-
+%\large{Master Thesis}\\
+\Large Address Clustering Heuristics for Account-Based Blockchain Networks: An Analysis based on a Decentraland User Address Set \\
+\large \vspace{1em}
+Dario Thürkauf \\
 \vspace{1em}
 \normalsize
-\begin{flushleft}
-Supervised by: \\
-Prof. Dr. Fabian Schär \\ 
+PhD candidate, Center for Innovative Finance, University of Basel\\
+\vspace{1.5em}
+Supervised by \\
+\large Prof. Dr. Fabian Schär\\
+\vspace{1em}
+\normalsize
 Professor for Distributed Ledger Technologies and Fintech \\
 Center for Innovative Finance, University of Basel
-\end{flushleft}
+\end{center}
 
-\vspace{1em}
+\normalsize
+%\begin{flushleft}
+%Supervised by: \\
+%Prof. Dr. Fabian Schär \\ 
+%Professor for Distributed Ledger Technologies and Fintech \\
+%Center for Innovative Finance, University of Basel
+%\end{flushleft}
+
 \onehalfspacing
 \begin{center}
 \section*{Abstract}
@@ -84,7 +92,7 @@ Center for Innovative Finance, University of Basel
 Given the negligible cost of creating blockchain addresses, the notion that one address equates to one user is flawed. Therefore, Blockchain Address Clustering emerges as a key tool for estimating the actual number of users. This paper examines heuristics to cluster addresses using Ethereum and Polygon PoS data, analyzing over 470,000 addresses collected from Decentraland over the course of nine months. We assess various existing heuristics, adapt them to our specific research context, and also introduce a new heuristic. Our findings suggest that graph representation learning, particularly the application of an existing node embedding algorithm to an asset transfer network graph, is the most effective approach for clustering a predefined address set. However, the method does not come without its drawbacks, which is why we propose possible extensions for improving clustering performance. \\ %intra-set
 
 \vfill
-\textbf{Keywords:} Blockchain, Accounts, Clustering Heuristics, Entity Identification, Graph Representation Learning.\\
+\textbf{Keywords:} Blockchain, Web3, Accounts, Clustering Heuristics, Entity Identification, Graph Representation Learning.\\
 %\noindent\textbf{JEL:} X00, X00, X00
 \end{titlepage}
 
@@ -93,30 +101,23 @@ Given the negligible cost of creating blockchain addresses, the notion that one 
 %%% Contents & Declaration%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\pagenumbering{gobble}
+%\pagenumbering{gobble}
 
-\newpage
-\pagenumbering{Roman}
-\tableofcontents
+%\pagenumbering{Roman}
+%\tableofcontents
 
-\vfill
-\begin{center}
-\includegraphics[width=4cm]{../figures/logo_cif.png}
-\end{center}
-\newpage
-\singlespacing
+%\singlespacing
 %\vspace{-1.5cm}
-\section*{Declaration of Independent Authorship}
-I attest with my signature that I have written this work independently and without outside help. I also attest that the information concerning the sources used in this work is true and complete in every respect. All sources that have been quoted or paraphrased have been marked accordingly. 
-Additionally, I affirm that any text passages written with the help of AI-supported technology are marked as such, including a reference to the AI-supported program used. This paper may be checked for plagiarism and use of AI-supported technology using the appropriate software. I understand that unethical conduct may lead to a grade of 1 or ``fail`` or expulsion from the study program.\\
-
-Dario Thürkauf
-
-\begin{figure}[h!]
-	\centering
-	\hspace{-10cm}
-	\includegraphics[width=3cm]{../figures/signature.jpeg}
-\end{figure}
+%\section*{Declaration of Independent Authorship}
+%I attest with my signature that I have written this work independently and without outside help. I also attest that the information concerning the sources used in this work is true and complete in every respect. All sources that have been quoted or paraphrased have been marked accordingly. 
+%Additionally, I affirm that any text passages written with the help of AI-supported technology are marked as such, including a reference to the AI-supported program used. This paper may be checked for plagiarism and use of AI-supported technology using the appropriate software. I understand that unethical conduct may lead to a grade of 1 or ``fail`` or expulsion from the study program.\\
+%
+%Dario Thürkauf
+%\begin{figure}[h!]
+%	\centering
+%	\hspace{-10cm}
+%	\includegraphics[width=3cm]{../figures/signature.jpeg}
+%\end{figure}
 %%%%%%%%%%%%%%%%%%%%
 
 \newpage
@@ -141,20 +142,18 @@ With these considerations in mind, privacy, or lack thereof, is and will remain 
 %\textbf{Related work}
 Previous work in this field can be broadly categorized into methods developed for blockchains that use the unspent transaction output (UTXO) model, such as Bitcoin, and those that utilize the account-based model, like Ethereum and Polygon PoS. 
 While both models share the concept of addresses, the notion of accounts is absent in UTXO-based blockchains. The way in which transactions are processed is fundamentally different, and therefore, clustering heuristics are not applicable to both paradigms. \newline
-Several address clustering heuristics in the UTXO setup have been proposed for Bitcoin and its derivatives \citep{Androulaki2013, Meiklejohn2013, Haslhofer2016, jourdan2018, kappos2022}. However, these methods are outside the scope of this thesis and will not be discussed further. \newline 
+Several address clustering heuristics in the UTXO setup have been proposed for Bitcoin and its derivatives \citep{Androulaki2013, Meiklejohn2013, Haslhofer2016, jourdan2018, kappos2022}. However, these methods are outside the scope of this work and will not be discussed further. \newline 
 As suggested by \cite{nakamotoBitcoin2008} in the Bitcoin whitepaper, most Bitcoin wallet implementations use a new key pair for each transaction to keep them from being linked to a common owner. Unlike the UTXO model, native transactions in account-based blockchains can only move funds between a single sender and receiver, and the ``change`` remains in the sender account. Subsequent transactions necessarily use the same address again. Therefore, the account-based model essentially relies on address reuse at the protocol level \citep{Beres2020}. Consequently, privacy guarantees should be lower as participants typically only use a limited set of addresses. \newline
 Yet, despite these inherent characteristics of account-based blockchains, the development and research into address clustering heuristics remain in their infancy. 
 The first heuristics were introduced by \cite{FV:17}, who proposed and applied methods that exploit patterns related to deposit addresses, multiple participation in airdrops, and token authorization mechanisms. \newline
 \cite{Beres2020} propose more universally applicable methods, arguing that Victor’s heuristics assume participation in certain on-chain events. Their approach interprets transactions or token transfers as network graphs, with addresses as nodes and asset transfers as edges. They quantitatively compare graph-representation learning algorithms, a subset of machine learning, and propose further user profiling techniques based on time-of-day activity and transaction fee patterns. Using ENS address pairs as ground truth, the authors rigorously test their methods and apply their findings to significantly reduce the privacy guarantees of \textit{Tornado Cash}, a non-custodial privacy-enhancing protocol on Ethereum. \newline
 \cite{wu2022tutela} extend on one of \cite{Beres2020} graph representation learning algorithms and apply it at scale. Further, they propose a set of new clustering heuristics targeting Tornado Cash,  showing that careless user behavior can still reveal identity. Based on those heuristics, they developed an application to measure the anonymity of an Ethereum address. All of the aforementioned methods will be discussed in greater depth in Section 3. \newline
-Broadening the scope of entity identification, \cite{victorlüders2019} study the largest fungible token networks on Ethereum from a graph perspective. Similarly, \cite{casalebrunet2021} apply network graph analysis to various non-fungible token (NFT) ecosystems. Both find that many networks follow either a star or a hub-and-spoke pattern, similar to social network interaction graphs. Moreover, \cite{Payette2017} propose a segmentation of the Ethereum address space into four distinct behavior groups sharing similar attributes, while applying k-means clustering. \newline
+Broadening the scope of entity identification, \cite{victorlüders2019} study the largest fungible token networks on Ethereum from a graph perspective. Similarly, \cite{casalebrunet2021} apply network graph analysis to various non-fungible token (NFT) ecosystems. Both find that many networks follow either a star or a hub-and-spoke pattern, similar to social network interaction graphs. Moreover, using k-means clustering, \cite{Payette2017} propose a segmentation of the Ethereum address space into four distinct behavior groups sharing similar attributes. \newline
 Rather than treating users as entities and analyzing on-chain data, \cite{yu2023} propose a novel approach for correlation analysis by exploiting network information. Although this approach can potentially avoid the impact of privacy-enhancing technologies, it introduces new limitations and problems. Thus, this method may be of great interest for future research, particularly when privacy-enhancing techniques become more widely used.
 
-%\textbf{Our contribution}
 In this work, we perform entity identification on an address set containing 473,927 addresses. To obtain these addresses, a separate project collected snapshots of avatar activity in Decentraland over nine months from July 2022 to April 2023. Due to Decentraland's blockchain-based architecture, each avatar contains information about a user's Web3 address. \newline
 We test the applicability of existing heuristics, and if feasible, their efficacy in detecting entities using multiple addresses is evaluated.
 The main objective is to estimate the number of real-world entities these addresses represent. The clustering of addresses is limited to this set only, without considering any addresses outside of it, e.g., that were not registered in Decentraland during the given time frame. Furthermore, we introduce our heuristic for identifying address clusters and evaluate its suitability for implementation in other contexts. As of our knowledge, we are the first to cluster addresses within a predefined set on a large scale.
-%Anwenden/discuss/anpassen/erweitern and evaluate existing heuristics to my specific address set.
 
 The remainder of this paper is structured as follows: In Section 2, we provide a brief overview of the basic concepts necessary to understand the setup, including Ethereum accounts, tokens, Decentraland, and privacy-enhancing protocols. Section 3 describes our methodology for data collection and preparation. The fourth section provides a detailed explanation of various clustering heuristics. The fifth section applies the clustering heuristics described in section 4, after which we discuss the results of our analysis and summarize our findings in sections 6 and 7.
 
@@ -166,7 +165,7 @@ The remainder of this paper is structured as follows: In Section 2, we provide a
 \section{Preliminaries}
 
 \subsection{Contract Accounts and EOAs}
-Account-based blockchains usually distinguish between externally owned accounts (EOAs) and contract accounts (smart contracts). \textit{EOAs} derived and controlled by private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. \textit{Contract accounts} are controlled by the contract's code; their state can be modified through transactions sent to the contract, and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, the address is usually the last 20 bytes of the Keccak-256 hash derived from the sender's address and account nonce. \citep{GW:14}
+Account-based blockchains usually distinguish between externally owned accounts (EOAs) and contract accounts (smart contracts). \textit{EOAs} are derived from private keys and can be used to hold the native protocol asset, send and receive transactions, and interact with contract accounts. \textit{Contract accounts} are controlled by the contract's code; their state can be modified through transactions sent to the contract, and they cannot initiate transactions. \citep{buterin2014ethereum} \newline Each account has a 20-byte address encoded in hexadecimal. For EOAs, this address is based on the last 20 bytes of the Keccak-256 hash of the ECDSA public key. For contract accounts, the address is usually the last 20 bytes of the Keccak-256 hash derived from the sender's address and account nonce. \citep{GW:14}
 
 \subsection{Ethereum, Polygon PoS and the EVM}
 Ethereum and Polygon PoS are both smart contract-based account-model blockchains. They share the same execution logic - the Ethereum Virtual Machine (EVM).
@@ -184,28 +183,22 @@ These transfer events include the \textit{sender} and \textit{recipient} address
 \subsection{Decentraland}
 \textit{Decentraland} is the first large-scale blockchain-based virtual world, with well-known companies like Tommy Hilfiger, Samsung, PepsiCo, Diesel, Adidas, and Netflix actively engaging in it \citep{metaverse-retailing2023}.\newline
 Two main reasons make Decentraland an ideal platform for empirical research.
-\textit{First}, its open architecture allows compiling snapshots of user activity, including the users' location within the metaverse and Web3 address. Using this capability, \cite{metaverse-retailing2023} captured snapshots of avatar locations over a nine-month period and provided the collected addresses for this thesis.\newline
+\textit{First}, its open architecture allows compiling snapshots of user activity, including the users' location within the metaverse and Web3 address. Using this capability, \cite{metaverse-retailing2023} captured snapshots of avatar locations over a nine-month period and provided the collected addresses for this work.\newline
 \textit{Second}, users who connect their Web3 account can own various digital assets, such as monetary units, land parcels, and avatar collectibles (e.g., wearables, emotes, and names). Smart contracts on Ethereum and Polygon track and manage the ownership of these assets. This allows us to analyze the entire transaction history and derive information about the avatars' economic activity. \newline
-Initially, Decentraland launched with two native tokens. \textit{LAND}, a NFT compliant with ERC-721, manages the ownership of land parcels in Decentraland. \textit{MANA}, a fungible token compliant with ERC-20, is the in-world currency used to purchase digital goods and services. The majority of purchases and trades are settled in MANA. \newline 
-Moreover, the Decentraland core developers provide a smart-contract-based marketplace where users can buy or trade LAND or other in-game collectibles.
+Initially, Decentraland launched with two native tokens. \textit{LAND}, a NFT compliant with ERC-721, manages the ownership of land parcels in Decentraland. \textit{MANA}, a fungible token compliant with ERC-20, is the in-world currency used to purchase digital goods and services. The majority of purchases and trades are settled in MANA. Moreover, the Decentraland core developers provide a smart-contract-based marketplace where users can buy or trade LAND or other in-game collectibles.
 
 \subsection{Privacy-enhancing Protocols}
-Crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains \citep{nadler2023tornado}. At a high level, they are categorized into a custodial and a non-custodial setup. \newline
-In the custodial setup, users send their assets to a centralized service provider's public deposit address. After some delay, the provider returns the assets to a privately relayed recipient address. This approach is fully trust-based, as the service provider has complete control over the assets and access to the identifying data. \citep{wu2022tutela, nadler2023tornado} \newline 
-In contrast, non-custodial crypto asset mixers (or privacy-enhancing protocols), such as Tornado Cash, replace the trusted mixing party with a publicly verifiable smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This approach has the advantage that users do not have to share the identifying information with anyone, and there is no liquidity risk as the funds are locked. \citep{nadler2023tornado} \newline
+%Crypto-asset mixers are currently the most widely used approach to achieve privacy on public blockchains \citep{nadler2023tornado}. 
+At a high level, privacy-enhancing services or protocols are categorized into a custodial and a non-custodial setup. In the custodial setup, users send their assets to a centralized service provider's public deposit address. After some delay, the provider returns the assets to a privately relayed recipient address. This approach is fully trust-based, as the service provider has complete control over the assets and access to the identifying data. \citep{Beres2020, wu2022tutela, nadler2023tornado} \newline 
+In contrast, non-custodial privacy-enhancing protocols, such as Tornado Cash, replace the trusted mixing party with a publicly verifiable smart contract. They rely on cryptographic schemes that allow anyone to prove and independently verify the validity of a withdrawal without disclosing the link to a specific deposit. This approach has the advantage that users do not have to share the identifying information with anyone, and there is no liquidity risk as the funds are locked. \citep{nadler2023tornado} \newline
 In a nutshell, the mixer works in the following way: Various entities deposit the same amount of a specific crypto asset to a Tornado Cash smart contract acting as a pool. Anyone who has contributed to the pool may then generate a new address and withdraw their funds without revealing the link between the deposit and withdrawal addresses. This feature is achieved using zkSNARKs (zero-knowledge, succinct, non-interactive argument of knowledge). 
-Each depositor inserts a hash value in a Merkle tree.
-%Subsequently, users can withdraw their assets from the mixer whenever they consider that the size of the anonymity set is satisfactory.
+Each depositor inserts a hash value in a Merkle tree. Subsequently, users can withdraw their assets from the mixer whenever they consider that the size of the anonymity set is satisfactory.
  At the time of withdrawal, each legitimate withdrawer can prove unlinkably with a zero-knowledge proof that they know the pre-image of a previously inserted hash leaf in the Merkle tree. For a detailed technical description of the Tornado Cash protocol, see \cite{khovratovich2019tornado} or \cite{pertsev2019tornado}.
 \newline
-In the context of this thesis, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The set of all deposits that a particular withdrawal could be originated from is defined as the \textit{anonymity set}. 
+In the context of this work, it is sufficient to know that third parties can still observe the addresses that have deposited to and withdrawn from the pool. The set of all deposits that a particular withdrawal could be originated from is defined as the \textit{anonymity set}. 
 In theory, a larger anonymity set will provide a higher level of privacy since any withdrawal address could be linked to more deposit addresses. However, in practice, this principle does not always hold.
 Some users reveal the link between their withdrawal and deposit addresses, for example, by withdrawing from the pool with the same address they deposited or directly sending funds between the two addresses. This behavior also affects the privacy of other depositors. Careless use of the protocol, testing transactions, or external incentive mechanisms might be reasons for this behavior. \newline
 In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
-%In theory, a larger anonymity set will provide a higher level of privacy as third parties will not be able to link a specific depositor address to a specific withdrawal address. However, this is not always the case. For example, some users (might) withdraw from the pool with the same address as they deposited. According to \cite{nadler2023tornado}, careless use of the protocol, testing transactions or external incentive mechanisms might be reasons for this behaviour. \newline
-%In addition, \cite{Beres2020} and \cite{wu2022tutela} propose approaches to de-anonymize Tornado cash transactions using various clustering heuristics. These methods are discussed in more detail in section 4.
-%making use of address re-use, transaction activity, transaction cost choice, or more complex transaction graph and network analyses.
-
 
 %%%%%%%%%%%%
 %%% Data %%%
@@ -314,7 +307,7 @@ To construct the network graph, we use the intra-set asset transfers described i
 Using the network graph, node embedding algorithms seek to learn a function that projects a node to a $d$-dimensional vector representation (also called feature vector). This is a way of simplifying the graph information by associating each node with a point in the Euclidean space. Various node embedding algorithms have been developed and applied to different domains. \citep{rozemberczki2020difftovec} \newline
 The intuition behind node embeddings is that addresses interacting with the same set of addresses within the network graph should be close in Euclidean distance. \cite{Beres2020} cites two main reasons for this. \textit{First}, users with multiple accounts often interact with the same addresses or services from most of them. \textit{Second}, when users move funds between their personal addresses, they may unintentionally reveal their address clusters. \newline
 \cite{karateclub} provide a variety of node embedding algorithms as a Python library\footnote{\url{https://github.com/benedekrozemberczki/karateclub}}. They categorize the methods into neighborhood (proximity) preserving and structural. \newline
-We focus on the three methods that performed best in \cite{Beres2020} experiments: \textit{Diff2Vec} \citep{rozemberczki2020difftovec}, \textit{Role2Vec} \citep{ahmed2018roletovec}, and \textit{DeepWalk} \citep{perozzi2014}. Diff2Vec and DeepWalk are neighborhood-preserving methods, while Role2Vec is a structural node embedding method. Although all methods utilize random walks to capture graph information, their approaches to leveraging these random walks for constructing Euclidean feature vectors differ. A detailed explanation of each algorithm is beyond the scope of this thesis. The interested reader may consult the original publications. For a concise overview of Diff2Vec, please refer to \cite{wu2022tutela}. \newline
+We focus on the three methods that performed best in \cite{Beres2020} experiments: \textit{Diff2Vec} \citep{rozemberczki2020difftovec}, \textit{Role2Vec} \citep{ahmed2018roletovec}, and \textit{DeepWalk} \citep{perozzi2014}. Diff2Vec and DeepWalk are neighborhood-preserving methods, while Role2Vec is a structural node embedding method. Although all methods utilize random walks to capture graph information, their approaches to leveraging these random walks for constructing Euclidean feature vectors differ. A detailed explanation of each algorithm is beyond the scope of this work. The interested reader may consult the original publications. For a concise overview of Diff2Vec, please refer to \cite{wu2022tutela}. \newline
 With our intra-set asset transfer data (\ref{sec:intra-set}) and ENS address pairs (\ref{sec:ens}), we were able to apply and evaluate the node embedding methods described above. To use the library described by \cite{karateclub}, certain preprocessing steps for the network graph are required. Transactions must be treated as undirected edges, loops (self-transactions) and multi-edges must be removed. Moreover, nodes outside the largest connected component are excluded. The resulting network graph includes 51,566 nodes and 249,302 edges. \newline
 It is worth noting that unlike \cite{wu2022tutela}, we decided not to include edge weights. For instance, if Alice sent Bob Ether three times and Bob sent Alice Ether two times, the edge weight would correspond to five. This choice facilitated the application of \cite{rozemberczki2020difftovec}'s library and eliminated the need to develop a custom method. Based on our network graph, we generate 128-dimensional feature vectors for each address and method. \newline
 Given a node embedding, we can search for the closest $k$ vectors to any given vector. As in \cite{wu2022tutela}, we accomplish this using FAISS (Facebook AI Similarity Search), developed by \cite{johnson2019faiss}, which always returns a list of $k$ nodes, ranked by their Euclidean distance to the given node\footnote{We set $k = 51566$, the total number of nodes in the network graph}. \newline
@@ -328,7 +321,7 @@ Both methods will not be employed due to their significantly poorer stand-alone 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../figures/time-of-day-activity.png}
+	\includegraphics[width=0.9\textwidth]{../figures/time-of-day-activity.png}
 	\caption{Time-of-Day Activity Histogram and KDE for a Selected ENS Address Pair, Own Illustration Based on \cite{Beres2020}}
 	\label{fig:ToD}
 \end{figure} 
@@ -379,7 +372,7 @@ Notably, two address pairs are absent within the network graph and, therefore, d
   \centering
   \begin{tabular}{lrrr}
     \hline
-	User & \textbf{Diff2Vec} & \textbf{Role2Vec} & \textbf{DeepWalk} \\
+	\textbf{User} & \textbf{Diff2Vec} & \textbf{Role2Vec} & \textbf{DeepWalk} \\
 	\hline
     1 & 2.5 & 6.2 & 2.7 \\
     2 & 577.3 & 33.3 & 58.8 \\
@@ -459,9 +452,9 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
 \end{table}
 
 \subsection{LAND Transfers}
-To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers that occurred between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same user address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we filter out purchases cluster addresses that sent each other LAND without compensation. \newline
+To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers that occurred between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we exclude purchases and build clusters for addresses that sent each other LAND without compensation. \newline
 A total of 2159 intra-set LAND transfers were recorded, of those, 740 (X \%) were without compensation. We were able to group the 413 unique addresses from these uncompensated transfers into 161 distinct clusters. 
-Notably, the majority of clusters consist of two or three addresses. However, one cluster stands out, containing a significantly higher count of 71 addresses. \newline 
+Notably, the majority of clusters consist of two or three addresses. However, one cluster counting 71 addresses stands out. \newline 
 Figure \ref{fig:LAND_network} visualizes LAND transfers between Decentraland addresses as a token network graph. In this graph, red edges signify non-compensated transfers, whereas blue edges represent LAND transfers made as part of a trade/purchase. Notably, the 71-address cluster previously mentioned is visible on the top-right of the largest connected component. \newline
 A few key observations can be drawn from this network graph. In line with our expectations, most LAND transfers involve some form of compensation. Moreover, certain nodes play a central role in LAND trading activity, indicated by their high connectivity within the network. Lastly, a recurring behavior pattern is observed wherein an individual address purchases LAND and subsequently transfers it to a third address.
 
@@ -536,7 +529,7 @@ Role2Vec performed best for our small test sample but may not always superior to
 %%%%%%%%%%%%%%%%%%
 
 \section{Conclusion}
-This thesis aimed to determine how many unique entities correspond to the 473,927 addresses observed in Decentraland from July 16, 2022, to April 23, 2023. \newline
+This work aimed to determine how many unique entities correspond to the 473,927 addresses observed in Decentraland from July 16, 2022, to April 23, 2023. \newline
 By focusing on Ethereum and Polygon on-chain data, we narrowed the set down to 137,544 addresses. The required data was efficiently sourced by gathering all transactions and token transfers related to the addresses via Etherscan and Polygonscan. Furthermore, with the help of ENS, we found a way to detect address pairs with a very high probability of being controlled by the same user. These address pairs served as our ground truth when evaluating the node embedding algorithms. \newline
 We discussed several existing clustering heuristics and evaluated their suitability in our context. Among these heuristics, two were found to be appropriate for clustering a predefined set of addresses with the available data: self-authorization \citep{FV:17} and graph representation learning \citep{Beres2020}. We modified the graph representation learning approach for our research goal. %to align with our research goals, this is the first attempt to utilize intra-set asset transfers in constructing the network graph
 To the best of our knowledge, we are the first to employ intra-set asset transfers for constructing the network graph. Moreover, we introduced a novel clustering heuristic that identifies uncompensated transfers of high-value NFTs, particularly LAND. \newline
@@ -545,8 +538,15 @@ From the 137,544 addresses transacting on Polygon or Ethereum, we identified an 
 To enhance clustering performance, node embeddings could incorporate time-of-day activity and gas price selection patterns. This approach holds considerable promise for future research in entity identification. \newline
 A significant challenge for graph representation learning is the formation of clusters after node embedding. In our study, we relied on an Euclidean distance threshold for this purpose. However, the resulting number and size of clusters are highly sensitive to the precise selection of this threshold. \newline
 Notably, our approach is versatile and can be applied to other large predefined address sets. This adaptability is particularly significant given the increasing importance of determining the true number of users in various blockchain applications, especially in areas like Decentralized Finance or on-chain governance. \newline
-Although we were able to detect entity clusters, Decentraland still exhibits a lot of natural activity. Its open infrastructure presents vast opportunities for in-depth analysis of the virtual world, as demonstrated in this thesis. \newline
+Although we were able to detect entity clusters, Decentraland still exhibits a lot of natural activity. Its open infrastructure presents vast opportunities for in-depth analysis of the virtual world, as demonstrated in this work. \newline
 Address clustering will continue to make further advancements. From a user perspective, it is crucial that privacy-enhancing protocols continue to evolve and gain large-scale adoption. Additionally, education on preserving privacy when transacting on blockchains becomes an increasingly important topic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Acknowledgements %%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{Acknowledgements}
+I would like to thank Prof. Dr. Fabian Schär for his advice and support throughout the thesis and the opportunity to delve into this intriguing topic. My gratitude also extends to Mitchell Goldberg for his valuable inputs and discussions. Last but not least, a special thanks to Willy Thürkauf for his proof-reading.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Literaturverzeichnis %%%
@@ -622,13 +622,13 @@ For the complete repository including a documentation of each file and its purpo
 
 \texttt{\url{https://github.com/dariothuerkauf/address-clustering}}
 
-For raw data not available in the repository, please contact the authors directly.
-
-An early version of a generalized address clustering Python module can be found at:
-
-\texttt{\url{https://github.com/dariothuerkauf/intra-set-address-clustering}}
-
-This module fetches the required data from Etherscan and Polygonscan when given a set of addresses as input, applies the Role2Vec algorithm to the resulting intra-set asset transfer data, and then constructs the clusters using a Euclidean Distance threshold. Please note that this module is still under development.
+%For raw data not available in the repository, please contact the authors directly.
+%
+%An early version of a generalized address clustering Python module can be found at:
+%
+%\texttt{\url{https://github.com/dariothuerkauf/intra-set-address-clustering}}
+%
+%This module fetches the required data from Etherscan and Polygonscan when given a set of addresses as input, applies the Role2Vec algorithm to the resulting intra-set asset transfer data, and then constructs the clusters using a Euclidean Distance threshold. Please note that this module is still under development.
 
 
 \end{document}
