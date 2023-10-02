@@ -453,7 +453,7 @@ Clusters of size 50+ 	& 2 & 2 & 3 & 7 & 9  & 13 & 14\\
 
 \subsection{LAND Transfers}
 To implement the LAND transfer clustering heuristic, we select all transaction hashes of LAND transfers that occurred between two Decentraland addresses. Next, we gather all token and native asset transfers associated with the selected transaction hashes. We group the data by transaction hash and examine each transfer's sender (\texttt{from}) and recipient (\texttt{to}) address. If the same address appears as the sender and recipient, we mark the transaction as a purchase. Finally, we exclude purchases and build clusters for addresses that sent each other LAND without compensation. \newline
-A total of 2159 intra-set LAND transfers were recorded, of those, 740 (X \%) were without compensation. We were able to group the 413 unique addresses from these uncompensated transfers into 161 distinct clusters. 
+A total of 2159 intra-set LAND transfers were recorded, of those, 677 (X \%) were without compensation. We were able to group the 413 unique addresses from these uncompensated transfers into 161 distinct clusters. 
 Notably, the majority of clusters consist of two or three addresses. However, one cluster counting 71 addresses stands out. \newline 
 Figure \ref{fig:LAND_network} visualizes LAND transfers between Decentraland addresses as a token network graph. In this graph, red edges signify non-compensated transfers, whereas blue edges represent LAND transfers made as part of a trade/purchase. Notably, the 71-address cluster previously mentioned is visible on the top-right of the largest connected component. \newline
 A few key observations can be drawn from this network graph. In line with our expectations, most LAND transfers involve some form of compensation. Moreover, certain nodes play a central role in LAND trading activity, indicated by their high connectivity within the network. Lastly, a recurring behavior pattern is observed wherein an individual address purchases LAND and subsequently transfers it to a third address.
@@ -608,7 +608,7 @@ I would like to thank Prof. Dr. Fabian Schär for his advice and support through
 \end{table}
 %Distinction: Transaction is a message sent from an externally owned account
 
-\subsection{Github Repositories}
+\subsection{Github Repository}
 
 The code, figures, and data sets used for this thesis are hosted on Github. The repository is organized into the following directories:
 
